@@ -131,28 +131,88 @@ export default function PosteriorTorso({
 
             {/* Vertical Reference Lines */}
             {showVerticalLines && (
-              <g opacity="0.75">
+              <g opacity={isBright ? 0.95 : 0.75}>
                 {/* Horizontal V6 Level Line */}
-                <line x1="20" y1="275" x2="380" y2="275" stroke="#f43f5e" strokeWidth="1.5" strokeDasharray="4,4" />
-                <text x="375" y="270" fill="#e11d48" fontSize="7.5" fontWeight="bold" textAnchor="end">
+                <line
+                  x1="20"
+                  y1="275"
+                  x2="380"
+                  y2="275"
+                  stroke={isBright ? "#be123c" : "#f43f5e"}
+                  strokeWidth={isBright ? 2.0 : 1.5}
+                  strokeDasharray="4,4"
+                />
+                <text
+                  x="375"
+                  y="270"
+                  fill={isBright ? "#9f1239" : "#e11d48"}
+                  fontSize="7.5"
+                  fontWeight="bold"
+                  textAnchor="end"
+                >
                   Horizontal Plane of V6 (Crucial Reference)
                 </text>
 
                 {/* Left Posterior Axillary Line (PAL) for V7 */}
-                <line x1="112" y1="130" x2="112" y2="380" stroke="#f97316" strokeWidth="1.2" strokeDasharray="3,3" />
-                <text x="110" y="375" fill="#ea580c" fontSize="7" fontWeight="bold" textAnchor="end">
+                <line
+                  x1="112"
+                  y1="130"
+                  x2="112"
+                  y2="380"
+                  stroke={isBright ? "#c2410c" : "#f97316"}
+                  strokeWidth={isBright ? 1.8 : 1.2}
+                  strokeDasharray="3,3"
+                />
+                <text
+                  x="110"
+                  y="375"
+                  fill={isBright ? "#9a3412" : "#ea580c"}
+                  fontSize="7"
+                  fontWeight="bold"
+                  textAnchor="end"
+                >
                   Left Posterior Axillary (V7)
                 </text>
 
                 {/* Left Midscapular Line for V8 */}
-                <line x1="148" y1="140" x2="148" y2="395" stroke="#ec4899" strokeWidth="1.2" strokeDasharray="3,3" />
-                <text x="148" y="390" fill="#db2777" fontSize="7" fontWeight="bold" textAnchor="middle">
+                <line
+                  x1="148"
+                  y1="140"
+                  x2="148"
+                  y2="395"
+                  stroke={isBright ? "#be185d" : "#ec4899"}
+                  strokeWidth={isBright ? 1.8 : 1.2}
+                  strokeDasharray="3,3"
+                />
+                <text
+                  x="148"
+                  y="390"
+                  fill={isBright ? "#9d174d" : "#db2777"}
+                  fontSize="7"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
                   Left Midscapular Line (V8)
                 </text>
 
                 {/* Left Paraspinal Line for V9 */}
-                <line x1="180" y1="100" x2="180" y2="410" stroke="#8b5cf6" strokeWidth="1.2" strokeDasharray="3,3" />
-                <text x="180" y="405" fill="#7c3aed" fontSize="7" fontWeight="bold" textAnchor="middle">
+                <line
+                  x1="180"
+                  y1="100"
+                  x2="180"
+                  y2="410"
+                  stroke={isBright ? "#6d28d9" : "#8b5cf6"}
+                  strokeWidth={isBright ? 1.8 : 1.2}
+                  strokeDasharray="3,3"
+                />
+                <text
+                  x="180"
+                  y="405"
+                  fill={isBright ? "#581c87" : "#7c3aed"}
+                  fontSize="7"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
                   Left Paraspinal (V9)
                 </text>
               </g>

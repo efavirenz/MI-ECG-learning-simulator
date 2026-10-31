@@ -96,10 +96,10 @@ export default function Navbar({
             </div>
           </div>
 
-          {/* Top Right: Version Number (v4 in rounded rectangle) */}
+          {/* Top Right: Version Number (v4.1 in rounded rectangle) */}
           <div className="flex items-center gap-2">
             <span
-              title="Simulator Version 4"
+              title="Simulator Version 4.1"
               className={`px-2.5 py-1 rounded-lg border font-mono font-bold text-xs tracking-wider shadow-sm flex items-center gap-1.5 transition-colors ${
                 isBright
                   ? `${currentTheme.badgeBg} ${currentTheme.badgeBorder} ${currentTheme.badgeText}`
@@ -107,7 +107,7 @@ export default function Navbar({
               }`}
             >
               <span className={`w-1.5 h-1.5 rounded-full ${isBright ? 'bg-current' : 'bg-current'} animate-ping`} />
-              v4
+              v4.1
             </span>
           </div>
         </div>
@@ -184,20 +184,29 @@ export default function Navbar({
 
       {/* Auto-closing Hamburger Navigation & Theme Drawer */}
       {isMenuOpen && (
-        <div className="fixed inset-0 z-50 flex">
-          {/* Semi-transparent Backdrop (auto-closes on click) */}
+        <div
+          onClick={() => setIsMenuOpen(false)}
+          className="fixed inset-0 z-50 flex cursor-pointer"
+          role="dialog"
+          aria-modal="true"
+        >
+          {/* Semi-transparent Backdrop (auto-closes on click or touch) */}
           <div
             onClick={() => setIsMenuOpen(false)}
-            className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm transition-opacity"
-            aria-hidden="true"
+            onTouchEnd={() => setIsMenuOpen(false)}
+            className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm transition-opacity cursor-pointer"
+            aria-label="Close menu by tapping outside"
           />
 
           {/* Slide-in Drawer Content - Full Screen Height & Optimized Distribution */}
-          <div className={`relative z-10 w-full max-w-sm sm:max-w-md h-screen max-h-screen shadow-2xl flex flex-col justify-between p-4 sm:p-5 border-r transition-colors overflow-y-auto ${
-            isBright
-              ? 'bg-white border-slate-300 text-slate-900'
-              : 'bg-slate-900 border-slate-800 text-slate-100'
-          }`}>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`relative z-10 w-full max-w-sm sm:max-w-md h-screen max-h-screen shadow-2xl flex flex-col justify-between p-4 sm:p-5 border-r transition-colors overflow-y-auto cursor-default ${
+              isBright
+                ? 'bg-white border-slate-300 text-slate-900'
+                : 'bg-slate-900 border-slate-800 text-slate-100'
+            }`}
+          >
             <div className="space-y-4">
               {/* Drawer Header */}
               <div className="flex items-center justify-between pb-3 border-b border-slate-700/50">
@@ -217,7 +226,7 @@ export default function Navbar({
                       ? `${currentTheme.badgeBg} ${currentTheme.badgeBorder} ${currentTheme.badgeText} border`
                       : `bg-slate-800 ${currentTheme.accentText} border border-slate-700`
                   }`}>
-                    v4
+                    v4.1
                   </span>
                   <button
                     onClick={() => setIsMenuOpen(false)}
@@ -352,7 +361,7 @@ export default function Navbar({
             {/* Drawer Footer */}
             <div className="pt-3 border-t border-slate-700/50 text-[11px] text-slate-400 flex items-center justify-between">
               <span>ACC/AHA 2025 • ESC 2023</span>
-              <span className={`font-mono font-bold ${currentTheme.accentText}`}>Release v4</span>
+              <span className={`font-mono font-bold ${currentTheme.accentText}`}>Release v4.1</span>
             </div>
           </div>
         </div>

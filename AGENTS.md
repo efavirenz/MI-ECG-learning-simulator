@@ -99,6 +99,12 @@ MI-ECG-learning-simulator/
 - Do not create dead buttons, dummy links, or unclickable controls.
 - Maintain bidirectional synchronization between the active MI territory, the heart diagram, the torso diagrams, and the ECG waveform monitors.
 
+### Rule 6 — Mobile Responsiveness & Touch Ergonomics
+- The default initial module on application launch is **Module 1 (`ECG Basics`)**.
+- All educational data tables must feature horizontal touch scrolling (`overflow-x-auto touch-pan-x`) with explicit minimum widths (`min-w-[620px]`) so columns remain accessible on mobile phone viewports.
+- Drawers and dialog overlays must support dismiss-on-outside-click/tap across all desktop and mobile touch browsers (including iOS Safari).
+- Anatomical and thoracic reference lines must preserve high-contrast visibility across both dark and bright themes.
+
 ---
 
 ## 4. Verification Workflow for Agents

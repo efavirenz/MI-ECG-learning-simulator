@@ -202,30 +202,110 @@ export default function AnteriorTorso({
             <path d="M 165 75 Q 120 70 60 90" fill="none" stroke="#64748b" strokeWidth="3" />
             <path d="M 235 75 Q 280 70 340 90" fill="none" stroke="#64748b" strokeWidth="3" />
 
-            {/* Reference Vertical Lines */}
+            {/* Reference Vertical Lines (High contrast in bright theme) */}
             {showLines && (
-              <g opacity="0.6">
+              <g opacity={isBright ? 0.95 : 0.7}>
                 {/* Midsternal Line */}
-                <line x1="200" y1="80" x2="200" y2="460" stroke="#38bdf8" strokeWidth="1" strokeDasharray="4,4" />
-                <text x="203" y="95" fill="#38bdf8" fontSize="6.5">Midsternal Line</text>
+                <line
+                  x1="200"
+                  y1="80"
+                  x2="200"
+                  y2="460"
+                  stroke={isBright ? "#0284c7" : "#38bdf8"}
+                  strokeWidth={isBright ? 2.0 : 1.2}
+                  strokeDasharray="4,4"
+                />
+                <text
+                  x="203"
+                  y="95"
+                  fill={isBright ? "#0369a1" : "#38bdf8"}
+                  fontSize={isBright ? "7.5" : "6.5"}
+                  fontWeight="bold"
+                >
+                  Midsternal Line
+                </text>
 
                 {/* Left Midclavicular Line (Patient Left = diagram right) */}
-                <line x1="280" y1="90" x2="280" y2="460" stroke="#818cf8" strokeWidth="1" strokeDasharray="3,3" />
-                <text x="283" y="105" fill="#818cf8" fontSize="6.5">Left Midclavicular (MCL)</text>
+                <line
+                  x1="280"
+                  y1="90"
+                  x2="280"
+                  y2="460"
+                  stroke={isBright ? "#4338ca" : "#818cf8"}
+                  strokeWidth={isBright ? 2.0 : 1.2}
+                  strokeDasharray="3,3"
+                />
+                <text
+                  x="283"
+                  y="105"
+                  fill={isBright ? "#312e81" : "#818cf8"}
+                  fontSize={isBright ? "7.5" : "6.5"}
+                  fontWeight="bold"
+                >
+                  Left Midclavicular (MCL)
+                </text>
 
                 {/* Left Anterior Axillary Line */}
-                <line x1="315" y1="120" x2="315" y2="460" stroke="#a78bfa" strokeWidth="1" strokeDasharray="2,2" />
-                <text x="318" y="130" fill="#a78bfa" fontSize="6.5">Ant. Axillary (AAL)</text>
+                <line
+                  x1="315"
+                  y1="120"
+                  x2="315"
+                  y2="460"
+                  stroke={isBright ? "#6d28d9" : "#a78bfa"}
+                  strokeWidth={isBright ? 2.0 : 1.2}
+                  strokeDasharray="3,3"
+                />
+                <text
+                  x="318"
+                  y="130"
+                  fill={isBright ? "#581c87" : "#a78bfa"}
+                  fontSize={isBright ? "7.5" : "6.5"}
+                  fontWeight="bold"
+                >
+                  Ant. Axillary (AAL)
+                </text>
 
                 {/* Left Midaxillary Line */}
-                <line x1="345" y1="140" x2="345" y2="460" stroke="#c084fc" strokeWidth="1" strokeDasharray="2,2" />
-                <text x="348" y="150" fill="#c084fc" fontSize="6.5">Midaxillary (MAL)</text>
+                <line
+                  x1="345"
+                  y1="140"
+                  x2="345"
+                  y2="460"
+                  stroke={isBright ? "#7e22ce" : "#c084fc"}
+                  strokeWidth={isBright ? 2.0 : 1.2}
+                  strokeDasharray="3,3"
+                />
+                <text
+                  x="348"
+                  y="150"
+                  fill={isBright ? "#6b21a8" : "#c084fc"}
+                  fontSize={isBright ? "7.5" : "6.5"}
+                  fontWeight="bold"
+                >
+                  Midaxillary (MAL)
+                </text>
 
                 {/* Right Midclavicular Line (for V4R) */}
                 {showSupplementalRight && (
                   <>
-                    <line x1="120" y1="90" x2="120" y2="460" stroke="#fbbf24" strokeWidth="1" strokeDasharray="3,3" />
-                    <text x="65" y="105" fill="#fbbf24" fontSize="6.5">Right MCL (V4R)</text>
+                    <line
+                      x1="120"
+                      y1="90"
+                      x2="120"
+                      y2="460"
+                      stroke={isBright ? "#b45309" : "#fbbf24"}
+                      strokeWidth={isBright ? 2.0 : 1.2}
+                      strokeDasharray="3,3"
+                    />
+                    <text
+                      x="65"
+                      y="105"
+                      fill={isBright ? "#78350f" : "#fbbf24"}
+                      fontSize={isBright ? "7.5" : "6.5"}
+                      fontWeight="bold"
+                    >
+                      Right MCL (V4R)
+                    </text>
                   </>
                 )}
               </g>

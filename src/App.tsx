@@ -12,7 +12,7 @@ import { THEMES, DEFAULT_THEME_ID, getTheme } from './data/themes';
 import { ThemeProvider } from './context/ThemeContext';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<TabType>('localization');
+  const [activeTab, setActiveTab] = useState<TabType>('basics');
   const [selectedTerritoryId, setSelectedTerritoryId] = useState<string>('inferior');
   const [selectedElectrode, setSelectedElectrode] = useState<Electrode | null>(null);
 
@@ -159,7 +159,7 @@ export default function App() {
         }`}>
           <div className="max-w-7xl mx-auto px-4 space-y-2">
             <p className={`font-semibold ${currentTheme.accentText}`}>
-              Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator • Release v4
+              Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator • Release v4.1
             </p>
             <p className={`text-[11px] max-w-xl mx-auto ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
               Developed in accordance with the 2025 ACC/AHA ACS Guidelines, 2023 ESC ACS Guidelines, and Queensland Ambulance Service March 2026 Clinical Practice Procedures. Educational model only.

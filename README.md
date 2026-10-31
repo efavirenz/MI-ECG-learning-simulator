@@ -124,6 +124,17 @@ npm run preview
 
 ## 📝 Update History & Changelog
 
+### [v4.1] [2026-10-31] — Default Homepage, Outside-Tap Dismissal, High-Contrast Overlays & Mobile Table Scrolling
+- **Default Homepage Routing**:
+  - Set default landing view to `1. ECG Basics` on startup for optimal pedagogical progression.
+- **Hamburger Menu Outside Click/Tap Dismissal**:
+  - Implemented full backdrop event capture (`onClick` and `onTouchEnd` with `e.stopPropagation()` on drawer content), enabling seamless menu closure when tapping or clicking outside on mobile Safari (iOS) and desktop browsers.
+- **High-Contrast Thoracic Reference Lines**:
+  - In `2. Electrode Placement` and `3. Supplemental Leads`, elevated vertical reference line contrast in bright themes with saturated strokes ($1.8\text{--}2.0\text{ px}$), $0.95$ opacity, and bold dark typography (`#0369a1`, `#312e81`, `#581c87`, `#6b21a8`, `#78350f`) for crisp visibility on light chest walls.
+- **Mobile Horizontal Table Scrolling**:
+  - In `1. ECG Basics` (`10 Electrodes vs 12 Leads`), wrapped `Standard 12 Leads Generation Matrix` in an `overflow-x-auto touch-pan-x` container with `min-w-[620px]` and mobile swipe indicator, resolving column clipping on iPhone screens.
+- **Version Bump**: Updated application release badge to `v4.1`.
+
 ### [v4] [2026-10-31] — Theme Consistency, Responsive Waveforms, Jitter-Free Rendering & Placement Ergonomics
 - **Eliminated Redundant Concept Banner**:
   - Removed the `Synchronized Educational Core • Concept Triad` banner to streamline interface hierarchy.

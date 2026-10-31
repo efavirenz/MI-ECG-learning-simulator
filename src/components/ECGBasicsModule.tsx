@@ -114,38 +114,47 @@ export default function ECGBasicsModule() {
 
           {/* Full Lead Mapping Table */}
           <div className={`rounded-xl border overflow-hidden ${isBright ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
-            <div className={`px-4 py-3 font-bold flex items-center justify-between border-b ${
+            <div className={`px-4 py-3 font-bold flex flex-wrap items-center justify-between gap-1 border-b ${
               isBright ? 'bg-slate-100 text-slate-800 border-slate-200' : 'bg-slate-950 text-white border-slate-800'
             }`}>
-              <span>Standard 12 Leads Generation Matrix</span>
+              <div className="flex items-center gap-2">
+                <span>Standard 12 Leads Generation Matrix</span>
+                <span className="sm:hidden text-[10px] font-normal font-mono px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-700 dark:text-cyan-300">
+                  Swipe horizontally ↔
+                </span>
+              </div>
               <span className={`text-[11px] font-normal ${isBright ? 'text-slate-600' : 'text-slate-400'}`}>
                 How 10 physical electrodes produce 12 electrical views
               </span>
             </div>
-            <table className="w-full text-left">
-              <thead className={`border-b text-[11px] ${
-                isBright ? 'bg-slate-50 text-slate-600 border-slate-200' : 'bg-slate-950/60 text-slate-400 border-slate-800'
-              }`}>
-                <tr>
-                  <th className="p-3">Lead Name</th>
-                  <th className="p-3">Category</th>
-                  <th className="p-3">Electrodes Used / Reference Vector</th>
-                  <th className="p-3">Anatomical Myocardial View</th>
-                  <th className="p-3">Typical Perfusing Artery</th>
-                </tr>
-              </thead>
-              <tbody className={`divide-y ${isBright ? 'divide-slate-200 text-slate-800' : 'divide-slate-800 text-slate-200'}`}>
-                {LEAD_MAPPINGS.map((row, idx) => (
-                  <tr key={idx} className={isBright ? 'hover:bg-slate-50 transition' : 'hover:bg-slate-800/40 transition'}>
-                    <td className={`p-3 font-mono font-bold ${theme.accentText}`}>{row.leadName}</td>
-                    <td className={`p-3 ${isBright ? 'text-slate-600' : 'text-slate-400'}`}>{row.category}</td>
-                    <td className={`p-3 font-mono ${isBright ? 'text-slate-700' : 'text-slate-300'}`}>{row.electrodesUsed}</td>
-                    <td className={`p-3 font-medium ${isBright ? 'text-slate-900' : 'text-white'}`}>{row.viewOfHeart}</td>
-                    <td className="p-3 text-cyan-600 dark:text-cyan-300">{row.artery}</td>
+
+            {/* Horizontal Scrollable Table Container for Mobile Devices */}
+            <div className="w-full overflow-x-auto touch-pan-x overscroll-x-contain">
+              <table className="w-full min-w-[620px] text-left">
+                <thead className={`border-b text-[11px] ${
+                  isBright ? 'bg-slate-50 text-slate-600 border-slate-200' : 'bg-slate-950/60 text-slate-400 border-slate-800'
+                }`}>
+                  <tr>
+                    <th className="p-3">Lead Name</th>
+                    <th className="p-3">Category</th>
+                    <th className="p-3">Electrodes Used / Reference Vector</th>
+                    <th className="p-3">Anatomical Myocardial View</th>
+                    <th className="p-3">Typical Perfusing Artery</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className={`divide-y ${isBright ? 'divide-slate-200 text-slate-800' : 'divide-slate-800 text-slate-200'}`}>
+                  {LEAD_MAPPINGS.map((row, idx) => (
+                    <tr key={idx} className={isBright ? 'hover:bg-slate-50 transition' : 'hover:bg-slate-800/40 transition'}>
+                      <td className={`p-3 font-mono font-bold ${theme.accentText}`}>{row.leadName}</td>
+                      <td className={`p-3 ${isBright ? 'text-slate-600' : 'text-slate-400'}`}>{row.category}</td>
+                      <td className={`p-3 font-mono ${isBright ? 'text-slate-700' : 'text-slate-300'}`}>{row.electrodesUsed}</td>
+                      <td className={`p-3 font-medium ${isBright ? 'text-slate-900' : 'text-white'}`}>{row.viewOfHeart}</td>
+                      <td className="p-3 text-cyan-600 dark:text-cyan-300">{row.artery}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
