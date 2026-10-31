@@ -99,34 +99,98 @@ export default function ECGWaveformMonitor({
         const actualLead = leadKey === 'II_RHYTHM' ? 'II' : leadKey;
         const delta = territory.waveformDeltas[actualLead];
 
-        // Clear canvas
-        ctx.clearRect(0, 0, w, h);
-
         // Standard 25 mm/s paper speed
-        // Lead cards show 2.5s of ECG; continuous Lead II rhythm strip shows 5.0s
+        // Lead cards show 2.5s of ECG (62.5 mm); continuous Lead II rhythm strip shows 5.0s (125 mm)
         const durationSec = leadKey === 'II_RHYTHM' ? 5.0 : 2.5;
+        const totalHorizontalMm = durationSec * 25;
 
-        // Baseline (0 mV) in vertical center
-        const centerY = h * 0.55;
-        // Standard calibration: 10 mm/mV. On screen, scale so 1.0 mV occupies ~38-42% of half-height
-        const voltScale = (h * 0.38) / 1.0;
+        // Calibrated isometric ECG scale:
+        // 1 mm small box = pxPerMm (0.04s horizontally, 0.1 mV vertically)
+        // 5 mm large box = pxPerMm * 5 (0.20s horizontally, 0.5 mV vertically)
+        // 10 mm = 1.0 mV = 10 * pxPerMm
+        const smallBox = w / totalHorizontalMm;
+        const largeBox = smallBox * 5;
+        const voltScale = smallBox * 10;
+
+        // Place isoelectric baseline (0.0 mV) strictly on a major horizontal grid line
+        const baselineRow = Math.max(1, Math.round((h * 0.55) / largeBox));
+        const centerY = baselineRow * largeBox;
+
+        // 1. Draw Calibrated ECG Grid directly on canvas
+        ctx.fillStyle = paperMode === 'paper' ? '#fff9f5' : '#0a0f1d';
+        ctx.fillRect(0, 0, w, h);
+
+        // Minor grid lines (1 mm / 0.04s / 0.1 mV)
+        ctx.lineWidth = 0.5;
+        ctx.strokeStyle = paperMode === 'paper' ? 'rgba(244, 63, 94, 0.18)' : 'rgba(30, 58, 138, 0.35)';
+        ctx.beginPath();
+        for (let x = 0; x <= w; x += smallBox) {
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, h);
+        }
+        for (let y = centerY % smallBox; y <= h; y += smallBox) {
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y);
+        }
+        ctx.stroke();
+
+        // Major grid lines (5 mm / 0.20s / 0.5 mV)
+        ctx.lineWidth = 1.0;
+        ctx.strokeStyle = paperMode === 'paper' ? 'rgba(225, 29, 72, 0.40)' : 'rgba(37, 99, 235, 0.55)';
+        ctx.beginPath();
+        for (let x = 0; x <= w; x += largeBox) {
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, h);
+        }
+        for (let y = centerY % largeBox; y <= h; y += largeBox) {
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y);
+        }
+        ctx.stroke();
+
+        // Isoelectric Baseline Guide (0.0 mV / PR Segment)
+        ctx.lineWidth = 1.0;
+        ctx.strokeStyle = paperMode === 'paper' ? 'rgba(225, 29, 72, 0.65)' : 'rgba(56, 189, 248, 0.45)';
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(0, centerY);
+        ctx.lineTo(w, centerY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Standard Calibration Pulse on Lead II rhythm strip: 10 mm (1.0 mV) high, 5 mm (0.20s) wide
+        if (leadKey === 'II_RHYTHM') {
+          const pulseX = 4;
+          const pulseW = largeBox;
+          const pulseH = voltScale;
+          ctx.lineWidth = 1.8;
+          ctx.strokeStyle = paperMode === 'paper' ? '#be123c' : '#38bdf8';
+          ctx.beginPath();
+          ctx.moveTo(pulseX, centerY);
+          ctx.lineTo(pulseX, centerY - pulseH);
+          ctx.lineTo(pulseX + pulseW, centerY - pulseH);
+          ctx.lineTo(pulseX + pulseW, centerY);
+          ctx.stroke();
+
+          ctx.fillStyle = paperMode === 'paper' ? '#be123c' : '#38bdf8';
+          ctx.font = 'bold 8.5px monospace';
+          ctx.fillText('1.0 mV', pulseX + 2, centerY - pulseH - 3);
+        }
 
         // Calculate sweep position
         const sweepTime = timeRef.current % durationSec;
         const sweepX = (sweepTime / durationSec) * w;
-        // Width of the blanking erase gap ahead of the sweep beam
         const eraseWidth = Math.max(14, w * 0.05);
 
-        // 1. Draw Normal Reference Overlay (if enabled & current territory is abnormal)
+        // 2. Draw Normal Reference Overlay (if enabled & current territory is abnormal)
         if (showNormalOverlay && selectedTerritoryId !== 'normal') {
           ctx.beginPath();
-          ctx.strokeStyle = paperMode === 'paper' ? 'rgba(148, 163, 184, 0.65)' : 'rgba(100, 116, 139, 0.55)';
-          ctx.lineWidth = 1.2;
+          ctx.strokeStyle = paperMode === 'paper' ? 'rgba(100, 116, 139, 0.70)' : 'rgba(148, 163, 184, 0.55)';
+          ctx.lineWidth = 1.3;
           ctx.setLineDash([3, 3]);
 
-          // Draw normal overlay up to the sweep line
           const maxNormalX = isPlaying ? sweepX : w;
-          const normalSteps = Math.max(10, Math.floor(maxNormalX));
+          const normalSteps = Math.max(20, Math.floor(maxNormalX * 1.5));
           for (let i = 0; i <= normalSteps; i++) {
             const x = (i / normalSteps) * maxNormalX;
             const t = (x / w) * durationSec;
@@ -141,23 +205,24 @@ export default function ECGWaveformMonitor({
 
         // Determine active waveform trace color
         let activeColor = paperMode === 'paper' ? '#0f172a' : '#38bdf8';
-        if (delta?.stElevationMm) {
-          activeColor = paperMode === 'paper' ? '#dc2626' : '#f87171'; // Red for ST deviation
+        if (delta?.stElevationMm && delta.stElevationMm > 0) {
+          activeColor = paperMode === 'paper' ? '#dc2626' : '#f87171'; // Red for ST elevation
+        } else if (delta?.stElevationMm && delta.stElevationMm < 0) {
+          activeColor = paperMode === 'paper' ? '#0284c7' : '#38bdf8'; // Cyan for ST depression
         } else if (territory.reciprocalLeads.includes(actualLead)) {
           activeColor = paperMode === 'paper' ? '#0284c7' : '#38bdf8'; // Cyan for reciprocal
         }
 
-        // 2. Draw Previous Cycle Trace (Beyond the erase gap ahead of the cursor)
-        // This shows the prior sweep until the beam arrives to overwrite it
+        // 3. Draw Previous Cycle Trace (Beyond erase gap ahead of sweep beam)
         if (isPlaying && sweepX + eraseWidth < w) {
           ctx.beginPath();
-          ctx.strokeStyle = paperMode === 'paper' ? 'rgba(15, 23, 42, 0.30)' : 'rgba(56, 189, 248, 0.30)';
+          ctx.strokeStyle = paperMode === 'paper' ? 'rgba(15, 23, 42, 0.25)' : 'rgba(56, 189, 248, 0.25)';
           ctx.lineWidth = 1.8;
           ctx.lineJoin = 'round';
           ctx.lineCap = 'round';
 
           const startOldX = sweepX + eraseWidth;
-          const oldSteps = Math.max(10, Math.floor(w - startOldX));
+          const oldSteps = Math.max(10, Math.floor((w - startOldX) * 1.5));
           for (let i = 0; i <= oldSteps; i++) {
             const x = startOldX + (i / oldSteps) * (w - startOldX);
             const t = (x / w) * durationSec;
@@ -169,8 +234,7 @@ export default function ECGWaveformMonitor({
           ctx.stroke();
         }
 
-        // 3. Draw Active Fresh Trace (From x = 0 up to sweepX)
-        // This dynamically grows and updates in sync with the moving beam!
+        // 4. Draw Active Fresh Trace (From x = 0 up to sweepX)
         let headY = centerY;
         const currentTraceWidth = isPlaying ? sweepX : w;
 
@@ -181,7 +245,7 @@ export default function ECGWaveformMonitor({
           ctx.lineJoin = 'round';
           ctx.lineCap = 'round';
 
-          const activeSteps = Math.max(10, Math.floor(currentTraceWidth * 1.2));
+          const activeSteps = Math.max(10, Math.floor(currentTraceWidth * 1.5));
           for (let i = 0; i <= activeSteps; i++) {
             const x = (i / activeSteps) * currentTraceWidth;
             const t = (x / w) * durationSec;
@@ -197,7 +261,7 @@ export default function ECGWaveformMonitor({
           ctx.stroke();
         }
 
-        // 4. Draw Animated Sweep Cursor & Glowing Lead Head
+        // 5. Draw Animated Sweep Cursor & Glowing Lead Head
         if (isPlaying) {
           // Vertical sweeping line
           ctx.beginPath();
@@ -321,8 +385,8 @@ export default function ECGWaveformMonitor({
       <div
         className={`rounded-xl border p-4 transition-colors select-none ${
           paperMode === 'paper'
-            ? 'bg-[#fff9f5] border-rose-200 ecg-grid-paper text-slate-900'
-            : 'bg-[#0b1329] border-slate-800 ecg-grid-background text-slate-100'
+            ? 'bg-[#fff9f5] border-rose-200 text-slate-900'
+            : 'bg-[#080d1a] border-slate-800 text-slate-100'
         }`}
       >
         {/* Standard 3x4 Layout Matrix */}
@@ -337,10 +401,10 @@ export default function ECGWaveformMonitor({
                 <div
                   key={leadName}
                   onClick={() => setDetailLead(leadName)}
-                  className={`group relative rounded-lg border p-2 cursor-pointer transition shadow-sm hover:ring-2 hover:ring-rose-500 ${
+                  className={`group relative rounded-lg border p-2 cursor-pointer transition shadow-sm hover:ring-2 hover:ring-rose-500 overflow-hidden ${
                     paperMode === 'paper'
-                      ? 'bg-white/70 border-rose-200/80'
-                      : 'bg-slate-950/70 border-slate-800/80'
+                      ? 'bg-white/80 border-rose-200/90 shadow-rose-100/50'
+                      : 'bg-slate-950/80 border-slate-800/90'
                   } ${
                     isPrimary ? 'ring-2 ring-rose-500 bg-rose-950/20' : isReciprocal ? 'ring-1 ring-cyan-500 bg-cyan-950/20' : ''
                   }`}
@@ -348,7 +412,7 @@ export default function ECGWaveformMonitor({
                   {/* Lead Header */}
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-mono font-bold text-sm px-1.5 py-0.5 rounded bg-slate-900/80 text-white border border-slate-700">
+                      <span className="font-mono font-bold text-sm px-1.5 py-0.5 rounded bg-slate-900 text-white border border-slate-700">
                         {leadName}
                       </span>
                       {isPrimary && (
@@ -364,8 +428,12 @@ export default function ECGWaveformMonitor({
                     </div>
 
                     <div className="flex items-center gap-1">
-                      {delta?.stElevationMm && (
-                        <span className="font-mono text-xs font-bold text-rose-500">
+                      {delta?.stElevationMm !== undefined && delta.stElevationMm !== 0 && (
+                        <span
+                          className={`font-mono text-xs font-bold ${
+                            delta.stElevationMm > 0 ? 'text-rose-500' : 'text-cyan-400'
+                          }`}
+                        >
                           {delta.stElevationMm > 0 ? '+' : ''}{delta.stElevationMm} mm
                         </span>
                       )}
@@ -376,7 +444,7 @@ export default function ECGWaveformMonitor({
                   {/* Animated Lead Canvas */}
                   <canvas
                     ref={el => { canvasRefs.current[leadName] = el; }}
-                    className="w-full h-24 block"
+                    className="w-full h-24 block rounded"
                   />
                 </div>
               );
@@ -404,12 +472,12 @@ export default function ECGWaveformMonitor({
             </button>
           </div>
 
-          <div className={`rounded-lg border p-1 ${
-            paperMode === 'paper' ? 'bg-white/60 border-rose-200' : 'bg-slate-950/70 border-slate-800'
+          <div className={`rounded-lg border p-1 overflow-hidden ${
+            paperMode === 'paper' ? 'bg-white/80 border-rose-200' : 'bg-slate-950/80 border-slate-800'
           }`}>
             <canvas
               ref={el => { canvasRefs.current['II_RHYTHM'] = el; }}
-              className="w-full h-24 block"
+              className="w-full h-24 block rounded"
             />
           </div>
         </div>
@@ -440,9 +508,9 @@ export default function ECGWaveformMonitor({
                   <div
                     key={leadName}
                     onClick={() => setDetailLead(leadName)}
-                    className={`group relative rounded-lg border p-2 cursor-pointer transition shadow-sm hover:ring-2 hover:ring-amber-500 ${
+                    className={`group relative rounded-lg border p-2 cursor-pointer transition shadow-sm hover:ring-2 hover:ring-amber-500 overflow-hidden ${
                       paperMode === 'paper'
-                        ? 'bg-amber-50/70 border-amber-200'
+                        ? 'bg-amber-50/80 border-amber-200'
                         : 'bg-amber-950/20 border-amber-800/60'
                     } ${isPrimary ? 'ring-2 ring-amber-500' : ''}`}
                   >
@@ -450,8 +518,12 @@ export default function ECGWaveformMonitor({
                       <span className="font-mono font-bold text-xs px-1.5 py-0.5 rounded bg-slate-900 text-white border border-slate-700">
                         {leadName}
                       </span>
-                      {delta?.stElevationMm && (
-                        <span className="font-mono text-xs font-bold text-amber-500">
+                      {delta?.stElevationMm !== undefined && delta.stElevationMm !== 0 && (
+                        <span
+                          className={`font-mono text-xs font-bold ${
+                            delta.stElevationMm > 0 ? 'text-amber-500' : 'text-cyan-400'
+                          }`}
+                        >
                           {delta.stElevationMm > 0 ? '+' : ''}{delta.stElevationMm} mm
                         </span>
                       )}
@@ -459,7 +531,7 @@ export default function ECGWaveformMonitor({
 
                     <canvas
                       ref={el => { canvasRefs.current[leadName] = el; }}
-                      className="w-full h-20 block"
+                      className="w-full h-20 block rounded"
                     />
                   </div>
                 );

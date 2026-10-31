@@ -124,7 +124,29 @@ npm run preview
 
 ## 📝 Update History & Changelog
 
-### [2026-10-31] — Clinical ECG Waveform Precision & Interactive State Enhancements
+### [v3] [2026-10-31] — Layout Optimization, Version Badge, Navigation Drawer & Color Themes
+- **Active MI State Dropdown Relocation**:
+  - Moved the interactive territory selector from the top-right header to a dedicated centered row between the simulator subtitle (`Interactive Clinical Simulator: Anatomy → Electrodes → ECG Waveforms`) and the navigation tabs (`1. ECG Basics`).
+  - Aligned center with responsive screen-fitted width (`max-w-3xl`) for seamless visibility across mobile, tablet, and widescreen desktop displays.
+- **Release Version Badge**:
+  - Added a dedicated `v3` indicator in a rounded rectangle badge at the top-right of the header with status pulse.
+- **Slide-in Hamburger Menu (Auto-Closing)**:
+  - Added a top-left hamburger menu (`Menu` icon) providing convenient access to all 7 curriculum modules:
+    1. `1. ECG Basics`
+    2. `2. Electrode Placement`
+    3. `3. Supplemental Leads`
+    4. `4. MI Localization`
+    5. `5. Waveform Simulator`
+    6. `6. Cases & Quiz`
+    7. `7. References & Criteria`
+  - Automatically closes upon module selection or backdrop click.
+- **10 Color Themes (5 Bright & 5 Dark)**:
+  - Embedded a full 10-palette clinical theme switcher directly within the hamburger drawer:
+    - **5 Bright Themes**: Pink ECG Paper (classic grid paper), Clinical White (hospital clean), Mint Health (emerald soft), Sky Pediatric (crisp sky), and Warm Clinic (amber parchment).
+    - **5 Dark Themes**: Telemetry Navy (default ICU monitor), Obsidian Cath-Lab (deep charcoal black), Bio-Monitor Green (biomedical telemetry), Deep Cobalt ICU (cardiac monitoring), and Critical Care Violet (high-contrast violet).
+  - Theme preference is automatically persisted across browser sessions via `localStorage` and synchronized with the ECG paper view mode.
+
+### [v2] [2026-10-31] — Clinical ECG Waveform Precision & Interactive State Enhancements
 - **Global Active MI State Dropdown**:
   - Replaced the static text badge in the top-right header with an interactive grouped `<select>` dropdown menu.
   - Allows instant switching between Normal Baseline, 9 STEMI territories, and STEMI mimics from any screen or module.
