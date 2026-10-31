@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { MI_TERRITORIES, MITerritory } from '../data/miTerritories';
 import { Activity, ShieldAlert, Sparkles, CheckCircle2, ChevronRight } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 interface HeartTerritoryViewProps {
   selectedTerritoryId: string;
@@ -11,6 +12,7 @@ export default function HeartTerritoryView({
   selectedTerritoryId,
   onSelectTerritory
 }: HeartTerritoryViewProps) {
+  const { theme, isBright } = useTheme();
   const [viewOrientation, setViewOrientation] = useState<'anterior' | 'posterior'>('anterior');
 
   const currentTerritory: MITerritory = MI_TERRITORIES[selectedTerritoryId] || MI_TERRITORIES['normal'];
@@ -40,18 +42,18 @@ export default function HeartTerritoryView({
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl flex flex-col xl:flex-row gap-6">
+    <div className={`border rounded-xl p-4 shadow-xl flex flex-col xl:flex-row gap-6 transition-colors ${theme.cardBg} ${theme.cardBorder}`}>
       {/* Left: Interactive 2D Vector Heart Diagram */}
       <div className="flex-1 flex flex-col items-center">
         {/* View Toggle Bar */}
         <div className="w-full flex items-center justify-between mb-3 px-2 text-xs">
-          <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-lg border border-slate-800">
+          <div className={`flex items-center gap-1.5 p-1 rounded-lg border ${theme.cardSubBg} ${theme.cardBorder}`}>
             <button
               onClick={() => setViewOrientation('anterior')}
               className={`px-3 py-1 rounded font-medium transition ${
                 viewOrientation === 'anterior'
-                  ? 'bg-rose-600 text-white shadow'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? `${theme.accentBg} shadow`
+                  : isBright ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               Anterior Heart View (Sternocostal)
@@ -60,21 +62,23 @@ export default function HeartTerritoryView({
               onClick={() => setViewOrientation('posterior')}
               className={`px-3 py-1 rounded font-medium transition ${
                 viewOrientation === 'posterior'
-                  ? 'bg-rose-600 text-white shadow'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? `${theme.accentBg} shadow`
+                  : isBright ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               Posterior / Inferior View (Diaphragmatic)
             </button>
           </div>
 
-          <span className="text-[11px] font-mono font-medium text-slate-400">
-            Current: <span className="text-rose-400 font-bold">{currentTerritory.name}</span>
+          <span className={`text-[11px] font-mono font-medium ${theme.subtextColor}`}>
+            Current: <span className={`${theme.accentText} font-bold`}>{currentTerritory.name}</span>
           </span>
         </div>
 
         {/* Anatomical Heart 2D SVG */}
-        <div className="relative w-full max-w-[480px] aspect-[1/1] bg-slate-950/70 rounded-xl border border-slate-800 p-2 flex items-center justify-center select-none overflow-hidden">
+        <div className={`relative w-full max-w-[480px] aspect-[1/1] rounded-xl border p-2 flex items-center justify-center select-none overflow-hidden transition-colors ${
+          isBright ? 'bg-slate-100 border-slate-300' : 'bg-slate-950/70 border-slate-800'
+        }`}>
           <svg viewBox="0 0 400 400" className="w-full h-full">
             <defs>
               <linearGradient id="heartBaseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -328,15 +332,16 @@ export default function HeartTerritoryView({
                 onClick={() => {
                   onSelectTerritory(key);
                   if (key === 'posterior' || key === 'inferior') {
-                    // hint posterior view if selected
                     if (key === 'posterior') setViewOrientation('posterior');
                   } else {
                     setViewOrientation('anterior');
                   }
                 }}
-                className={`px-2.5 py-1 rounded text-xs font-semibold transition border flex items-center gap-1.5 ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition border flex items-center gap-1.5 ${
                   isSelected
-                    ? 'bg-rose-600 text-white border-rose-400 shadow-md scale-105'
+                    ? `${theme.accentBg} ${theme.accentBorder} shadow-md scale-105 font-bold`
+                    : isBright
+                    ? 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
                     : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 hover:border-slate-600'
                 }`}
               >
@@ -348,8 +353,8 @@ export default function HeartTerritoryView({
         </div>
 
         {/* Mimics Selector Buttons */}
-        <div className="w-full mt-2 pt-2 border-t border-slate-800 flex items-center justify-center gap-2 text-xs">
-          <span className="text-slate-400">STEMI Mimics:</span>
+        <div className={`w-full mt-2 pt-2 border-t flex items-center justify-center gap-2 text-xs ${isBright ? 'border-slate-200' : 'border-slate-800'}`}>
+          <span className={theme.subtextColor}>STEMI Mimics:</span>
           {mimicsKeys.map(key => {
             const terr = MI_TERRITORIES[key];
             const isSelected = selectedTerritoryId === key;
@@ -357,9 +362,11 @@ export default function HeartTerritoryView({
               <button
                 key={key}
                 onClick={() => onSelectTerritory(key)}
-                className={`px-2 py-0.5 rounded text-xs font-medium transition border ${
+                className={`px-2.5 py-0.5 rounded-lg text-xs font-medium transition border ${
                   isSelected
-                    ? 'bg-indigo-600 text-white border-indigo-400'
+                    ? 'bg-indigo-600 text-white border-indigo-400 font-bold shadow-sm'
+                    : isBright
+                    ? 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100'
                     : 'bg-slate-800/80 text-slate-400 border-slate-700 hover:text-white'
                 }`}
               >
@@ -371,32 +378,36 @@ export default function HeartTerritoryView({
       </div>
 
       {/* Right: Synchronized Territory Details & ECG Leads Box */}
-      <div className="w-full xl:w-96 flex flex-col justify-between bg-slate-950/70 border border-slate-800 rounded-xl p-4">
+      <div className={`w-full xl:w-96 flex flex-col justify-between border rounded-xl p-4 transition-colors ${theme.cardSubBg} ${theme.cardBorder}`}>
         <div className="space-y-3.5 text-xs">
           {/* Header */}
-          <div className="border-b border-slate-800 pb-2">
-            <span className="text-[10px] uppercase font-mono tracking-wider text-rose-400 font-bold flex items-center gap-1">
+          <div className={`border-b pb-2 ${isBright ? 'border-slate-200' : 'border-slate-800'}`}>
+            <span className={`text-[10px] uppercase font-mono tracking-wider font-bold flex items-center gap-1 ${theme.accentText}`}>
               <Activity className="w-3.5 h-3.5" /> Myocardial Territory Profile
             </span>
-            <h3 className="text-base font-bold text-white mt-0.5">
+            <h3 className={`text-base font-bold mt-0.5 ${theme.headingColor}`}>
               {currentTerritory.name}
             </h3>
-            <p className="text-slate-300 text-xs mt-1">
+            <p className={`text-xs mt-1 ${theme.subtextColor}`}>
               {currentTerritory.shortDescription}
             </p>
           </div>
 
           {/* Primary Leads Highlight */}
           {currentTerritory.primaryLeads.length > 0 && (
-            <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5">
-              <span className="font-semibold text-rose-400 uppercase tracking-wide text-[11px] block mb-1">
+            <div className={`border rounded-lg p-2.5 ${isBright ? 'bg-white border-slate-200' : 'bg-slate-900/90 border-slate-800'}`}>
+              <span className={`font-semibold uppercase tracking-wide text-[11px] block mb-1 ${theme.accentText}`}>
                 Primary Contiguous ECG Leads:
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {currentTerritory.primaryLeads.map(lead => (
                   <span
                     key={lead}
-                    className="px-2 py-0.5 bg-rose-600/30 border border-rose-500/60 text-rose-200 font-mono font-bold rounded"
+                    className={`px-2 py-0.5 font-mono font-bold rounded border ${
+                      isBright 
+                        ? 'bg-rose-100 border-rose-300 text-rose-800' 
+                        : 'bg-rose-600/30 border-rose-500/60 text-rose-200'
+                    }`}
                   >
                     {lead}
                   </span>
@@ -407,15 +418,19 @@ export default function HeartTerritoryView({
 
           {/* Reciprocal Leads */}
           {currentTerritory.reciprocalLeads.length > 0 && (
-            <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5">
-              <span className="font-semibold text-cyan-400 uppercase tracking-wide text-[11px] block mb-1">
+            <div className={`border rounded-lg p-2.5 ${isBright ? 'bg-white border-slate-200' : 'bg-slate-900/90 border-slate-800'}`}>
+              <span className="font-semibold text-cyan-600 dark:text-cyan-400 uppercase tracking-wide text-[11px] block mb-1">
                 Reciprocal Mirror ECG Leads:
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {currentTerritory.reciprocalLeads.map(lead => (
                   <span
                     key={lead}
-                    className="px-2 py-0.5 bg-cyan-950/60 border border-cyan-500/50 text-cyan-300 font-mono font-bold rounded"
+                    className={`px-2 py-0.5 font-mono font-bold rounded border ${
+                      isBright 
+                        ? 'bg-cyan-50 border-cyan-200 text-cyan-800' 
+                        : 'bg-cyan-950/60 border-cyan-500/50 text-cyan-300'
+                    }`}
                   >
                     {lead}
                   </span>
@@ -426,40 +441,44 @@ export default function HeartTerritoryView({
 
           {/* Culprit Artery & Dominance Notes */}
           <div>
-            <span className="font-semibold text-amber-400 uppercase tracking-wide text-[11px] block mb-0.5">
+            <span className="font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide text-[11px] block mb-0.5">
               Culprit Vessel & Anatomy:
             </span>
-            <p className="text-slate-200 font-medium">
+            <p className={`font-semibold ${isBright ? 'text-slate-900' : 'text-slate-200'}`}>
               {currentTerritory.culpritArtery}
             </p>
-            <p className="text-slate-400 text-[11px] mt-1 leading-snug">
+            <p className={`text-[11px] mt-1 leading-snug ${theme.subtextColor}`}>
               {currentTerritory.coronaryAnatomyNotes}
             </p>
           </div>
 
           {/* Expected Waveform Abnormalities */}
-          <div className="space-y-1 bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
-            <span className="font-semibold text-emerald-400 uppercase tracking-wide text-[11px] block mb-1">
+          <div className={`space-y-1 p-2.5 rounded-lg border ${
+            isBright ? 'bg-white border-slate-200 text-slate-800' : 'bg-slate-900/60 border-slate-800 text-slate-200'
+          }`}>
+            <span className="font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide text-[11px] block mb-1">
               Hallmark ECG Abnormalities:
             </span>
-            <p className="text-slate-300">
-              <strong className="text-slate-200">ST Segment:</strong> {currentTerritory.expectedECG.stSegment}
+            <p className={`text-xs ${theme.subtextColor}`}>
+              <strong className={isBright ? 'text-slate-900' : 'text-slate-200'}>ST Segment:</strong> {currentTerritory.expectedECG.stSegment}
             </p>
-            <p className="text-slate-300">
-              <strong className="text-slate-200">T Wave:</strong> {currentTerritory.expectedECG.tWave}
+            <p className={`text-xs ${theme.subtextColor}`}>
+              <strong className={isBright ? 'text-slate-900' : 'text-slate-200'}>T Wave:</strong> {currentTerritory.expectedECG.tWave}
             </p>
-            <p className="text-slate-300">
-              <strong className="text-slate-200">Q Wave:</strong> {currentTerritory.expectedECG.qWave}
+            <p className={`text-xs ${theme.subtextColor}`}>
+              <strong className={isBright ? 'text-slate-900' : 'text-slate-200'}>Q Wave:</strong> {currentTerritory.expectedECG.qWave}
             </p>
           </div>
 
           {/* Supplemental Leads Recommendation Callout */}
           {currentTerritory.supplementalLeadsRecommended && (
-            <div className="p-2.5 bg-amber-950/40 border border-amber-500/40 rounded-lg">
-              <span className="font-bold text-amber-300 flex items-center gap-1 mb-1 text-[11px]">
+            <div className={`p-2.5 rounded-lg border ${
+              isBright ? 'bg-amber-50 border-amber-200 text-slate-800' : 'bg-amber-950/40 border-amber-500/40 text-slate-200'
+            }`}>
+              <span className="font-bold text-amber-700 dark:text-amber-300 flex items-center gap-1 mb-1 text-[11px]">
                 <Sparkles className="w-3.5 h-3.5" /> Acquire Supplemental Leads: {currentTerritory.supplementalLeadsRecommended.leads.join(', ')}
               </span>
-              <p className="text-amber-200/90 text-xs">
+              <p className={`text-xs ${isBright ? 'text-slate-700' : 'text-amber-200/90'}`}>
                 {currentTerritory.supplementalLeadsRecommended.clinicalPearl}
               </p>
             </div>
@@ -467,13 +486,13 @@ export default function HeartTerritoryView({
 
           {/* Clinical Pearls */}
           <div>
-            <span className="font-semibold text-indigo-400 uppercase tracking-wide text-[11px] block mb-1">
+            <span className="font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide text-[11px] block mb-1">
               Practical Clinical Pearls:
             </span>
-            <ul className="space-y-1 text-slate-300">
+            <ul className={`space-y-1 ${theme.subtextColor}`}>
               {currentTerritory.clinicalPearls.map((p, idx) => (
                 <li key={idx} className="flex items-start gap-1.5 leading-snug">
-                  <ChevronRight className="w-3 h-3 text-indigo-400 flex-shrink-0 mt-0.5" />
+                  <ChevronRight className="w-3 h-3 text-indigo-500 flex-shrink-0 mt-0.5" />
                   <span>{p}</span>
                 </li>
               ))}
@@ -482,7 +501,9 @@ export default function HeartTerritoryView({
         </div>
 
         {/* Anatomical Variation Note */}
-        <div className="mt-3 pt-2 border-t border-slate-800 text-[10px] text-slate-400 flex items-start gap-1.5">
+        <div className={`mt-3 pt-2 border-t text-[10px] flex items-start gap-1.5 ${
+          isBright ? 'border-slate-200 text-slate-500' : 'border-slate-800 text-slate-400'
+        }`}>
           <ShieldAlert className="w-3.5 h-3.5 text-slate-400 flex-shrink-0 mt-0.5" />
           <span>
             Clinical Note: ECG lead territories represent typical electrical projections. Biological variation in coronary dominance and collateral channels means findings are supportive, not an absolute one-to-one anatomical map.

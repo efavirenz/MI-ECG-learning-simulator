@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { MI_TERRITORIES } from '../data/miTerritories';
 import { getEcgVoltage } from '../utils/ecgGenerator';
 import LeadDetailModal from './LeadDetailModal';
+import { useTheme } from '../context/ThemeContext';
 import {
   Play,
   Pause,
@@ -24,6 +25,7 @@ export default function ECGWaveformMonitor({
   paperMode,
   onTogglePaperMode
 }: ECGWaveformMonitorProps) {
+  const { theme, isBright } = useTheme();
   const [isPlaying, setIsPlaying] = useState(true);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
   const [showSupplemental, setShowSupplemental] = useState(false);
@@ -40,11 +42,23 @@ export default function ECGWaveformMonitor({
   // Canvas elements refs
   const canvasRefs = useRef<Record<string, HTMLCanvasElement | null>>({});
 
-  // 12 Leads in standard clinical 3x4 layout
-  const standardLayout: string[][] = [
-    ['I', 'aVR', 'V1', 'V4'],
-    ['II', 'aVL', 'V2', 'V5'],
-    ['III', 'aVF', 'V3', 'V6']
+  // Clinically sorted lead list:
+  // On mobile (single column): displays limb leads first (I, II, III, aVR, aVL, aVF) then precordial (V1-V6)
+  // On desktop (md: 4 columns x 3 rows): placed via CSS grid into standard 3x4 layout:
+  // Col 1: I, II, III | Col 2: aVR, aVL, aVF | Col 3: V1, V2, V3 | Col 4: V4, V5, V6
+  const clinicalOrderedLeads: { name: string; gridClass: string }[] = [
+    { name: 'I', gridClass: 'md:col-start-1 md:row-start-1' },
+    { name: 'II', gridClass: 'md:col-start-1 md:row-start-2' },
+    { name: 'III', gridClass: 'md:col-start-1 md:row-start-3' },
+    { name: 'aVR', gridClass: 'md:col-start-2 md:row-start-1' },
+    { name: 'aVL', gridClass: 'md:col-start-2 md:row-start-2' },
+    { name: 'aVF', gridClass: 'md:col-start-2 md:row-start-3' },
+    { name: 'V1', gridClass: 'md:col-start-3 md:row-start-1' },
+    { name: 'V2', gridClass: 'md:col-start-3 md:row-start-2' },
+    { name: 'V3', gridClass: 'md:col-start-3 md:row-start-3' },
+    { name: 'V4', gridClass: 'md:col-start-4 md:row-start-1' },
+    { name: 'V5', gridClass: 'md:col-start-4 md:row-start-2' },
+    { name: 'V6', gridClass: 'md:col-start-4 md:row-start-3' },
   ];
 
   const supplementalLeads = ['V3R', 'V4R', 'V7', 'V8', 'V9'];
@@ -56,7 +70,7 @@ export default function ECGWaveformMonitor({
     }
   }, [selectedTerritoryId]);
 
-  // Main synchronized rendering loop
+  // Main synchronized rendering loop with rock-solid, jitter-free fixed pixel sampling
   useEffect(() => {
     const render = (timestamp: number) => {
       if (!lastTimestampRef.current) lastTimestampRef.current = timestamp;
@@ -69,7 +83,7 @@ export default function ECGWaveformMonitor({
 
       // Leads to render
       const leadsToDraw = [
-        ...standardLayout.flat(),
+        ...clinicalOrderedLeads.map(l => l.name),
         'II_RHYTHM',
         ...(showSupplemental ? supplementalLeads : [])
       ];
@@ -101,16 +115,13 @@ export default function ECGWaveformMonitor({
         const isRhythmStrip = leadKey === 'II_RHYTHM';
 
         // Standard 25 mm/s paper speed & 10 mm/mV voltage calibration
-        // Calibrate physical millimeter scale on screen to ensure tall R waves and deep S waves never clip:
         const targetMm = isRhythmStrip ? Math.max(150, w / 4.0) : 62.5; // 2.5s = 62.5 mm
         const smallBox = Math.max(3.5, Math.min(4.2, w / targetMm));
         const largeBox = smallBox * 5;
         const voltScale = smallBox * 10; // 1.0 mV = 10 mm = 10 small boxes
         const durationSec = isRhythmStrip ? (w / (smallBox * 25)) : 2.5;
 
-        // Place isoelectric baseline (0.0 mV) strictly on a major horizontal grid line with anti-clipping clearance:
-        // Lead II rhythm strip: 60% height gives 30+ px clearance above for tall Lead II R waves (1.25 mV)
-        // 3x4 lead cards: 52% height balances clearance for tall R (V4-V5: 1.45 mV) and deep S (V1-V2: -1.45 mV)
+        // Place isoelectric baseline strictly on a major horizontal grid line
         const baselineRatio = isRhythmStrip ? 0.60 : 0.52;
         const baselineRow = Math.max(1, Math.round((h * baselineRatio) / largeBox));
         const centerY = baselineRow * largeBox;
@@ -181,6 +192,9 @@ export default function ECGWaveformMonitor({
         const sweepX = (sweepTime / durationSec) * w;
         const eraseWidth = Math.max(14, w * 0.05);
 
+        // Fixed 1.0 CSS pixel increment ensures rock-solid, jitter-free waveform rendering
+        const stepPx = 1.0;
+
         // 2. Draw Normal Reference Overlay (if enabled & current territory is abnormal)
         if (showNormalOverlay && selectedTerritoryId !== 'normal') {
           ctx.beginPath();
@@ -189,14 +203,18 @@ export default function ECGWaveformMonitor({
           ctx.setLineDash([3, 3]);
 
           const maxNormalX = isPlaying ? sweepX : w;
-          const normalSteps = Math.max(20, Math.floor(maxNormalX * 1.5));
-          for (let i = 0; i <= normalSteps; i++) {
-            const x = (i / normalSteps) * maxNormalX;
+          for (let x = 0; x <= maxNormalX; x += stepPx) {
             const t = (x / w) * durationSec;
             const v = getEcgVoltage(actualLead, t, 'normal', 75);
             const y = centerY - v * voltScale;
-            if (i === 0) ctx.moveTo(x, y);
+            if (x === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
+          }
+          if (maxNormalX % stepPx !== 0) {
+            const t = (maxNormalX / w) * durationSec;
+            const v = getEcgVoltage(actualLead, t, 'normal', 75);
+            const y = centerY - v * voltScale;
+            ctx.lineTo(maxNormalX, y);
           }
           ctx.stroke();
           ctx.setLineDash([]);
@@ -221,13 +239,12 @@ export default function ECGWaveformMonitor({
           ctx.lineCap = 'round';
 
           const startOldX = sweepX + eraseWidth;
-          const oldSteps = Math.max(10, Math.floor((w - startOldX) * 1.5));
-          for (let i = 0; i <= oldSteps; i++) {
-            const x = startOldX + (i / oldSteps) * (w - startOldX);
+          const firstOldX = Math.ceil(startOldX);
+          for (let x = firstOldX; x <= w; x += stepPx) {
             const t = (x / w) * durationSec;
             const v = getEcgVoltage(actualLead, t, selectedTerritoryId, 75);
             const y = centerY - v * voltScale;
-            if (i === 0) ctx.moveTo(x, y);
+            if (x === firstOldX) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
           }
           ctx.stroke();
@@ -244,18 +261,21 @@ export default function ECGWaveformMonitor({
           ctx.lineJoin = 'round';
           ctx.lineCap = 'round';
 
-          const activeSteps = Math.max(10, Math.floor(currentTraceWidth * 1.5));
-          for (let i = 0; i <= activeSteps; i++) {
-            const x = (i / activeSteps) * currentTraceWidth;
+          for (let x = 0; x <= currentTraceWidth; x += stepPx) {
             const t = (x / w) * durationSec;
             const v = getEcgVoltage(actualLead, t, selectedTerritoryId, 75);
             const y = centerY - v * voltScale;
-            if (i === 0) ctx.moveTo(x, y);
+            if (x === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
-
-            if (i === activeSteps) {
-              headY = y;
-            }
+            headY = y;
+          }
+          if (currentTraceWidth % stepPx !== 0) {
+            const x = currentTraceWidth;
+            const t = (x / w) * durationSec;
+            const v = getEcgVoltage(actualLead, t, selectedTerritoryId, 75);
+            const y = centerY - v * voltScale;
+            ctx.lineTo(x, y);
+            headY = y;
           }
           ctx.stroke();
         }
@@ -301,14 +321,14 @@ export default function ECGWaveformMonitor({
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl flex flex-col gap-4">
+    <div className={`border rounded-xl p-4 shadow-xl flex flex-col gap-4 transition-colors ${theme.cardBg} ${theme.cardBorder}`}>
       {/* Top Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+      <div className={`flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl border transition-colors ${theme.cardSubBg} ${theme.cardBorder}`}>
         <div className="flex flex-wrap items-center gap-2">
-          {/* Play / Pause */}
+          {/* Play / Pause - Theme Accent Highlight */}
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shadow"
+            className={`px-3.5 py-1.5 ${theme.accentBg} ${theme.accentHoverBg} rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shadow`}
           >
             {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
             {isPlaying ? 'Pause' : 'Play Trace'}
@@ -317,23 +337,29 @@ export default function ECGWaveformMonitor({
           {/* Reset */}
           <button
             onClick={handleReset}
-            className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition"
+            className={`p-1.5 rounded-lg border transition ${
+              isBright 
+                ? 'bg-white hover:bg-slate-100 text-slate-700 border-slate-300' 
+                : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
+            }`}
             title="Reset sweep animation to start"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
 
           {/* Speed Selector */}
-          <div className="flex items-center gap-1 bg-slate-900 px-2 py-1 rounded-lg border border-slate-800 text-xs">
-            <span className="text-slate-400 text-[11px]">Speed:</span>
+          <div className={`flex items-center gap-1 px-2 py-1 rounded-lg border text-xs ${
+            isBright ? 'bg-white border-slate-300' : 'bg-slate-900 border-slate-800'
+          }`}>
+            <span className={`text-[11px] ${isBright ? 'text-slate-600' : 'text-slate-400'}`}>Speed:</span>
             {[0.5, 1.0, 2.0].map(s => (
               <button
                 key={s}
                 onClick={() => setPlaybackSpeed(s)}
                 className={`px-1.5 py-0.5 rounded text-[11px] font-mono transition ${
                   playbackSpeed === s
-                    ? 'bg-rose-600 text-white font-bold'
-                    : 'text-slate-400 hover:text-white'
+                    ? `${theme.accentBg} font-bold shadow-sm`
+                    : isBright ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 {s}x
@@ -344,9 +370,13 @@ export default function ECGWaveformMonitor({
           {/* Paper / Dark Mode Toggle */}
           <button
             onClick={onTogglePaperMode}
-            className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium border border-slate-700 flex items-center gap-1.5 transition"
+            className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border flex items-center gap-1.5 transition ${
+              isBright
+                ? 'bg-white hover:bg-slate-100 text-slate-700 border-slate-300'
+                : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+            }`}
           >
-            {paperMode === 'paper' ? <Moon className="w-3.5 h-3.5 text-cyan-400" /> : <Sun className="w-3.5 h-3.5 text-amber-400" />}
+            {paperMode === 'paper' ? <Moon className="w-3.5 h-3.5 text-cyan-500" /> : <Sun className="w-3.5 h-3.5 text-amber-500" />}
             {paperMode === 'paper' ? 'Dark Monitor View' : 'Pink ECG Paper View'}
           </button>
 
@@ -355,8 +385,10 @@ export default function ECGWaveformMonitor({
             onClick={() => setShowNormalOverlay(!showNormalOverlay)}
             className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border transition flex items-center gap-1.5 ${
               showNormalOverlay
-                ? 'bg-cyan-950/80 border-cyan-500/50 text-cyan-300'
-                : 'bg-slate-800 border-slate-700 text-slate-400'
+                ? `${theme.badgeBg} ${theme.badgeBorder} ${theme.badgeText} font-semibold`
+                : isBright
+                ? 'bg-white border-slate-300 text-slate-600 hover:text-slate-900'
+                : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -370,11 +402,13 @@ export default function ECGWaveformMonitor({
             onClick={() => setShowSupplemental(!showSupplemental)}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition flex items-center gap-1.5 ${
               showSupplemental
-                ? 'bg-amber-950 border-amber-500/60 text-amber-300'
+                ? 'bg-amber-500 text-white border-amber-600 shadow'
+                : isBright
+                ? 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100'
                 : 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             {showSupplemental ? 'Hide Supplemental Leads' : 'Show Supplemental (V3R-V4R, V7-V9)'}
           </button>
         </div>
@@ -388,67 +422,67 @@ export default function ECGWaveformMonitor({
             : 'bg-[#080d1a] border-slate-800 text-slate-100'
         }`}
       >
-        {/* Standard 3x4 Layout Matrix */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-          {standardLayout.map((column) =>
-            column.map(leadName => {
-              const delta = territory.waveformDeltas[leadName];
-              const isPrimary = territory.primaryLeads.includes(leadName);
-              const isReciprocal = territory.reciprocalLeads.includes(leadName);
+        {/* Clinically Sorted 3x4 Matrix:
+            On mobile (Safari iPhone): single column sorted limb leads (I, II, III, aVR, aVL, aVF) then precordial (V1-V6).
+            On desktop (md:): mapped into standard 3x4 layout columns via CSS grid classes */}
+        <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-3 gap-3">
+          {clinicalOrderedLeads.map(({ name: leadName, gridClass }) => {
+            const delta = territory.waveformDeltas[leadName];
+            const isPrimary = territory.primaryLeads.includes(leadName);
+            const isReciprocal = territory.reciprocalLeads.includes(leadName);
 
-              return (
-                <div
-                  key={leadName}
-                  onClick={() => setDetailLead(leadName)}
-                  className={`group relative rounded-lg border p-2 cursor-pointer transition shadow-sm hover:ring-2 hover:ring-rose-500 overflow-hidden ${
-                    paperMode === 'paper'
-                      ? 'bg-white/80 border-rose-200/90 shadow-rose-100/50'
-                      : 'bg-slate-950/80 border-slate-800/90'
-                  } ${
-                    isPrimary ? 'ring-2 ring-rose-500 bg-rose-950/20' : isReciprocal ? 'ring-1 ring-cyan-500 bg-cyan-950/20' : ''
-                  }`}
-                >
-                  {/* Lead Header */}
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-mono font-bold text-sm px-1.5 py-0.5 rounded bg-slate-900 text-white border border-slate-700">
-                        {leadName}
+            return (
+              <div
+                key={leadName}
+                onClick={() => setDetailLead(leadName)}
+                className={`group relative rounded-lg border p-2 cursor-pointer transition shadow-sm hover:ring-2 hover:ring-cyan-500 overflow-hidden ${gridClass} ${
+                  paperMode === 'paper'
+                    ? 'bg-white/90 border-rose-200/90 shadow-rose-100/50'
+                    : 'bg-slate-950/80 border-slate-800/90'
+                } ${
+                  isPrimary ? 'ring-2 ring-rose-500 bg-rose-950/20' : isReciprocal ? 'ring-1 ring-cyan-500 bg-cyan-950/20' : ''
+                }`}
+              >
+                {/* Lead Header */}
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono font-bold text-sm px-1.5 py-0.5 rounded bg-slate-900 text-white border border-slate-700">
+                      {leadName}
+                    </span>
+                    {isPrimary && (
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-600 text-white animate-pulse">
+                        PRIMARY
                       </span>
-                      {isPrimary && (
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-600 text-white animate-pulse">
-                          PRIMARY
-                        </span>
-                      )}
-                      {isReciprocal && (
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-700 text-white">
-                          RECIPROCAL
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-1">
-                      {delta?.stElevationMm !== undefined && delta.stElevationMm !== 0 && (
-                        <span
-                          className={`font-mono text-xs font-bold ${
-                            delta.stElevationMm > 0 ? 'text-rose-500' : 'text-cyan-400'
-                          }`}
-                        >
-                          {delta.stElevationMm > 0 ? '+' : ''}{delta.stElevationMm} mm
-                        </span>
-                      )}
-                      <Maximize2 className="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition" />
-                    </div>
+                    )}
+                    {isReciprocal && (
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-700 text-white">
+                        RECIPROCAL
+                      </span>
+                    )}
                   </div>
 
-                  {/* Animated Lead Canvas */}
-                  <canvas
-                    ref={el => { canvasRefs.current[leadName] = el; }}
-                    className="w-full h-28 sm:h-30 block rounded"
-                  />
+                  <div className="flex items-center gap-1">
+                    {delta?.stElevationMm !== undefined && delta.stElevationMm !== 0 && (
+                      <span
+                        className={`font-mono text-xs font-bold ${
+                          delta.stElevationMm > 0 ? 'text-rose-500' : 'text-cyan-400'
+                        }`}
+                      >
+                        {delta.stElevationMm > 0 ? '+' : ''}{delta.stElevationMm} mm
+                      </span>
+                    )}
+                    <Maximize2 className="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition" />
+                  </div>
                 </div>
-              );
-            })
-          )}
+
+                {/* Animated Lead Canvas */}
+                <canvas
+                  ref={el => { canvasRefs.current[leadName] = el; }}
+                  className="w-full h-28 sm:h-30 block rounded"
+                />
+              </div>
+            );
+          })}
         </div>
 
         {/* Lead II Continuous Rhythm Strip at Bottom */}
@@ -458,14 +492,14 @@ export default function ECGWaveformMonitor({
               <span className="px-2 py-0.5 rounded bg-slate-900 text-white border border-slate-700">
                 Lead II (Continuous Rhythm Strip • 25 mm/s • 10 mm/mV)
               </span>
-              <span className="text-[11px] font-normal opacity-75">
+              <span className="text-[11px] font-normal opacity-75 hidden sm:inline">
                 Evaluates baseline rhythm, P waves, PR interval, and underlying rate
               </span>
             </span>
 
             <button
               onClick={() => setDetailLead('II')}
-              className="text-xs text-rose-500 hover:underline flex items-center gap-1 font-semibold"
+              className={`text-xs ${theme.accentText} hover:underline flex items-center gap-1 font-semibold`}
             >
               <Maximize2 className="w-3 h-3" /> Inspect Lead II
             </button>

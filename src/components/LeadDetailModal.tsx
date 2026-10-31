@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { MI_TERRITORIES } from '../data/miTerritories';
 import { getCycleLandmarks, getEcgVoltage } from '../utils/ecgGenerator';
 import { X, ZoomIn, Info, CheckCircle2, Sliders, AlertTriangle } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 interface LeadDetailModalProps {
   lead: string;
@@ -16,6 +17,7 @@ export default function LeadDetailModal({
   paperMode,
   onClose
 }: LeadDetailModalProps) {
+  const { theme, isBright } = useTheme();
   const [showNormalComparison, setShowNormalComparison] = useState(true);
   const [activeLandmarkCode, setActiveLandmarkCode] = useState<string | null>('J-Pt');
   const [caliperMm, setCaliperMm] = useState<number | null>(null);
@@ -105,19 +107,25 @@ export default function LeadDetailModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+      <div className={`border rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] transition-colors ${
+        isBright ? 'bg-white border-slate-200 text-slate-800' : 'bg-slate-900 border-slate-800 text-slate-100'
+      }`}>
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/50">
+        <div className={`flex items-center justify-between px-6 py-4 border-b ${
+          isBright ? 'bg-slate-50 border-slate-200' : 'bg-slate-950/50 border-slate-800'
+        }`}>
           <div className="flex items-center gap-3">
-            <span className="w-8 h-8 rounded-lg bg-rose-600/30 border border-rose-500/50 flex items-center justify-center font-mono font-bold text-rose-300 text-sm">
+            <span className={`w-8 h-8 rounded-lg flex items-center justify-center font-mono font-bold text-sm ${
+              isBright ? 'bg-rose-100 border border-rose-300 text-rose-700' : 'bg-rose-600/30 border border-rose-500/50 text-rose-300'
+            }`}>
               {lead}
             </span>
             <div>
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <h2 className={`text-lg font-bold ${isBright ? 'text-slate-900' : 'text-white'} flex items-center gap-2`}>
                 Lead {lead} Magnified Waveform Analysis
               </h2>
-              <span className="text-xs text-slate-400">
-                Pattern: <strong className="text-rose-400">{territory.name}</strong> • Calibrated 25 mm/s • 10 mm/mV
+              <span className={`text-xs ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
+                Pattern: <strong className={theme.accentText}>{territory.name}</strong> • Calibrated 25 mm/s • 10 mm/mV
               </span>
             </div>
           </div>
@@ -429,58 +437,66 @@ export default function LeadDetailModal({
           </div>
 
           {/* Active Landmark Information Box */}
-          <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-4 space-y-2">
+          <div className={`border rounded-xl p-4 space-y-2 ${
+            isBright ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-slate-950/70 border-slate-800 text-slate-200'
+          }`}>
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-bold text-amber-300 flex items-center gap-2">
-                <Info className="w-4 h-4 text-amber-400" />
+              <h4 className="text-sm font-bold text-amber-600 dark:text-amber-300 flex items-center gap-2">
+                <Info className="w-4 h-4 text-amber-500" />
                 {activeLandmark.name} ({activeLandmark.code})
               </h4>
-              <span className="text-xs font-mono bg-slate-900 px-2 py-0.5 rounded text-slate-300 border border-slate-800">
+              <span className={`text-xs font-mono px-2 py-0.5 rounded border ${
+                isBright ? 'bg-white text-slate-700 border-slate-300' : 'bg-slate-900 text-slate-300 border-slate-800'
+              }`}>
                 Landmark Voltage: {(activeLandmark.voltageMv).toFixed(2)} mV ({(activeLandmark.voltageMv * 10).toFixed(1)} mm)
               </span>
             </div>
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <p className={`text-xs leading-relaxed ${isBright ? 'text-slate-600' : 'text-slate-300'}`}>
               {activeLandmark.description}
             </p>
           </div>
 
           {/* Lead Specific Clinical Status in Active MI Territory */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-            <div className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl space-y-1.5">
-              <span className="font-semibold text-rose-400 uppercase tracking-wide text-[11px] block">
+            <div className={`p-3 rounded-xl border space-y-1.5 ${
+              isBright ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-slate-950/60 border-slate-800 text-slate-200'
+            }`}>
+              <span className="font-semibold text-rose-600 dark:text-rose-400 uppercase tracking-wide text-[11px] block">
                 Lead Role in {territory.name}:
               </span>
-              <p className="text-slate-300">
+              <p className={isBright ? 'text-slate-700' : 'text-slate-300'}>
                 {territory.primaryLeads.includes(lead) ? (
-                  <span className="text-rose-400 font-bold flex items-center gap-1">
+                  <span className="text-rose-600 dark:text-rose-400 font-bold flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" /> PRIMARY contiguous injury lead (ST elevation).
                   </span>
                 ) : territory.reciprocalLeads.includes(lead) ? (
-                  <span className="text-cyan-400 font-bold flex items-center gap-1">
+                  <span className="text-cyan-600 dark:text-cyan-400 font-bold flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" /> RECIPROCAL mirror injury lead (ST depression / reciprocal changes).
                   </span>
                 ) : (
-                  <span className="text-slate-400">
+                  <span className={isBright ? 'text-slate-500' : 'text-slate-400'}>
                     Non-infarct baseline reference lead in this selected territory.
                   </span>
                 )}
               </p>
               {delta?.stElevationMm !== undefined && delta.stElevationMm !== 0 && (
-                <div className="mt-1 text-slate-200">
-                  Target ST Deviation: <strong className="text-white">{delta.stElevationMm > 0 ? '+' : ''}{delta.stElevationMm} mm ({(delta.stElevationMm * 0.1).toFixed(2)} mV)</strong> ({delta.stSlope || (delta.stElevationMm > 0 ? 'convex' : 'horizontal')}).
+                <div className={`mt-1 font-medium ${isBright ? 'text-slate-900' : 'text-slate-200'}`}>
+                  Target ST Deviation: <strong className={isBright ? 'text-slate-900' : 'text-white'}>{delta.stElevationMm > 0 ? '+' : ''}{delta.stElevationMm} mm ({(delta.stElevationMm * 0.1).toFixed(2)} mV)</strong> ({delta.stSlope || (delta.stElevationMm > 0 ? 'convex' : 'horizontal')}).
                 </div>
               )}
             </div>
 
-            <div className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl space-y-1.5">
-              <span className="font-semibold text-indigo-400 uppercase tracking-wide text-[11px] block">
+            <div className={`p-3 rounded-xl border space-y-1.5 ${
+              isBright ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-slate-950/60 border-slate-800 text-slate-200'
+            }`}>
+              <span className="font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide text-[11px] block">
                 Caliper & J-Point Measurement Guide:
               </span>
-              <p className="text-slate-300 leading-snug">
+              <p className={`leading-snug ${isBright ? 'text-slate-700' : 'text-slate-300'}`}>
                 Click anywhere on the ECG grid above to position the electronic caliper and measure elevation/depression relative to the isoelectric PR segment baseline.
               </p>
-              <div className="text-[11px] text-slate-400 pt-1">
-                Per 2025 ACC/AHA & 2023 ESC guidelines, STEMI criteria strictly require measurement at the <strong className="text-amber-300">J point</strong> relative to the preceding <strong className="text-cyan-300">PR segment</strong>.
+              <div className={`text-[11px] pt-1 ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
+                Per 2025 ACC/AHA & 2023 ESC guidelines, STEMI criteria strictly require measurement at the <strong className="text-amber-600 dark:text-amber-300">J point</strong> relative to the preceding <strong className="text-cyan-600 dark:text-cyan-300">PR segment</strong>.
               </div>
             </div>
           </div>

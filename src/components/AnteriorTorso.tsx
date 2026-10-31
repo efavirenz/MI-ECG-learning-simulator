@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { STANDARD_ELECTRODES, SUPPLEMENTAL_ELECTRODES, Electrode } from '../data/electrodes';
 import { Eye, CheckCircle2, AlertTriangle, HelpCircle, RotateCcw, Info } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 interface AnteriorTorsoProps {
   selectedElectrodeId: string | null;
@@ -13,6 +14,7 @@ export default function AnteriorTorso({
   onSelectElectrode,
   showSupplementalRight = true
 }: AnteriorTorsoProps) {
+  const { theme, isBright } = useTheme();
   const [showSkeleton, setShowSkeleton] = useState(true);
   const [showLines, setShowLines] = useState(true);
   const [showAngleOfLouis, setShowAngleOfLouis] = useState(true);
@@ -28,18 +30,19 @@ export default function AnteriorTorso({
 
   const selectedElectrode = activeElectrodeList.find(e => e.id === selectedElectrodeId) || null;
 
+  const pickRandomTarget = () => {
+    // Include both limb leads and precordial / right-sided leads in practice targets
+    const candidates = activeElectrodeList.filter(e => e.type === 'precordial' || e.type === 'limb' || e.type === 'right-sided');
+    const random = candidates[Math.floor(Math.random() * candidates.length)];
+    setTargetPracticeElectrode(random);
+    setPracticeFeedback(null);
+  };
+
   const startPractice = () => {
     setPracticeMode(true);
     setScore({ correct: 0, total: 0 });
     setPracticeFeedback(null);
     pickRandomTarget();
-  };
-
-  const pickRandomTarget = () => {
-    const precordialAndLimb = activeElectrodeList.filter(e => e.type === 'precordial' || e.type === 'right-sided');
-    const random = precordialAndLimb[Math.floor(Math.random() * precordialAndLimb.length)];
-    setTargetPracticeElectrode(random);
-    setPracticeFeedback(null);
   };
 
   const handleElectrodeClick = (e: Electrode) => {
@@ -57,7 +60,7 @@ export default function AnteriorTorso({
         setScore(prev => ({ ...prev, total: prev.total + 1 }));
         setPracticeFeedback({
           isCorrect: false,
-          message: `Incorrect! You clicked ${e.code}. For ${targetPracticeElectrode.name} (${targetPracticeElectrode.code}), look for: ${targetPracticeElectrode.anatomicalLocation}`
+          message: `Incorrect! You clicked a different position. For ${targetPracticeElectrode.name} (${targetPracticeElectrode.code}), look for: ${targetPracticeElectrode.anatomicalLocation}`
         });
       }
     } else {
@@ -66,36 +69,42 @@ export default function AnteriorTorso({
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl flex flex-col xl:flex-row gap-6">
+    <div className={`border rounded-xl p-4 shadow-xl flex flex-col xl:flex-row gap-6 transition-colors ${theme.cardBg} ${theme.cardBorder}`}>
       {/* Left / Top: SVG Torso Diagram */}
       <div className="flex-1 flex flex-col items-center">
         {/* Controls Toolbar */}
         <div className="w-full flex flex-wrap items-center justify-between gap-2 mb-3 px-2 text-xs">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-              <Eye className="w-3.5 h-3.5 text-cyan-400" />
+            <span className={`font-semibold uppercase tracking-wider flex items-center gap-1.5 ${isBright ? 'text-slate-700' : 'text-slate-300'}`}>
+              <Eye className={`w-3.5 h-3.5 ${theme.accentText}`} />
               Torso Overlays:
             </span>
             <button
               onClick={() => setShowSkeleton(!showSkeleton)}
-              className={`px-2.5 py-1 rounded border transition ${
-                showSkeleton ? 'bg-cyan-950/80 border-cyan-500/50 text-cyan-300' : 'bg-slate-800 border-slate-700 text-slate-400'
+              className={`px-2.5 py-1 rounded border transition font-medium ${
+                showSkeleton 
+                  ? `${theme.badgeBg} ${theme.badgeBorder} ${theme.badgeText}` 
+                  : isBright ? 'bg-slate-100 border-slate-300 text-slate-600' : 'bg-slate-800 border-slate-700 text-slate-400'
               }`}
             >
               Ribs & Sternum
             </button>
             <button
               onClick={() => setShowLines(!showLines)}
-              className={`px-2.5 py-1 rounded border transition ${
-                showLines ? 'bg-indigo-950/80 border-indigo-500/50 text-indigo-300' : 'bg-slate-800 border-slate-700 text-slate-400'
+              className={`px-2.5 py-1 rounded border transition font-medium ${
+                showLines 
+                  ? `${theme.badgeBg} ${theme.badgeBorder} ${theme.badgeText}` 
+                  : isBright ? 'bg-slate-100 border-slate-300 text-slate-600' : 'bg-slate-800 border-slate-700 text-slate-400'
               }`}
             >
               Reference Lines
             </button>
             <button
               onClick={() => setShowAngleOfLouis(!showAngleOfLouis)}
-              className={`px-2.5 py-1 rounded border transition ${
-                showAngleOfLouis ? 'bg-amber-950/80 border-amber-500/50 text-amber-300' : 'bg-slate-800 border-slate-700 text-slate-400'
+              className={`px-2.5 py-1 rounded border transition font-medium ${
+                showAngleOfLouis 
+                  ? 'bg-amber-100 border-amber-300 text-amber-800 dark:bg-amber-950/80 dark:border-amber-500/50 dark:text-amber-300' 
+                  : isBright ? 'bg-slate-100 border-slate-300 text-slate-600' : 'bg-slate-800 border-slate-700 text-slate-400'
               }`}
             >
               Angle of Louis
@@ -104,13 +113,15 @@ export default function AnteriorTorso({
 
           <div className="flex items-center gap-2">
             {practiceMode ? (
-              <div className="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded border border-slate-700">
-                <span className="text-amber-400 font-bold">
+              <div className={`flex items-center gap-2 px-3 py-1 rounded border ${
+                isBright ? 'bg-slate-100 border-slate-300 text-slate-800' : 'bg-slate-800 border-slate-700 text-slate-200'
+              }`}>
+                <span className="text-amber-500 font-bold">
                   Score: {score.correct}/{score.total}
                 </span>
                 <button
                   onClick={() => setPracticeMode(false)}
-                  className="text-slate-400 hover:text-white flex items-center gap-1 text-xs ml-2"
+                  className="text-slate-400 hover:text-rose-500 flex items-center gap-1 text-xs ml-2 font-medium"
                 >
                   <RotateCcw className="w-3 h-3" /> Exit
                 </button>
@@ -118,7 +129,7 @@ export default function AnteriorTorso({
             ) : (
               <button
                 onClick={startPractice}
-                className="px-3 py-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-medium rounded shadow transition flex items-center gap-1.5"
+                className="px-3.5 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-medium rounded-lg shadow transition flex items-center gap-1.5 text-xs"
               >
                 <HelpCircle className="w-3.5 h-3.5" /> Practice Mode
               </button>
@@ -128,16 +139,22 @@ export default function AnteriorTorso({
 
         {/* Practice Mode Prompt Banner */}
         {practiceMode && targetPracticeElectrode && (
-          <div className="w-full mb-3 p-2.5 bg-indigo-950/60 border border-indigo-500/40 rounded-lg text-center animate-fade-in">
-            <span className="text-slate-300 text-xs uppercase tracking-wide">Target Objective:</span>
-            <div className="text-base font-bold text-cyan-300">
-              Click the correct location for: <span className="text-white underline">{targetPracticeElectrode.name} ({targetPracticeElectrode.code})</span>
+          <div className={`w-full mb-3 p-3 rounded-xl border text-center animate-fade-in ${
+            isBright ? 'bg-indigo-50 border-indigo-200 text-slate-900' : 'bg-indigo-950/60 border-indigo-500/40 text-slate-100'
+          }`}>
+            <span className={`text-[11px] uppercase tracking-wide font-bold block ${isBright ? 'text-indigo-700' : 'text-indigo-300'}`}>
+              Target Objective (Tap the Unknown Lead Dot on Chest/Limbs):
+            </span>
+            <div className="text-sm sm:text-base font-bold mt-0.5">
+              Locate & Tap: <span className={`${theme.accentText} underline`}>{targetPracticeElectrode.name} ({targetPracticeElectrode.code})</span>
             </div>
             {practiceFeedback && (
-              <div className={`mt-1.5 text-xs font-semibold px-2 py-1 rounded flex items-center justify-center gap-1.5 ${
-                practiceFeedback.isCorrect ? 'bg-emerald-900/70 text-emerald-300 border border-emerald-500/40' : 'bg-rose-900/70 text-rose-300 border border-rose-500/40'
+              <div className={`mt-2 text-xs font-semibold px-2.5 py-1.5 rounded-lg flex items-center justify-center gap-1.5 ${
+                practiceFeedback.isCorrect 
+                  ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40' 
+                  : 'bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-500/40'
               }`}>
-                {practiceFeedback.isCorrect ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <AlertTriangle className="w-4 h-4 text-rose-400" />}
+                {practiceFeedback.isCorrect ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <AlertTriangle className="w-4 h-4 text-rose-500" />}
                 {practiceFeedback.message}
               </div>
             )}
@@ -145,13 +162,15 @@ export default function AnteriorTorso({
         )}
 
         {/* Anatomical 2D Vector SVG */}
-        <div className="relative w-full max-w-[500px] aspect-[4/5] bg-slate-950/60 rounded-xl border border-slate-800/80 p-2 flex items-center justify-center select-none overflow-hidden">
+        <div className={`relative w-full max-w-[500px] aspect-[4/5] rounded-xl border p-2 flex items-center justify-center select-none overflow-hidden transition-colors ${
+          isBright ? 'bg-slate-100 border-slate-300' : 'bg-slate-950/60 border-slate-800/80'
+        }`}>
           <svg viewBox="0 0 400 500" className="w-full h-full">
             <defs>
               <linearGradient id="bodySkinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#334155" />
-                <stop offset="50%" stopColor="#1e293b" />
-                <stop offset="100%" stopColor="#0f172a" />
+                <stop offset="0%" stopColor={isBright ? "#cbd5e1" : "#334155"} />
+                <stop offset="50%" stopColor={isBright ? "#94a3b8" : "#1e293b"} />
+                <stop offset="100%" stopColor={isBright ? "#64748b" : "#0f172a"} />
               </linearGradient>
               <filter id="glowEffect" x="-20%" y="-20%" width="140%" height="140%">
                 <feGaussianBlur stdDeviation="3" result="blur" />
@@ -175,68 +194,57 @@ export default function AnteriorTorso({
                  C 325 90, 280 78, 240 75
                  C 240 65, 240 40, 250 25 Z"
               fill="url(#bodySkinGrad)"
-              stroke="#475569"
+              stroke={isBright ? "#475569" : "#475569"}
               strokeWidth="2.5"
             />
 
-            {/* Neck & Clavicle Anatomical Base */}
-            <path d="M 160 75 Q 200 95 240 75" fill="none" stroke="#64748b" strokeWidth="2" strokeDasharray="3,3" />
-
-            {/* Sternal Notch */}
-            <ellipse cx="200" cy="85" rx="10" ry="4" fill="none" stroke="#94a3b8" strokeWidth="2" />
-            <text x="200" y="78" textAnchor="middle" fill="#94a3b8" fontSize="9" fontWeight="600">Suprasternal Notch</text>
-
             {/* Clavicles */}
-            <path d="M 195 86 C 160 82, 110 92, 60 115" fill="none" stroke="#64748b" strokeWidth="3" strokeLinecap="round" />
-            <path d="M 205 86 C 240 82, 290 92, 340 115" fill="none" stroke="#64748b" strokeWidth="3" strokeLinecap="round" />
-            <text x="95" y="100" fill="#64748b" fontSize="8">Right Clavicle</text>
-            <text x="305" y="100" fill="#64748b" fontSize="8" textAnchor="end">Left Clavicle</text>
+            <path d="M 165 75 Q 120 70 60 90" fill="none" stroke="#64748b" strokeWidth="3" />
+            <path d="M 235 75 Q 280 70 340 90" fill="none" stroke="#64748b" strokeWidth="3" />
 
-            {/* Midclavicular, Anterior Axillary, Midaxillary Reference Lines */}
+            {/* Reference Vertical Lines */}
             {showLines && (
-              <g opacity="0.65">
-                {/* Left Midclavicular Line (vertical through midclavicle ~x=255) */}
-                <line x1="255" y1="95" x2="255" y2="400" stroke="#38bdf8" strokeWidth="1.2" strokeDasharray="4,4" />
-                <text x="257" y="395" fill="#38bdf8" fontSize="7.5" fontWeight="600">Left Midclavicular (MCL)</text>
+              <g opacity="0.6">
+                {/* Midsternal Line */}
+                <line x1="200" y1="80" x2="200" y2="460" stroke="#38bdf8" strokeWidth="1" strokeDasharray="4,4" />
+                <text x="203" y="95" fill="#38bdf8" fontSize="6.5">Midsternal Line</text>
 
-                {/* Right Midclavicular Line (for V4R ~x=145) */}
-                <line x1="145" y1="95" x2="145" y2="400" stroke="#38bdf8" strokeWidth="1.2" strokeDasharray="4,4" />
-                <text x="143" y="395" fill="#38bdf8" fontSize="7.5" fontWeight="600" textAnchor="end">Right MCL (V4R)</text>
+                {/* Left Midclavicular Line (Patient Left = diagram right) */}
+                <line x1="280" y1="90" x2="280" y2="460" stroke="#818cf8" strokeWidth="1" strokeDasharray="3,3" />
+                <text x="283" y="105" fill="#818cf8" fontSize="6.5">Left Midclavicular (MCL)</text>
 
-                {/* Left Anterior Axillary Line (~x=295) */}
-                <line x1="295" y1="130" x2="295" y2="380" stroke="#818cf8" strokeWidth="1.2" strokeDasharray="4,4" />
-                <text x="297" y="375" fill="#818cf8" fontSize="7.5" fontWeight="600">Left Ant. Axillary (AAL)</text>
+                {/* Left Anterior Axillary Line */}
+                <line x1="315" y1="120" x2="315" y2="460" stroke="#a78bfa" strokeWidth="1" strokeDasharray="2,2" />
+                <text x="318" y="130" fill="#a78bfa" fontSize="6.5">Ant. Axillary (AAL)</text>
 
-                {/* Left Midaxillary Line (~x=325) */}
-                <line x1="325" y1="150" x2="325" y2="360" stroke="#c084fc" strokeWidth="1.2" strokeDasharray="4,4" />
-                <text x="327" y="355" fill="#c084fc" fontSize="7.5" fontWeight="600">Left Midaxillary (MAL)</text>
+                {/* Left Midaxillary Line */}
+                <line x1="345" y1="140" x2="345" y2="460" stroke="#c084fc" strokeWidth="1" strokeDasharray="2,2" />
+                <text x="348" y="150" fill="#c084fc" fontSize="6.5">Midaxillary (MAL)</text>
 
-                {/* Horizontal V4 plane reference line */}
-                <line x1="100" y1="265" x2="335" y2="265" stroke="#f43f5e" strokeWidth="1" strokeDasharray="2,3" />
-                <text x="337" y="268" fill="#f43f5e" fontSize="7">Horizontal Plane (V4-V5-V6)</text>
+                {/* Right Midclavicular Line (for V4R) */}
+                {showSupplementalRight && (
+                  <>
+                    <line x1="120" y1="90" x2="120" y2="460" stroke="#fbbf24" strokeWidth="1" strokeDasharray="3,3" />
+                    <text x="65" y="105" fill="#fbbf24" fontSize="6.5">Right MCL (V4R)</text>
+                  </>
+                )}
               </g>
             )}
 
-            {/* Skeletal Anatomy: Sternum & Ribs */}
+            {/* Ribcage and Sternum Overlay */}
             {showSkeleton && (
-              <g opacity="0.85">
-                {/* Manubrium */}
-                <polygon points="190,88 210,88 214,120 186,120" fill="#334155" stroke="#94a3b8" strokeWidth="1.5" />
-                <text x="200" y="108" textAnchor="middle" fill="#cbd5e1" fontSize="7.5">Manubrium</text>
-
-                {/* Sternum Body */}
-                <polygon points="186,126 214,126 210,240 190,240" fill="#1e293b" stroke="#94a3b8" strokeWidth="1.5" />
-                <text x="200" y="175" textAnchor="middle" fill="#94a3b8" fontSize="8" transform="rotate(-90 200 175)">Sternum Body</text>
-
-                {/* Xiphoid Process */}
-                <polygon points="194,242 206,242 200,260" fill="#475569" stroke="#94a3b8" strokeWidth="1" />
-                <text x="200" y="272" textAnchor="middle" fill="#94a3b8" fontSize="7.5">Xiphoid</text>
+              <g opacity="0.75">
+                {/* Manubrium & Sternum Body */}
+                <path d="M 185 85 L 215 85 L 212 120 L 188 120 Z" fill="#64748b" opacity="0.4" />
+                <line x1="185" y1="120" x2="215" y2="120" stroke="#f59e0b" strokeWidth="3" />
+                <path d="M 188 123 L 212 123 L 208 240 L 192 240 Z" fill="#64748b" opacity="0.35" />
+                <polygon points="194,240 206,240 200,258" fill="#475569" />
 
                 {/* Rib 1 */}
-                <path d="M 188 92 C 160 96, 120 115, 80 145" fill="none" stroke="#475569" strokeWidth="2.5" />
-                <path d="M 212 92 C 240 96, 280 115, 320 145" fill="none" stroke="#475569" strokeWidth="2.5" />
+                <path d="M 185 92 C 160 95, 120 110, 85 140" fill="none" stroke="#475569" strokeWidth="2.5" />
+                <path d="M 215 92 C 240 95, 280 110, 315 140" fill="none" stroke="#475569" strokeWidth="2.5" />
 
-                {/* Rib 2 (attaches directly at Angle of Louis!) */}
+                {/* Rib 2 (At Angle of Louis) */}
                 <path d="M 186 123 C 150 128, 110 145, 75 180" fill="none" stroke="#cbd5e1" strokeWidth="2.5" />
                 <path d="M 214 123 C 250 128, 290 145, 325 180" fill="none" stroke="#cbd5e1" strokeWidth="2.5" />
                 <text x="140" y="132" fill="#94a3b8" fontSize="7">Rib 2</text>
@@ -277,16 +285,20 @@ export default function AnteriorTorso({
               </g>
             )}
 
-            {/* Faint Nipple Indicators with Clinical Caution */}
+            {/* Faint Nipple Indicators */}
             <circle cx="120" cy="235" r="5" fill="#475569" opacity="0.35" />
             <circle cx="280" cy="235" r="5" fill="#475569" opacity="0.35" />
 
-            {/* Interactive Electrode Markers */}
+            {/* Interactive Electrode Markers - Enlarged Hit Target for Touch & Mouse */}
             {activeElectrodeList.map(elec => {
               // Convert percentage to svg coordinates (400 x 500)
               const cx = (elec.coords.x / 100) * 400;
               const cy = (elec.coords.y / 100) * 500;
               const isSelected = elec.id === selectedElectrodeId;
+
+              // In Practice Mode: labels are hidden, neutral appearance
+              const dotFill = practiceMode ? '#475569' : elec.color;
+              const dotStroke = practiceMode ? '#94a3b8' : '#ffffff';
 
               return (
                 <g
@@ -294,17 +306,26 @@ export default function AnteriorTorso({
                   onClick={() => handleElectrodeClick(elec)}
                   className="cursor-pointer group"
                 >
+                  {/* Invisible Massive Touch/Click Target Zone (56x56 px hit target) */}
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r="28"
+                    fill="transparent"
+                    className="cursor-pointer"
+                  />
+
                   {/* Outer pulse/selection ring */}
                   {isSelected && (
                     <circle
                       cx={cx}
                       cy={cy}
-                      r="16"
+                      r="20"
                       fill="none"
-                      stroke={elec.color}
-                      strokeWidth="3"
+                      stroke={practiceMode ? '#38bdf8' : elec.color}
+                      strokeWidth="3.5"
                       className="animate-pulse"
-                      opacity="0.8"
+                      opacity="0.85"
                     />
                   )}
 
@@ -312,125 +333,149 @@ export default function AnteriorTorso({
                   <circle
                     cx={cx}
                     cy={cy}
-                    r={isSelected ? 11 : 9}
-                    fill={elec.color}
-                    stroke="#ffffff"
-                    strokeWidth="2"
+                    r={isSelected ? 15 : 12}
+                    fill={dotFill}
+                    stroke={dotStroke}
+                    strokeWidth="2.5"
                     className="transition-all duration-200 group-hover:scale-125 origin-center shadow-lg"
                   />
 
-                  {/* Electrode Code Text */}
-                  <text
-                    x={cx}
-                    y={cy + 3.5}
-                    textAnchor="middle"
-                    fill="#ffffff"
-                    fontSize={elec.code.length > 2 ? '7' : '8'}
-                    fontWeight="bold"
-                    className="pointer-events-none select-none drop-shadow"
-                  >
-                    {elec.code}
-                  </text>
+                  {/* Electrode Code Text (HIDDEN in practice mode for unknown test) */}
+                  {!practiceMode ? (
+                    <text
+                      x={cx}
+                      y={cy + 4}
+                      textAnchor="middle"
+                      fill="#ffffff"
+                      fontSize={elec.code.length > 2 ? '8' : '9.5'}
+                      fontWeight="bold"
+                      className="pointer-events-none select-none drop-shadow"
+                    >
+                      {elec.code}
+                    </text>
+                  ) : (
+                    <text
+                      x={cx}
+                      y={cy + 3.5}
+                      textAnchor="middle"
+                      fill="#e2e8f0"
+                      fontSize="9"
+                      fontWeight="bold"
+                      className="pointer-events-none select-none"
+                    >
+                      ?
+                    </text>
+                  )}
                 </g>
               );
             })}
           </svg>
         </div>
 
-        {/* Legend beneath torso */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mt-3 text-xs">
-          <span className="text-slate-400">Standard Precordial:</span>
-          {STANDARD_ELECTRODES.filter(e => e.type === 'precordial').map(e => (
-            <button
-              key={e.id}
-              onClick={() => handleElectrodeClick(e)}
-              className={`px-2 py-0.5 rounded font-mono font-bold text-xs transition border ${
-                selectedElectrodeId === e.id
-                  ? 'border-white text-white shadow'
-                  : 'border-transparent text-slate-300 hover:border-slate-600'
-              }`}
-              style={{ backgroundColor: e.color + '33', color: e.color }}
-            >
-              {e.code}
-            </button>
-          ))}
-          {showSupplementalRight && (
-            <>
-              <span className="text-slate-400 ml-2">Right-Sided:</span>
-              {SUPPLEMENTAL_ELECTRODES.filter(e => e.type === 'right-sided').map(e => (
-                <button
-                  key={e.id}
-                  onClick={() => handleElectrodeClick(e)}
-                  className={`px-2 py-0.5 rounded font-mono font-bold text-xs transition border ${
-                    selectedElectrodeId === e.id
-                      ? 'border-white text-white shadow'
-                      : 'border-transparent text-slate-300 hover:border-slate-600'
-                  }`}
-                  style={{ backgroundColor: e.color + '33', color: e.color }}
-                >
-                  {e.code}
-                </button>
-              ))}
-            </>
-          )}
-        </div>
+        {/* Legend beneath torso - HIDDEN during Practice Mode to prevent test guidance */}
+        {!practiceMode && (
+          <div className="flex flex-wrap items-center justify-center gap-2 mt-3 text-xs">
+            <span className={theme.subtextColor}>Precordial:</span>
+            {STANDARD_ELECTRODES.filter(e => e.type === 'precordial').map(e => (
+              <button
+                key={e.id}
+                onClick={() => handleElectrodeClick(e)}
+                className={`px-2.5 py-1 rounded-lg font-mono font-bold text-xs transition border ${
+                  selectedElectrodeId === e.id
+                    ? 'border-white text-white shadow ring-2 ring-white/50'
+                    : isBright
+                    ? 'border-slate-300 text-slate-700 hover:border-slate-500'
+                    : 'border-transparent text-slate-300 hover:border-slate-600'
+                }`}
+                style={{ backgroundColor: e.color + '26', color: isBright ? undefined : e.color }}
+              >
+                {e.code}
+              </button>
+            ))}
+            {showSupplementalRight && (
+              <>
+                <span className={`${theme.subtextColor} ml-2`}>Right-Sided:</span>
+                {SUPPLEMENTAL_ELECTRODES.filter(e => e.type === 'right-sided').map(e => (
+                  <button
+                    key={e.id}
+                    onClick={() => handleElectrodeClick(e)}
+                    className={`px-2.5 py-1 rounded-lg font-mono font-bold text-xs transition border ${
+                      selectedElectrodeId === e.id
+                        ? 'border-white text-white shadow ring-2 ring-white/50'
+                        : isBright
+                        ? 'border-slate-300 text-slate-700 hover:border-slate-500'
+                        : 'border-transparent text-slate-300 hover:border-slate-600'
+                    }`}
+                    style={{ backgroundColor: e.color + '26', color: isBright ? undefined : e.color }}
+                  >
+                    {e.code}
+                  </button>
+                ))}
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Right / Bottom: Detailed Clinical Placement Info Panel */}
-      <div className="w-full xl:w-96 flex flex-col justify-between bg-slate-950/70 border border-slate-800 rounded-xl p-4">
+      <div className={`w-full xl:w-96 flex flex-col justify-between border rounded-xl p-4 transition-colors ${theme.cardSubBg} ${theme.cardBorder}`}>
         {selectedElectrode ? (
           <div className="space-y-3.5 text-xs">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div className={`flex items-center justify-between border-b pb-2 ${isBright ? 'border-slate-200' : 'border-slate-800'}`}>
               <div className="flex items-center gap-2">
                 <span
-                  className="w-4 h-4 rounded-full flex-shrink-0"
+                  className="w-4 h-4 rounded-full flex-shrink-0 shadow"
                   style={{ backgroundColor: selectedElectrode.color }}
                 />
-                <h3 className="text-base font-bold text-white">
+                <h3 className={`text-base font-bold ${theme.headingColor}`}>
                   {selectedElectrode.name} ({selectedElectrode.code})
                 </h3>
               </div>
-              <span className="px-2 py-0.5 rounded text-[10px] uppercase font-mono font-bold bg-slate-800 text-slate-300">
+              <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono font-bold ${
+                isBright ? 'bg-slate-200 text-slate-800' : 'bg-slate-800 text-slate-300'
+              }`}>
                 {selectedElectrode.type}
               </span>
             </div>
 
             {/* Anatomical Location */}
             <div>
-              <span className="font-semibold text-cyan-400 uppercase tracking-wide text-[11px] block mb-0.5">
+              <span className={`font-semibold uppercase tracking-wide text-[11px] block mb-0.5 ${theme.accentText}`}>
                 Precise Anatomical Placement:
               </span>
-              <p className="text-slate-200 bg-slate-900/90 p-2.5 rounded-lg border border-slate-800 font-medium">
+              <p className={`p-2.5 rounded-lg border font-medium ${
+                isBright ? 'bg-white text-slate-800 border-slate-200' : 'bg-slate-900/90 text-slate-200 border-slate-800'
+              }`}>
                 {selectedElectrode.anatomicalLocation}
               </p>
             </div>
 
             {/* Instructions */}
             <div>
-              <span className="font-semibold text-indigo-400 uppercase tracking-wide text-[11px] block mb-0.5">
+              <span className="font-semibold text-indigo-500 uppercase tracking-wide text-[11px] block mb-0.5">
                 Step-by-Step Procedure:
               </span>
-              <p className="text-slate-300 leading-relaxed">
+              <p className={`leading-relaxed ${theme.subtextColor}`}>
                 {selectedElectrode.instructions}
               </p>
             </div>
 
             {/* Clinical Purpose */}
             <div>
-              <span className="font-semibold text-emerald-400 uppercase tracking-wide text-[11px] block mb-0.5">
+              <span className="font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide text-[11px] block mb-0.5">
                 Clinical Significance & View:
               </span>
-              <p className="text-slate-300 leading-relaxed">
+              <p className={`leading-relaxed ${theme.subtextColor}`}>
                 {selectedElectrode.clinicalPurpose}
               </p>
             </div>
 
             {/* Common Mistakes */}
             <div>
-              <span className="font-semibold text-rose-400 uppercase tracking-wide text-[11px] block mb-0.5">
+              <span className="font-semibold text-rose-500 uppercase tracking-wide text-[11px] block mb-0.5">
                 Common Placement Pitfalls:
               </span>
-              <ul className="list-disc list-inside space-y-1 text-slate-300">
+              <ul className={`list-disc list-inside space-y-1 ${theme.subtextColor}`}>
                 {selectedElectrode.commonMistakes.map((m, idx) => (
                   <li key={idx} className="leading-snug">{m}</li>
                 ))}
@@ -439,11 +484,13 @@ export default function AnteriorTorso({
 
             {/* Adult Female Patient Considerations */}
             {selectedElectrode.femaleLandmarkNotes && (
-              <div className="p-2.5 bg-amber-950/40 border border-amber-600/30 rounded-lg">
-                <span className="font-semibold text-amber-300 flex items-center gap-1 mb-1 text-[11px]">
+              <div className={`p-2.5 rounded-lg border ${
+                isBright ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-amber-950/40 border-amber-600/30 text-amber-200/90'
+              }`}>
+                <span className="font-semibold text-amber-700 dark:text-amber-300 flex items-center gap-1 mb-1 text-[11px]">
                   <Info className="w-3.5 h-3.5" /> Adult Female Patient Technique:
                 </span>
-                <p className="text-amber-200/90 leading-tight">
+                <p className="leading-tight">
                   {selectedElectrode.femaleLandmarkNotes}
                 </p>
               </div>
@@ -451,25 +498,27 @@ export default function AnteriorTorso({
 
             {/* Modified Torso Warning */}
             {selectedElectrode.modifiedTorsoNotes && (
-              <div className="p-2.5 bg-rose-950/40 border border-rose-600/30 rounded-lg">
-                <span className="font-semibold text-rose-300 flex items-center gap-1 mb-1 text-[11px]">
+              <div className={`p-2.5 rounded-lg border ${
+                isBright ? 'bg-rose-50 border-rose-200 text-rose-900' : 'bg-rose-950/40 border-rose-600/30 text-rose-200/90'
+              }`}>
+                <span className="font-semibold text-rose-700 dark:text-rose-300 flex items-center gap-1 mb-1 text-[11px]">
                   <AlertTriangle className="w-3.5 h-3.5" /> Torso Modification Warning:
                 </span>
-                <p className="text-rose-200/90 leading-tight">
+                <p className="leading-tight">
                   {selectedElectrode.modifiedTorsoNotes}
                 </p>
               </div>
             )}
           </div>
         ) : (
-          <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400 space-y-3">
-            <Info className="w-10 h-10 text-cyan-500/60" />
-            <h4 className="text-sm font-semibold text-slate-200">Interactive Anatomical Guide</h4>
-            <p className="text-xs leading-relaxed max-w-xs">
+          <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-3">
+            <Info className={`w-10 h-10 ${theme.accentText} opacity-70`} />
+            <h4 className={`text-sm font-semibold ${theme.headingColor}`}>Interactive Anatomical Guide</h4>
+            <p className={`text-xs leading-relaxed max-w-xs ${theme.subtextColor}`}>
               Click any electrode marker on the chest or buttons below to inspect its precise anatomical location, landmarking steps (Angle of Louis), and common placement errors.
             </p>
-            <div className="pt-3 border-t border-slate-800 w-full text-[11px] text-slate-500">
-              Tip: Switch on <span className="text-emerald-400 font-semibold">Practice Mode</span> to test your landmark identification skills!
+            <div className={`pt-3 border-t w-full text-[11px] ${isBright ? 'border-slate-200 text-slate-500' : 'border-slate-800 text-slate-500'}`}>
+              Tip: Switch on <span className="text-emerald-500 font-semibold">Practice Mode</span> to test your landmark identification skills!
             </div>
           </div>
         )}

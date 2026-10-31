@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { SUPPLEMENTAL_ELECTRODES, Electrode } from '../data/electrodes';
 import { Eye, AlertCircle, Info, Sparkles } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 interface PosteriorTorsoProps {
   selectedElectrodeId: string | null;
@@ -11,6 +12,7 @@ export default function PosteriorTorso({
   selectedElectrodeId,
   onSelectElectrode
 }: PosteriorTorsoProps) {
+  const { theme, isBright } = useTheme();
   const [showBones, setShowBones] = useState(true);
   const [showVerticalLines, setShowVerticalLines] = useState(true);
 
@@ -18,51 +20,58 @@ export default function PosteriorTorso({
   const selectedElectrode = posteriorElectrodes.find(e => e.id === selectedElectrodeId) || null;
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl flex flex-col xl:flex-row gap-6">
+    <div className={`border rounded-xl p-4 shadow-xl flex flex-col xl:flex-row gap-6 transition-colors ${theme.cardBg} ${theme.cardBorder}`}>
       {/* Left: SVG Posterior View */}
       <div className="flex-1 flex flex-col items-center">
         {/* Controls */}
         <div className="w-full flex items-center justify-between gap-2 mb-3 px-2 text-xs">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-              <Eye className="w-3.5 h-3.5 text-cyan-400" /> Overlays:
+            <span className={`font-semibold uppercase tracking-wider flex items-center gap-1.5 ${isBright ? 'text-slate-700' : 'text-slate-300'}`}>
+              <Eye className={`w-3.5 h-3.5 ${theme.accentText}`} /> Overlays:
             </span>
             <button
               onClick={() => setShowBones(!showBones)}
-              className={`px-2.5 py-1 rounded border transition ${
-                showBones ? 'bg-cyan-950/80 border-cyan-500/50 text-cyan-300' : 'bg-slate-800 border-slate-700 text-slate-400'
+              className={`px-2.5 py-1 rounded border transition font-medium ${
+                showBones 
+                  ? `${theme.badgeBg} ${theme.badgeBorder} ${theme.badgeText}` 
+                  : isBright ? 'bg-slate-100 border-slate-300 text-slate-600' : 'bg-slate-800 border-slate-700 text-slate-400'
               }`}
             >
               Spine & Scapula
             </button>
             <button
               onClick={() => setShowVerticalLines(!showVerticalLines)}
-              className={`px-2.5 py-1 rounded border transition ${
-                showVerticalLines ? 'bg-indigo-950/80 border-indigo-500/50 text-indigo-300' : 'bg-slate-800 border-slate-700 text-slate-400'
+              className={`px-2.5 py-1 rounded border transition font-medium ${
+                showVerticalLines 
+                  ? `${theme.badgeBg} ${theme.badgeBorder} ${theme.badgeText}` 
+                  : isBright ? 'bg-slate-100 border-slate-300 text-slate-600' : 'bg-slate-800 border-slate-700 text-slate-400'
               }`}
             >
               Reference Lines
             </button>
           </div>
 
-          <div className="text-[11px] text-amber-400 font-medium flex items-center gap-1 bg-amber-950/30 px-2.5 py-1 rounded border border-amber-500/30">
-            <Sparkles className="w-3.5 h-3.5" /> Posterior Leads (V7 – V9)
+          <div className={`text-[11px] font-medium flex items-center gap-1 px-2.5 py-1 rounded border ${
+            isBright ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-amber-950/40 border-amber-500/40 text-amber-300'
+          }`}>
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Posterior Leads (V7 – V9)
           </div>
         </div>
 
         {/* Anatomical Posterior Vector SVG */}
-        <div className="relative w-full max-w-[500px] aspect-[4/5] bg-slate-950/60 rounded-xl border border-slate-800/80 p-2 flex items-center justify-center select-none overflow-hidden">
+        <div className={`relative w-full max-w-[500px] aspect-[4/5] rounded-xl border p-2 flex items-center justify-center select-none overflow-hidden transition-colors ${
+          isBright ? 'bg-slate-100 border-slate-300' : 'bg-slate-950/60 border-slate-800/80'
+        }`}>
           <svg viewBox="0 0 400 500" className="w-full h-full">
             <defs>
               <linearGradient id="backSkinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#334155" />
-                <stop offset="50%" stopColor="#1e293b" />
-                <stop offset="100%" stopColor="#0f172a" />
+                <stop offset="0%" stopColor={isBright ? "#cbd5e1" : "#334155"} />
+                <stop offset="50%" stopColor={isBright ? "#94a3b8" : "#1e293b"} />
+                <stop offset="100%" stopColor={isBright ? "#64748b" : "#0f172a"} />
               </linearGradient>
             </defs>
 
             {/* Posterior Torso Silhouette */}
-            {/* Note: Facing patient's back: left side on diagram is patient's LEFT side */}
             <path
               d="M 150 25 C 160 40, 160 65, 160 75
                  C 120 78, 75 90, 48 120
@@ -83,18 +92,18 @@ export default function PosteriorTorso({
             />
 
             {/* Patient Back Orientation Labels */}
-            <text x="50" y="55" fill="#38bdf8" fontSize="10" fontWeight="bold">PATIENT LEFT</text>
-            <text x="350" y="55" fill="#94a3b8" fontSize="10" fontWeight="bold" textAnchor="end">PATIENT RIGHT</text>
+            <text x="50" y="55" fill="#0284c7" fontSize="10" fontWeight="bold">PATIENT LEFT</text>
+            <text x="350" y="55" fill="#64748b" fontSize="10" fontWeight="bold" textAnchor="end">PATIENT RIGHT</text>
 
             {/* Vertebral Column / Spine */}
             {showBones && (
               <g opacity="0.8">
                 {/* Cervical to Lumbar Spine Line */}
                 <line x1="200" y1="70" x2="200" y2="460" stroke="#94a3b8" strokeWidth="6" strokeDasharray="8,4" />
-                <text x="206" y="90" fill="#cbd5e1" fontSize="8">Vertebra C7 (Prominens)</text>
-                <text x="206" y="275" fill="#cbd5e1" fontSize="8">Thoracic Spine (T7-T8)</text>
+                <text x="206" y="90" fill={isBright ? "#334155" : "#cbd5e1"} fontSize="8">Vertebra C7 (Prominens)</text>
+                <text x="206" y="275" fill={isBright ? "#334155" : "#cbd5e1"} fontSize="8">Thoracic Spine (T7-T8)</text>
 
-                {/* Left Scapula (Patient Left = diagram left) */}
+                {/* Left Scapula */}
                 <polygon
                   points="90,120 155,130 148,225 105,175"
                   fill="#1e293b"
@@ -103,12 +112,12 @@ export default function PosteriorTorso({
                   opacity="0.8"
                 />
                 <circle cx="148" cy="225" r="3.5" fill="#f59e0b" />
-                <text x="146" y="240" fill="#f59e0b" fontSize="7.5" fontWeight="bold" textAnchor="middle">
+                <text x="146" y="240" fill="#d97706" fontSize="7.5" fontWeight="bold" textAnchor="middle">
                   Inferior Angle (Scapula)
                 </text>
-                <text x="110" y="150" fill="#94a3b8" fontSize="8">Left Scapula</text>
+                <text x="110" y="150" fill={isBright ? "#334155" : "#94a3b8"} fontSize="8">Left Scapula</text>
 
-                {/* Right Scapula (Patient Right = diagram right) */}
+                {/* Right Scapula */}
                 <polygon
                   points="310,120 245,130 252,225 295,175"
                   fill="#1e293b"
@@ -116,34 +125,34 @@ export default function PosteriorTorso({
                   strokeWidth="1.5"
                   opacity="0.4"
                 />
-                <text x="290" y="150" fill="#64748b" fontSize="8" textAnchor="end">Right Scapula</text>
+                <text x="290" y="150" fill={isBright ? "#475569" : "#64748b"} fontSize="8" textAnchor="end">Right Scapula</text>
               </g>
             )}
 
             {/* Vertical Reference Lines */}
             {showVerticalLines && (
-              <g opacity="0.7">
-                {/* Horizontal V6 Level Line (around from front to back at y=275) */}
+              <g opacity="0.75">
+                {/* Horizontal V6 Level Line */}
                 <line x1="20" y1="275" x2="380" y2="275" stroke="#f43f5e" strokeWidth="1.5" strokeDasharray="4,4" />
-                <text x="375" y="270" fill="#f43f5e" fontSize="7.5" fontWeight="bold" textAnchor="end">
+                <text x="375" y="270" fill="#e11d48" fontSize="7.5" fontWeight="bold" textAnchor="end">
                   Horizontal Plane of V6 (Crucial Reference)
                 </text>
 
-                {/* Left Posterior Axillary Line (PAL) for V7 (~x=112) */}
+                {/* Left Posterior Axillary Line (PAL) for V7 */}
                 <line x1="112" y1="130" x2="112" y2="380" stroke="#f97316" strokeWidth="1.2" strokeDasharray="3,3" />
-                <text x="110" y="375" fill="#f97316" fontSize="7" fontWeight="bold" textAnchor="end">
+                <text x="110" y="375" fill="#ea580c" fontSize="7" fontWeight="bold" textAnchor="end">
                   Left Posterior Axillary (V7)
                 </text>
 
-                {/* Left Midscapular Line for V8 (~x=148) */}
+                {/* Left Midscapular Line for V8 */}
                 <line x1="148" y1="140" x2="148" y2="395" stroke="#ec4899" strokeWidth="1.2" strokeDasharray="3,3" />
-                <text x="148" y="390" fill="#ec4899" fontSize="7" fontWeight="bold" textAnchor="middle">
+                <text x="148" y="390" fill="#db2777" fontSize="7" fontWeight="bold" textAnchor="middle">
                   Left Midscapular Line (V8)
                 </text>
 
-                {/* Left Paraspinal Line for V9 (~x=180) */}
+                {/* Left Paraspinal Line for V9 */}
                 <line x1="180" y1="100" x2="180" y2="410" stroke="#8b5cf6" strokeWidth="1.2" strokeDasharray="3,3" />
-                <text x="180" y="405" fill="#8b5cf6" fontSize="7" fontWeight="bold" textAnchor="middle">
+                <text x="180" y="405" fill="#7c3aed" fontSize="7" fontWeight="bold" textAnchor="middle">
                   Left Paraspinal (V9)
                 </text>
               </g>
@@ -161,23 +170,32 @@ export default function PosteriorTorso({
                   onClick={() => onSelectElectrode(elec.id === selectedElectrodeId ? null : elec)}
                   className="cursor-pointer group"
                 >
+                  {/* Invisible Massive Touch/Click Target Zone */}
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r="28"
+                    fill="transparent"
+                    className="cursor-pointer"
+                  />
+
                   {isSelected && (
                     <circle
                       cx={cx}
                       cy={cy}
-                      r="18"
+                      r="20"
                       fill="none"
                       stroke={elec.color}
-                      strokeWidth="3"
+                      strokeWidth="3.5"
                       className="animate-pulse"
-                      opacity="0.8"
+                      opacity="0.85"
                     />
                   )}
 
                   <circle
                     cx={cx}
                     cy={cy}
-                    r={isSelected ? 13 : 10}
+                    r={isSelected ? 15 : 12}
                     fill={elec.color}
                     stroke="#ffffff"
                     strokeWidth="2.5"
@@ -189,7 +207,7 @@ export default function PosteriorTorso({
                     y={cy + 4}
                     textAnchor="middle"
                     fill="#ffffff"
-                    fontSize="8.5"
+                    fontSize="9"
                     fontWeight="bold"
                     className="pointer-events-none select-none drop-shadow"
                   >
@@ -203,17 +221,19 @@ export default function PosteriorTorso({
 
         {/* Buttons */}
         <div className="flex items-center gap-3 mt-3 text-xs">
-          <span className="text-slate-400">Select Lead:</span>
+          <span className={theme.subtextColor}>Select Lead:</span>
           {posteriorElectrodes.map(e => (
             <button
               key={e.id}
               onClick={() => onSelectElectrode(e.id === selectedElectrodeId ? null : e)}
-              className={`px-3 py-1 rounded font-mono font-bold text-xs transition border ${
+              className={`px-3 py-1 rounded-lg font-mono font-bold text-xs transition border ${
                 selectedElectrodeId === e.id
-                  ? 'border-white text-white shadow'
+                  ? 'border-white text-white shadow ring-2 ring-white/50'
+                  : isBright
+                  ? 'border-slate-300 text-slate-700 hover:border-slate-500'
                   : 'border-transparent text-slate-300 hover:border-slate-600'
               }`}
-              style={{ backgroundColor: e.color + '33', color: e.color }}
+              style={{ backgroundColor: e.color + '26', color: isBright ? undefined : e.color }}
             >
               {e.code}
             </button>
@@ -222,90 +242,72 @@ export default function PosteriorTorso({
       </div>
 
       {/* Right: Explanatory & Clinical Guidance Panel */}
-      <div className="w-full xl:w-96 flex flex-col justify-between bg-slate-950/70 border border-slate-800 rounded-xl p-4">
+      <div className={`w-full xl:w-96 flex flex-col justify-between border rounded-xl p-4 transition-colors ${theme.cardSubBg} ${theme.cardBorder}`}>
         {selectedElectrode ? (
           <div className="space-y-3.5 text-xs">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div className={`flex items-center justify-between border-b pb-2 ${isBright ? 'border-slate-200' : 'border-slate-800'}`}>
               <div className="flex items-center gap-2">
                 <span
-                  className="w-4 h-4 rounded-full flex-shrink-0"
+                  className="w-4 h-4 rounded-full flex-shrink-0 shadow"
                   style={{ backgroundColor: selectedElectrode.color }}
                 />
-                <h3 className="text-base font-bold text-white">
+                <h3 className={`text-base font-bold ${theme.headingColor}`}>
                   {selectedElectrode.name} ({selectedElectrode.code})
                 </h3>
               </div>
-              <span className="px-2 py-0.5 rounded text-[10px] uppercase font-mono font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">
+              <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono font-bold ${
+                isBright ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-amber-950/60 text-amber-300 border border-amber-500/40'
+              }`}>
                 Posterior Lead
               </span>
             </div>
 
             <div>
-              <span className="font-semibold text-cyan-400 uppercase tracking-wide text-[11px] block mb-0.5">
-                Exact Anatomical Placement:
+              <span className="font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide text-[11px] block mb-0.5">
+                Precise Anatomical Landmark:
               </span>
-              <p className="text-slate-200 bg-slate-900/90 p-2.5 rounded-lg border border-slate-800 font-medium">
+              <p className={`p-2.5 rounded-lg border font-medium ${
+                isBright ? 'bg-white text-slate-800 border-slate-200' : 'bg-slate-900/90 text-slate-200 border-slate-800'
+              }`}>
                 {selectedElectrode.anatomicalLocation}
               </p>
             </div>
 
             <div>
-              <span className="font-semibold text-indigo-400 uppercase tracking-wide text-[11px] block mb-0.5">
-                Technique & Landmarking:
+              <span className="font-semibold text-cyan-600 dark:text-cyan-400 uppercase tracking-wide text-[11px] block mb-0.5">
+                Horizontal Alignment Rule:
               </span>
-              <p className="text-slate-300 leading-relaxed">
-                {selectedElectrode.instructions}
+              <p className={`leading-relaxed ${theme.subtextColor}`}>
+                Must be positioned in the <strong className={theme.headingColor}>exact same horizontal plane as lead V6</strong> (5th intercostal space at midaxillary line). Do not angle downward.
               </p>
             </div>
 
             <div>
-              <span className="font-semibold text-emerald-400 uppercase tracking-wide text-[11px] block mb-0.5">
-                Diagnostic Role & Threshold:
+              <span className="font-semibold text-rose-600 dark:text-rose-400 uppercase tracking-wide text-[11px] block mb-0.5">
+                Diagnostic Threshold:
               </span>
-              <p className="text-slate-300 leading-relaxed">
-                {selectedElectrode.clinicalPurpose}
+              <p className={`leading-relaxed ${theme.subtextColor}`}>
+                ST-segment elevation <strong className={theme.headingColor}>≥ 0.5 mm (0.05 mV)</strong> in any posterior lead (V7, V8, or V9) confirms true acute posterior STEMI.
               </p>
             </div>
 
-            <div className="p-2.5 bg-rose-950/40 border border-rose-600/30 rounded-lg">
-              <span className="font-semibold text-rose-300 flex items-center gap-1 mb-1 text-[11px]">
-                <AlertCircle className="w-3.5 h-3.5" /> Pitfalls to Avoid:
-              </span>
-              <ul className="list-disc list-inside space-y-1 text-rose-200/90">
-                {selectedElectrode.commonMistakes.map((m, idx) => (
-                  <li key={idx} className="leading-tight">{m}</li>
-                ))}
-              </ul>
+            <div className={`p-2.5 rounded-lg border text-[11px] ${
+              isBright ? 'bg-slate-100 border-slate-200 text-slate-700' : 'bg-slate-900 border-slate-800 text-slate-300'
+            }`}>
+              <div className="font-bold flex items-center gap-1 mb-1">
+                <Info className="w-3.5 h-3.5 text-cyan-500" />
+                Physical Cable Reassignment Note:
+              </div>
+              Repurpose V4, V5, V6 leads on your 10-electrode device and manually hand-annotate tracing with "V7", "V8", "V9".
             </div>
           </div>
         ) : (
-          <div className="space-y-4 text-xs">
-            <div className="flex items-center gap-2 text-amber-400 border-b border-slate-800 pb-2">
-              <Info className="w-5 h-5 flex-shrink-0" />
-              <h4 className="text-sm font-semibold text-white">Why Record Posterior Leads?</h4>
-            </div>
-
-            <p className="text-slate-300 leading-relaxed">
-              Standard 12-lead ECG electrodes face the anterior and lateral chest wall. The <strong className="text-cyan-300">posterior wall of the left ventricle</strong> is directly opposite leads V1–V3.
+          <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-3">
+            <AlertCircle className={`w-10 h-10 ${theme.accentText} opacity-70`} />
+            <h4 className={`text-sm font-semibold ${theme.headingColor}`}>Posterior Chest Guidance</h4>
+            <p className={`text-xs leading-relaxed max-w-xs ${theme.subtextColor}`}>
+              Click on leads V7, V8, or V9 on the patient's left back to inspect anatomical landmarks, muscle attenuation, and diagnostic criteria.
             </p>
-
-            <div className="p-3 bg-indigo-950/40 border border-indigo-500/30 rounded-lg space-y-1.5">
-              <span className="font-bold text-indigo-300 block">Reciprocal Signature in V1–V3:</span>
-              <p className="text-slate-300">
-                Transmural posterior STEMI produces <span className="text-amber-300 font-semibold">horizontal ST depression</span>, <span className="text-amber-300 font-semibold">tall R waves (R/S &gt; 1)</span>, and <span className="text-amber-300 font-semibold">upright T waves</span> in standard anterior leads V1–V3.
-              </p>
-            </div>
-
-            <div className="p-3 bg-emerald-950/40 border border-emerald-500/30 rounded-lg space-y-1.5">
-              <span className="font-bold text-emerald-300 block">Guideline STEMI Threshold:</span>
-              <p className="text-slate-300">
-                Because back musculature attenuates voltage, ST elevation <strong className="text-white">≥ 0.5 mm (0.05 mV)</strong> in leads V7–V9 is diagnostic of acute posterior STEMI!
-              </p>
-            </div>
-
-            <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-800">
-              Click <span className="text-orange-400 font-bold">V7</span>, <span className="text-pink-400 font-bold">V8</span>, or <span className="text-purple-400 font-bold">V9</span> to view anatomical instructions and acquisition tips.
-            </div>
           </div>
         )}
       </div>

@@ -124,6 +124,25 @@ npm run preview
 
 ## 📝 Update History & Changelog
 
+### [v4] [2026-10-31] — Theme Consistency, Responsive Waveforms, Jitter-Free Rendering & Placement Ergonomics
+- **Eliminated Redundant Concept Banner**:
+  - Removed the `Synchronized Educational Core • Concept Triad` banner to streamline interface hierarchy.
+- **Theme Color & Contrast Harmonization**:
+  - Introduced unified React `ThemeContext` providing dynamic design tokens (`accentBg`, `accentText`, `cardBg`, `cardSubBg`, `cardBorder`, etc.) across all 7 curriculum modules.
+  - Resolved theme mismatches where topic fonts and highlight buttons remained hardcoded red in non-red palettes. The red `HeartPulse` logo next to the hamburger menu remains preserved.
+  - Eliminated pale font over pale background in `3. Supplemental Leads` and other bright themes, replacing them with high-contrast dark text on light backgrounds.
+- **Electrode Placement Hit Target Ergonomics & Practice Blind Mode**:
+  - In `MODULE 1: STANDARD 12-LEAD PLACEMENT SIMULATOR`, enlarged electrode tap targets with an invisible $56 \times 56\text{ px}$ ($r=28$) touch zone and expanded marker radius ($r=12\text{--}15$), resolving mobile touch issues.
+  - Added limb leads (`RA`, `LA`, `RL`, `LL`) to randomized practice targets alongside precordial leads.
+  - In Practice Mode, hid all electrode text labels and color markers (displaying neutral unlabelled `?` targets) and hid the bottom legend to enforce true anatomical landmark recall.
+- **Conditional Active MI State Dropdown**:
+  - Moved the active MI dropdown directly below the navigation tabs and restricted display to `4. MI Localization` and `5. Waveform Simulator` tabs only.
+- **Jitter-Free Waveform Rendering**:
+  - Overhauled canvas rendering loops to use invariant, fixed $1.0\text{ px}$ sampling coordinates across all traces (active wave, prior cycle, and normal overlay), eliminating visual jitter during playback.
+- **Mobile Single-Column Clinical Lead Ordering**:
+  - Configured responsive CSS Grid positioning for mobile screens (e.g. Safari on iPhone): sorted in canonical order from limb leads (`I, II, III, aVR, aVL, aVF`) to precordial leads (`V1–V6`), while maintaining the standard $3 \times 4$ layout matrix on desktop.
+- **Version Bump**: Updated application release badge to `v4`.
+
 ### [v3.1] [2026-10-31] — Lead II Rhythm Strip Anti-Clipping, Full-Height Menu & Waveform Precision
 - **Lead II Continuous Rhythm Strip Anti-Clipping**:
   - Resolved vertical clipping where tall Lead II R waves ($+1.25\text{ mV}$) exceeded canvas boundaries.

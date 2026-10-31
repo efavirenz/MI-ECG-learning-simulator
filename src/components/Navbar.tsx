@@ -53,10 +53,12 @@ export default function Navbar({
     setIsMenuOpen(false); // Auto-close drawer on selection
   };
 
+  const showActiveMiDropdown = activeTab === 'localization' || activeTab === 'waveforms';
+
   return (
     <header className={`sticky top-0 z-40 backdrop-blur-md border-b transition-colors ${currentTheme.navBg} ${currentTheme.borderCol}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Row 1: Top Bar with Hamburger, Logo, Clinical Title, and v3 Badge */}
+        {/* Row 1: Top Bar with Hamburger, Red HeartPulse Icon (Untouched), Clinical Title, and v4 Badge */}
         <div className="flex items-center justify-between h-16 gap-3">
           {/* Top Left: Hamburger Menu Button + Logo + Title */}
           <div className="flex items-center gap-3">
@@ -73,7 +75,7 @@ export default function Navbar({
               <Menu className="w-5 h-5" />
             </button>
 
-            {/* HeartPulse Logo */}
+            {/* HeartPulse Logo (DO NOT TOUCH - Kept Red as requested) */}
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 to-rose-400 flex items-center justify-center text-white shadow-lg shadow-rose-950/40 flex-shrink-0">
               <HeartPulse className="w-6 h-6 animate-pulse" />
             </div>
@@ -94,65 +96,24 @@ export default function Navbar({
             </div>
           </div>
 
-          {/* Top Right: Version Number (v3.1 in rounded rectangle) */}
+          {/* Top Right: Version Number (v4 in rounded rectangle) */}
           <div className="flex items-center gap-2">
             <span
-              title="Simulator Version 3.1"
-              className="px-2.5 py-1 rounded-lg border border-rose-500/50 bg-rose-950/60 text-rose-300 font-mono font-bold text-xs tracking-wider shadow-sm flex items-center gap-1"
+              title="Simulator Version 4"
+              className={`px-2.5 py-1 rounded-lg border font-mono font-bold text-xs tracking-wider shadow-sm flex items-center gap-1.5 transition-colors ${
+                isBright
+                  ? `${currentTheme.badgeBg} ${currentTheme.badgeBorder} ${currentTheme.badgeText}`
+                  : `bg-slate-900/90 border-slate-700 ${currentTheme.accentText}`
+              }`}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
-              v3.1
+              <span className={`w-1.5 h-1.5 rounded-full ${isBright ? 'bg-current' : 'bg-current'} animate-ping`} />
+              v4
             </span>
           </div>
         </div>
 
-        {/* Row 2: Centered Active MI State Dropdown (Between Title/Subtitle and 1. ECG Basics Tab) */}
-        <div className={`w-full py-2 flex justify-center items-center border-t border-b ${currentTheme.borderCol}`}>
-          <div className={`w-full max-w-3xl flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl border shadow-inner text-xs transition-colors ${
-            isBright
-              ? 'bg-white/95 border-slate-300 text-slate-800'
-              : 'bg-slate-900/90 border-slate-700/80 text-slate-200'
-          }`}>
-            <Activity className="w-4 h-4 text-rose-500 flex-shrink-0 animate-pulse" />
-            <label htmlFor="active-mi-select" className={`font-semibold whitespace-nowrap text-xs flex items-center gap-1 ${
-              isBright ? 'text-slate-700' : 'text-slate-300'
-            }`}>
-              Active MI State:
-            </label>
-            <select
-              id="active-mi-select"
-              value={selectedTerritoryId}
-              onChange={(e) => onSelectTerritory(e.target.value)}
-              className={`flex-1 w-full max-w-2xl font-semibold font-mono text-xs rounded-lg px-3 py-1.5 border focus:outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer text-center transition-colors ${
-                isBright
-                  ? 'bg-slate-50 text-rose-700 border-slate-300'
-                  : 'bg-slate-950 text-rose-400 border-slate-700'
-              }`}
-            >
-              <optgroup label="Baseline">
-                <option value="normal">Normal Baseline (Sinus Rhythm)</option>
-              </optgroup>
-              <optgroup label="Acute STEMI Territories">
-                <option value="septal">Septal STEMI (V1–V2 • LAD Septal Perforators)</option>
-                <option value="anterior">Anterior STEMI (V3–V4 • Mid LAD / Diagonals)</option>
-                <option value="anteroseptal">Anteroseptal STEMI (V1–V4 • Proximal LAD)</option>
-                <option value="extensive_anterior">Extensive Anterior (V1–V6, I, aVL • Proximal LAD / LMCA)</option>
-                <option value="lateral">Lateral STEMI (I, aVL, V5–V6 • LCx / Diagonals)</option>
-                <option value="high_lateral">High Lateral STEMI (I, aVL • D1 / OM1)</option>
-                <option value="inferior">Inferior STEMI (II, III, aVF • RCA / LCx)</option>
-                <option value="posterior">Posterior STEMI (V7–V9 / Reciprocal V1–V3 • LCx / RCA)</option>
-                <option value="right_ventricular">Right Ventricular Infarction (V3R, V4R • Proximal RCA)</option>
-              </optgroup>
-              <optgroup label="STEMI Mimics">
-                <option value="pericarditis">Acute Pericarditis (Diffuse Concave ST & PR Depression)</option>
-                <option value="early_repolarization">Benign Early Repolarization (Concave ST & J-Point Notch)</option>
-              </optgroup>
-            </select>
-          </div>
-        </div>
-
-        {/* Row 3: Navigation Tabs Bar (Starting with 1. ECG Basics) */}
-        <nav className="flex space-x-1 overflow-x-auto py-2 no-scrollbar">
+        {/* Row 2: Navigation Tabs Bar */}
+        <nav className="flex space-x-1 overflow-x-auto py-2 no-scrollbar border-t border-slate-800/40">
           {navItems.map(item => {
             const isActive = activeTab === item.id;
             return (
@@ -161,7 +122,7 @@ export default function Navbar({
                 onClick={() => handleTabClick(item.id)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition flex items-center gap-1.5 ${
                   isActive
-                    ? 'bg-rose-600 text-white shadow-md'
+                    ? `${currentTheme.accentBg} shadow-md`
                     : isBright
                     ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
                     : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900'
@@ -172,6 +133,53 @@ export default function Navbar({
             );
           })}
         </nav>
+
+        {/* Row 3: Active MI Dropdown (Displayed ONLY when clicking/tapping 4. MI Localization or 5. Waveform Simulator) */}
+        {showActiveMiDropdown && (
+          <div className={`w-full py-2.5 flex justify-center items-center border-t transition-colors ${currentTheme.borderCol}`}>
+            <div className={`w-full max-w-3xl flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl border shadow-inner text-xs transition-colors ${
+              isBright
+                ? 'bg-white/95 border-slate-300 text-slate-800'
+                : 'bg-slate-900/90 border-slate-700/80 text-slate-200'
+            }`}>
+              <Activity className={`w-4 h-4 ${currentTheme.accentText} flex-shrink-0 animate-pulse`} />
+              <label htmlFor="active-mi-select" className={`font-semibold whitespace-nowrap text-xs flex items-center gap-1 ${
+                isBright ? 'text-slate-700' : 'text-slate-300'
+              }`}>
+                Active MI State:
+              </label>
+              <select
+                id="active-mi-select"
+                value={selectedTerritoryId}
+                onChange={(e) => onSelectTerritory(e.target.value)}
+                className={`flex-1 w-full max-w-2xl font-semibold font-mono text-xs rounded-lg px-3 py-1.5 border focus:outline-none ${currentTheme.accentRing} cursor-pointer text-center transition-colors ${
+                  isBright
+                    ? `bg-slate-50 ${currentTheme.accentText} border-slate-300`
+                    : `bg-slate-950 ${currentTheme.accentText} border-slate-700`
+                }`}
+              >
+                <optgroup label="Baseline">
+                  <option value="normal">Normal Baseline (Sinus Rhythm)</option>
+                </optgroup>
+                <optgroup label="Acute STEMI Territories">
+                  <option value="septal">Septal STEMI (V1–V2 • LAD Septal Perforators)</option>
+                  <option value="anterior">Anterior STEMI (V3–V4 • Mid LAD / Diagonals)</option>
+                  <option value="anteroseptal">Anteroseptal STEMI (V1–V4 • Proximal LAD)</option>
+                  <option value="extensive_anterior">Extensive Anterior (V1–V6, I, aVL • Proximal LAD / LMCA)</option>
+                  <option value="lateral">Lateral STEMI (I, aVL, V5–V6 • LCx / Diagonals)</option>
+                  <option value="high_lateral">High Lateral STEMI (I, aVL • D1 / OM1)</option>
+                  <option value="inferior">Inferior STEMI (II, III, aVF • RCA / LCx)</option>
+                  <option value="posterior">Posterior STEMI (V7–V9 / Reciprocal V1–V3 • LCx / RCA)</option>
+                  <option value="right_ventricular">Right Ventricular Infarction (V3R, V4R • Proximal RCA)</option>
+                </optgroup>
+                <optgroup label="STEMI Mimics">
+                  <option value="pericarditis">Acute Pericarditis (Diffuse Concave ST & PR Depression)</option>
+                  <option value="early_repolarization">Benign Early Repolarization (Concave ST & J-Point Notch)</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Auto-closing Hamburger Navigation & Theme Drawer */}
@@ -194,7 +202,7 @@ export default function Navbar({
               {/* Drawer Header */}
               <div className="flex items-center justify-between pb-3 border-b border-slate-700/50">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-rose-600 flex items-center justify-center text-white shadow flex-shrink-0">
+                  <div className={`w-8 h-8 rounded-lg ${currentTheme.accentBg} flex items-center justify-center shadow flex-shrink-0`}>
                     <HeartPulse className="w-4 h-4" />
                   </div>
                   <div>
@@ -204,8 +212,12 @@ export default function Navbar({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-rose-950/80 text-rose-300 border border-rose-600/40">
-                    v3.1
+                  <span className={`px-2 py-0.5 rounded text-[11px] font-mono font-bold ${
+                    isBright
+                      ? `${currentTheme.badgeBg} ${currentTheme.badgeBorder} ${currentTheme.badgeText} border`
+                      : `bg-slate-800 ${currentTheme.accentText} border border-slate-700`
+                  }`}>
+                    v4
                   </span>
                   <button
                     onClick={() => setIsMenuOpen(false)}
@@ -219,7 +231,7 @@ export default function Navbar({
 
               {/* Drawer Section 1: The 7 Navigation Tabs */}
               <div className="space-y-1.5">
-                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-rose-500 block px-1">
+                <span className={`text-[11px] font-mono font-bold uppercase tracking-wider ${currentTheme.accentText} block px-1`}>
                   Modules & Curriculum (7 Tabs)
                 </span>
                 <div className="space-y-1">
@@ -231,7 +243,7 @@ export default function Navbar({
                         onClick={() => handleTabClick(item.id)}
                         className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center justify-between ${
                           isActive
-                            ? 'bg-rose-600 text-white shadow'
+                            ? `${currentTheme.accentBg} shadow`
                             : isBright
                             ? 'text-slate-700 hover:bg-slate-100'
                             : 'text-slate-300 hover:bg-slate-800 hover:text-white'
@@ -240,7 +252,7 @@ export default function Navbar({
                         <span className="flex items-center gap-2">
                           <span className={`w-5 h-5 rounded flex items-center justify-center text-[10px] font-mono font-bold flex-shrink-0 ${
                             isActive
-                              ? 'bg-rose-700 text-white'
+                              ? 'bg-black/20 text-white'
                               : isBright
                               ? 'bg-slate-200 text-slate-700'
                               : 'bg-slate-800 text-slate-400'
@@ -259,7 +271,7 @@ export default function Navbar({
               {/* Drawer Section 2: Color Themes (5 Bright + 5 Dark Side-by-Side in 2 Columns) */}
               <div className="space-y-2.5 pt-3 border-t border-slate-700/50">
                 <div className="flex items-center justify-between px-1">
-                  <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-rose-500 flex items-center gap-1.5">
+                  <span className={`text-[11px] font-mono font-bold uppercase tracking-wider ${currentTheme.accentText} flex items-center gap-1.5`}>
                     <Palette className="w-3.5 h-3.5" />
                     Color Themes (10 Options)
                   </span>
@@ -280,7 +292,7 @@ export default function Navbar({
                             onClick={() => handleThemeClick(theme.id)}
                             className={`w-full text-left px-2 py-1.5 rounded-lg text-[11px] font-medium transition flex items-center justify-between border ${
                               isSelected
-                                ? 'border-rose-500 bg-rose-500/10 text-rose-600 font-bold'
+                                ? `${theme.badgeBorder} ${theme.badgeBg} ${theme.badgeText} font-bold`
                                 : isBright
                                 ? 'border-slate-200 hover:bg-slate-100 text-slate-700'
                                 : 'border-slate-800 hover:bg-slate-800 text-slate-300'
@@ -293,7 +305,7 @@ export default function Navbar({
                               />
                               <span className="truncate">{theme.name}</span>
                             </span>
-                            {isSelected && <Check className="w-3 h-3 text-rose-500 flex-shrink-0" />}
+                            {isSelected && <Check className="w-3 h-3 flex-shrink-0" />}
                           </button>
                         );
                       })}
@@ -314,7 +326,7 @@ export default function Navbar({
                             onClick={() => handleThemeClick(theme.id)}
                             className={`w-full text-left px-2 py-1.5 rounded-lg text-[11px] font-medium transition flex items-center justify-between border ${
                               isSelected
-                                ? 'border-rose-500 bg-rose-500/10 text-rose-400 font-bold'
+                                ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400 font-bold'
                                 : isBright
                                 ? 'border-slate-200 hover:bg-slate-100 text-slate-700'
                                 : 'border-slate-800 hover:bg-slate-800 text-slate-300'
@@ -327,7 +339,7 @@ export default function Navbar({
                               />
                               <span className="truncate">{theme.name}</span>
                             </span>
-                            {isSelected && <Check className="w-3 h-3 text-rose-500 flex-shrink-0" />}
+                            {isSelected && <Check className="w-3 h-3 flex-shrink-0" />}
                           </button>
                         );
                       })}
@@ -340,7 +352,7 @@ export default function Navbar({
             {/* Drawer Footer */}
             <div className="pt-3 border-t border-slate-700/50 text-[11px] text-slate-400 flex items-center justify-between">
               <span>ACC/AHA 2025 • ESC 2023</span>
-              <span className="font-mono text-rose-400 font-bold">Release v3.1</span>
+              <span className={`font-mono font-bold ${currentTheme.accentText}`}>Release v4</span>
             </div>
           </div>
         </div>

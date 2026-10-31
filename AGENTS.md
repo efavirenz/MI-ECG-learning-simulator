@@ -32,6 +32,8 @@ MI-ECG-learning-simulator/
     ├── main.tsx                 # React entry point
     ├── App.tsx                  # Global state coordinator & module switcher
     ├── index.css                # Tailwind base + calibrated ECG grid background classes
+    ├── context/
+    │   └── ThemeContext.tsx         # Global theme provider, tokens, and useTheme hook
     ├── data/
     │   ├── electrodes.ts        # 10 standard + 5 supplemental electrodes data
     │   ├── miTerritories.ts     # STEMI territories, culprit vessels, waveform deltas
