@@ -124,6 +124,20 @@ npm run preview
 
 ## 📝 Update History & Changelog
 
+### [v3.1] [2026-10-31] — Lead II Rhythm Strip Anti-Clipping, Full-Height Menu & Waveform Precision
+- **Lead II Continuous Rhythm Strip Anti-Clipping**:
+  - Resolved vertical clipping where tall Lead II R waves ($+1.25\text{ mV}$) exceeded canvas boundaries.
+  - Increased rhythm strip canvas height to `h-36 sm:h-40` (144–160px) and synchronized physical millimeter scaling ($3.5\text{--}4.2\text{ px/mm}$) across all leads.
+  - Aligned isoelectric baseline to 60% height, guaranteeing $>30\text{ px}$ headroom for tall R peaks and hyperacute ST-T elevation.
+- **Full-Height Hamburger Navigation Drawer**:
+  - Restructured drawer container to occupy full display height (`h-screen max-h-screen`) without vertical overflow.
+  - Converted the 10 color themes into a 2-column side-by-side grid (5 Bright on left, 5 Dark on right), eliminating unnecessary scrolling.
+- **Waveform Graphical Accuracy & Dynamic Headroom**:
+  - Re-audited and calibrated baseline morphologies across all 12 standard and 5 supplemental leads.
+  - Corrected Lead aVR morphology (`qAmp: 0.0`) for clean physiological rS complex and inverted T wave.
+  - Calibrated magnified single-lead inspection modal baseline to $Y = 180$ with 40 px major grid lines, preventing clipping of deep S waves ($-1.45\text{ mV}$ in V2) and tall R waves ($+1.45\text{ mV}$ in V5).
+- **Version Bump**: Updated application release badge to `v3.1`.
+
 ### [v3] [2026-10-31] — Layout Optimization, Version Badge, Navigation Drawer & Color Themes
 - **Active MI State Dropdown Relocation**:
   - Moved the interactive territory selector from the top-right header to a dedicated centered row between the simulator subtitle (`Interactive Clinical Simulator: Anatomy → Electrodes → ECG Waveforms`) and the navigation tabs (`1. ECG Basics`).

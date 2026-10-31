@@ -37,7 +37,8 @@ MI-ECG-learning-simulator/
     │   ├── miTerritories.ts     # STEMI territories, culprit vessels, waveform deltas
     │   ├── clinicalCriteria.ts  # 2025 ACC/AHA & 2023 ESC criteria, mimics, ACS equivalents
     │   ├── clinicalCases.ts     # 5 clinical scenarios + 10-question knowledge quiz
-    │   └── references.ts        # Cited guideline references and clinical disclaimer
+    │   ├── references.ts        # Cited guideline references and clinical disclaimer
+    │   └── themes.ts            # 10 clinical UI themes (5 bright + 5 dark) and styling tokens
     ├── utils/
     │   └── ecgGenerator.ts      # Mathematical Gaussian ECG synthesizer & landmark calculator
     └── components/
@@ -84,6 +85,7 @@ MI-ECG-learning-simulator/
 - **Paper Speed**: Standard is $25\text{ mm/s}$ ($1\text{ mm small box} = 0.04\text{ s} = 40\text{ ms}$; $5\text{ mm large box} = 0.20\text{ s} = 200\text{ ms}$).
 - **Voltage Calibration**: Standard is $10\text{ mm/mV}$ ($1\text{ mm small box} = 0.1\text{ mV}$; $10\text{ mm} = 1.0\text{ mV}$).
 - All canvas and SVG waveform renderings must align with these grid measurements.
+- **Anti-Clipping & Margin Standards**: Waveform monitors must provide sufficient vertical headroom for tall R waves (Lead II, V4, V5 up to $1.45\text{ mV}$ + STEMI ST elevation) and deep S waves (V1, V2 down to $-1.45\text{ mV}$). Lead II continuous rhythm strips must have proportional canvas height and width-adjusted duration so waveforms never exceed canvas boundaries.
 
 ### Rule 4 — Mandatory Clinical Safety Warnings
 - **Mason-Likar Torso Modification**: Always document that moving limb electrodes to the torso alters frontal axis and produces pseudo-Q waves; it is valid for telemetry but non-diagnostic for STEMI.

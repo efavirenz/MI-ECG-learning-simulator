@@ -94,14 +94,14 @@ export default function Navbar({
             </div>
           </div>
 
-          {/* Top Right: Version Number (v3 in rounded rectangle) */}
+          {/* Top Right: Version Number (v3.1 in rounded rectangle) */}
           <div className="flex items-center gap-2">
             <span
-              title="Simulator Version 3.0"
+              title="Simulator Version 3.1"
               className="px-2.5 py-1 rounded-lg border border-rose-500/50 bg-rose-950/60 text-rose-300 font-mono font-bold text-xs tracking-wider shadow-sm flex items-center gap-1"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
-              v3
+              v3.1
             </span>
           </div>
         </div>
@@ -184,17 +184,17 @@ export default function Navbar({
             aria-hidden="true"
           />
 
-          {/* Slide-in Drawer Content */}
-          <div className={`relative z-10 w-84 max-w-[85vw] h-full shadow-2xl overflow-y-auto flex flex-col justify-between p-5 border-r transition-colors ${
+          {/* Slide-in Drawer Content - Full Screen Height & Optimized Distribution */}
+          <div className={`relative z-10 w-full max-w-sm sm:max-w-md h-screen max-h-screen shadow-2xl flex flex-col justify-between p-4 sm:p-5 border-r transition-colors overflow-y-auto ${
             isBright
               ? 'bg-white border-slate-300 text-slate-900'
               : 'bg-slate-900 border-slate-800 text-slate-100'
           }`}>
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* Drawer Header */}
               <div className="flex items-center justify-between pb-3 border-b border-slate-700/50">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-rose-600 flex items-center justify-center text-white shadow">
+                  <div className="w-8 h-8 rounded-lg bg-rose-600 flex items-center justify-center text-white shadow flex-shrink-0">
                     <HeartPulse className="w-4 h-4" />
                   </div>
                   <div>
@@ -205,7 +205,7 @@ export default function Navbar({
 
                 <div className="flex items-center gap-2">
                   <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-rose-950/80 text-rose-300 border border-rose-600/40">
-                    v3
+                    v3.1
                   </span>
                   <button
                     onClick={() => setIsMenuOpen(false)}
@@ -218,8 +218,8 @@ export default function Navbar({
               </div>
 
               {/* Drawer Section 1: The 7 Navigation Tabs */}
-              <div className="space-y-2">
-                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-rose-500 block">
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-rose-500 block px-1">
                   Modules & Curriculum (7 Tabs)
                 </span>
                 <div className="space-y-1">
@@ -229,7 +229,7 @@ export default function Navbar({
                       <button
                         key={item.id}
                         onClick={() => handleTabClick(item.id)}
-                        className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold transition flex items-center justify-between ${
+                        className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center justify-between ${
                           isActive
                             ? 'bg-rose-600 text-white shadow'
                             : isBright
@@ -238,7 +238,7 @@ export default function Navbar({
                         }`}
                       >
                         <span className="flex items-center gap-2">
-                          <span className={`w-5 h-5 rounded flex items-center justify-center text-[10px] font-mono font-bold ${
+                          <span className={`w-5 h-5 rounded flex items-center justify-center text-[10px] font-mono font-bold flex-shrink-0 ${
                             isActive
                               ? 'bg-rose-700 text-white'
                               : isBright
@@ -247,98 +247,100 @@ export default function Navbar({
                           }`}>
                             {item.number}
                           </span>
-                          {item.label.replace(/^\d+\.\s*/, '')}
+                          <span className="truncate">{item.label.replace(/^\d+\.\s*/, '')}</span>
                         </span>
-                        {isActive && <Check className="w-4 h-4" />}
+                        {isActive && <Check className="w-4 h-4 flex-shrink-0" />}
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Drawer Section 2: Color Themes (5 Bright + 5 Dark) */}
-              <div className="space-y-3 pt-3 border-t border-slate-700/50">
-                <div className="flex items-center justify-between">
+              {/* Drawer Section 2: Color Themes (5 Bright + 5 Dark Side-by-Side in 2 Columns) */}
+              <div className="space-y-2.5 pt-3 border-t border-slate-700/50">
+                <div className="flex items-center justify-between px-1">
                   <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-rose-500 flex items-center gap-1.5">
                     <Palette className="w-3.5 h-3.5" />
                     Color Themes (10 Options)
                   </span>
                 </div>
 
-                {/* 5 Bright Colors */}
-                <div className="space-y-1.5">
-                  <span className="text-[10px] uppercase font-mono font-bold text-slate-400 block px-1">
-                    Bright Themes (5)
-                  </span>
-                  <div className="grid grid-cols-1 gap-1">
-                    {THEMES.filter(t => t.mode === 'bright').map(theme => {
-                      const isSelected = currentThemeId === theme.id;
-                      return (
-                        <button
-                          key={theme.id}
-                          onClick={() => handleThemeClick(theme.id)}
-                          className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition flex items-center justify-between border ${
-                            isSelected
-                              ? 'border-rose-500 bg-rose-500/10 text-rose-600 font-bold'
-                              : isBright
-                              ? 'border-slate-200 hover:bg-slate-100 text-slate-700'
-                              : 'border-slate-800 hover:bg-slate-800 text-slate-300'
-                          }`}
-                        >
-                          <span className="flex items-center gap-2">
-                            <span
-                              className="w-3.5 h-3.5 rounded-full border border-black/20 shadow-sm"
-                              style={{ backgroundColor: theme.colorPreview }}
-                            />
-                            {theme.name}
-                          </span>
-                          {isSelected && <Check className="w-3.5 h-3.5 text-rose-500" />}
-                        </button>
-                      );
-                    })}
+                <div className="grid grid-cols-2 gap-2">
+                  {/* Column 1: 5 Bright Themes */}
+                  <div className="space-y-1">
+                    <span className="text-[10px] uppercase font-mono font-bold text-slate-400 block px-1">
+                      Bright (5)
+                    </span>
+                    <div className="space-y-1">
+                      {THEMES.filter(t => t.mode === 'bright').map(theme => {
+                        const isSelected = currentThemeId === theme.id;
+                        return (
+                          <button
+                            key={theme.id}
+                            onClick={() => handleThemeClick(theme.id)}
+                            className={`w-full text-left px-2 py-1.5 rounded-lg text-[11px] font-medium transition flex items-center justify-between border ${
+                              isSelected
+                                ? 'border-rose-500 bg-rose-500/10 text-rose-600 font-bold'
+                                : isBright
+                                ? 'border-slate-200 hover:bg-slate-100 text-slate-700'
+                                : 'border-slate-800 hover:bg-slate-800 text-slate-300'
+                            }`}
+                          >
+                            <span className="flex items-center gap-1.5 truncate">
+                              <span
+                                className="w-3 h-3 rounded-full border border-black/20 shadow-sm flex-shrink-0"
+                                style={{ backgroundColor: theme.colorPreview }}
+                              />
+                              <span className="truncate">{theme.name}</span>
+                            </span>
+                            {isSelected && <Check className="w-3 h-3 text-rose-500 flex-shrink-0" />}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
 
-                {/* 5 Dark Colors */}
-                <div className="space-y-1.5 pt-2">
-                  <span className="text-[10px] uppercase font-mono font-bold text-slate-400 block px-1">
-                    Dark Themes (5)
-                  </span>
-                  <div className="grid grid-cols-1 gap-1">
-                    {THEMES.filter(t => t.mode === 'dark').map(theme => {
-                      const isSelected = currentThemeId === theme.id;
-                      return (
-                        <button
-                          key={theme.id}
-                          onClick={() => handleThemeClick(theme.id)}
-                          className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition flex items-center justify-between border ${
-                            isSelected
-                              ? 'border-rose-500 bg-rose-500/10 text-rose-400 font-bold'
-                              : isBright
-                              ? 'border-slate-200 hover:bg-slate-100 text-slate-700'
-                              : 'border-slate-800 hover:bg-slate-800 text-slate-300'
-                          }`}
-                        >
-                          <span className="flex items-center gap-2">
-                            <span
-                              className="w-3.5 h-3.5 rounded-full border border-white/20 shadow-sm"
-                              style={{ backgroundColor: theme.colorPreview }}
-                            />
-                            {theme.name}
-                          </span>
-                          {isSelected && <Check className="w-3.5 h-3.5 text-rose-500" />}
-                        </button>
-                      );
-                    })}
+                  {/* Column 2: 5 Dark Themes */}
+                  <div className="space-y-1">
+                    <span className="text-[10px] uppercase font-mono font-bold text-slate-400 block px-1">
+                      Dark (5)
+                    </span>
+                    <div className="space-y-1">
+                      {THEMES.filter(t => t.mode === 'dark').map(theme => {
+                        const isSelected = currentThemeId === theme.id;
+                        return (
+                          <button
+                            key={theme.id}
+                            onClick={() => handleThemeClick(theme.id)}
+                            className={`w-full text-left px-2 py-1.5 rounded-lg text-[11px] font-medium transition flex items-center justify-between border ${
+                              isSelected
+                                ? 'border-rose-500 bg-rose-500/10 text-rose-400 font-bold'
+                                : isBright
+                                ? 'border-slate-200 hover:bg-slate-100 text-slate-700'
+                                : 'border-slate-800 hover:bg-slate-800 text-slate-300'
+                            }`}
+                          >
+                            <span className="flex items-center gap-1.5 truncate">
+                              <span
+                                className="w-3 h-3 rounded-full border border-white/20 shadow-sm flex-shrink-0"
+                                style={{ backgroundColor: theme.colorPreview }}
+                              />
+                              <span className="truncate">{theme.name}</span>
+                            </span>
+                            {isSelected && <Check className="w-3 h-3 text-rose-500 flex-shrink-0" />}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Drawer Footer */}
-            <div className="pt-4 border-t border-slate-700/50 text-[11px] text-slate-400 flex items-center justify-between">
+            <div className="pt-3 border-t border-slate-700/50 text-[11px] text-slate-400 flex items-center justify-between">
               <span>ACC/AHA 2025 • ESC 2023</span>
-              <span className="font-mono text-rose-400 font-bold">Release v3</span>
+              <span className="font-mono text-rose-400 font-bold">Release v3.1</span>
             </div>
           </div>
         </div>

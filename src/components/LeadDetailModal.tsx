@@ -28,11 +28,11 @@ export default function LeadDetailModal({
   // Calibrated SVG Coordinate System:
   // ViewBox: 0 0 600 320
   // Standard calibration: 10 mm/mV (1 mm = 0.1 mV = 8 px; 10 mm = 1.0 mV = 80 px)
-  // Baseline (0 mV) placed at Y = 200
+  // Baseline (0 mV) placed at Y = 180 (centered on a major grid line with clearance above & below)
   // Calibration pulse placed at X = 20 to 60 (width 40 px = 0.20s; height 80 px = 1.0 mV)
   // Waveform mapped from X = 80 to 580 (0.8s cardiac cycle = 500 px)
   const timeToX = (t: number) => 80 + (t / 0.8) * 490;
-  const voltToY = (v: number) => 200 - v * 80;
+  const voltToY = (v: number) => 180 - v * 80;
 
   // Generate SVG path points with high sampling density for smooth curves
   const abnormalPoints: string[] = [];
@@ -89,10 +89,10 @@ export default function LeadDetailModal({
 
   // SVG grid lines definition
   const minorYLines: number[] = [];
-  for (let y = 16; y <= 312; y += 8) {
+  for (let y = 12; y <= 308; y += 8) {
     minorYLines.push(y);
   }
-  const majorYLines = [40, 80, 120, 160, 200, 240, 280];
+  const majorYLines = [20, 60, 100, 140, 180, 220, 260, 300];
 
   const minorXLines: number[] = [];
   for (let x = 18; x <= 590; x += 24.5) {
@@ -170,8 +170,8 @@ export default function LeadDetailModal({
                 const rect = e.currentTarget.getBoundingClientRect();
                 const clickY = e.clientY - rect.top;
                 const svgY = (clickY / rect.height) * 320;
-                // Baseline 0 mV is at Y = 200. 1 mV = 80px => 0.1 mV (1 mm) = 8px
-                const deviationMv = (200 - svgY) / 80;
+                // Baseline 0 mV is at Y = 180. 1 mV = 80px => 0.1 mV (1 mm) = 8px
+                const deviationMv = (180 - svgY) / 80;
                 setCaliperMm(parseFloat((deviationMv * 10).toFixed(1)));
               }}
             >
@@ -226,9 +226,9 @@ export default function LeadDetailModal({
               {/* Isoelectric PR/TP Baseline Line (0.0 mV) */}
               <line
                 x1="10"
-                y1="200"
+                y1="180"
                 x2="590"
-                y2="200"
+                y2="180"
                 stroke={paperMode === 'paper' ? '#be123c' : '#38bdf8'}
                 strokeWidth="1.2"
                 strokeDasharray="4,3"
@@ -236,7 +236,7 @@ export default function LeadDetailModal({
               />
               <text
                 x="85"
-                y="195"
+                y="175"
                 fill={paperMode === 'paper' ? '#be123c' : '#38bdf8'}
                 fontSize="9"
                 fontWeight="700"
@@ -247,12 +247,12 @@ export default function LeadDetailModal({
 
               {/* Standard Calibration Pulse (10 mm = 1.0 mV high = 80px, 0.20s = 5 mm wide = 40px) */}
               <path
-                d="M 25 200 L 25 120 L 65 120 L 65 200"
+                d="M 25 180 L 25 100 L 65 100 L 65 180"
                 fill="none"
                 stroke={paperMode === 'paper' ? '#be123c' : '#38bdf8'}
                 strokeWidth="2"
               />
-              <text x="45" y="115" textAnchor="middle" fill={paperMode === 'paper' ? '#be123c' : '#38bdf8'} fontSize="8" fontWeight="bold">
+              <text x="45" y="95" textAnchor="middle" fill={paperMode === 'paper' ? '#be123c' : '#38bdf8'} fontSize="8" fontWeight="bold">
                 1.0 mV
               </text>
 
@@ -348,7 +348,7 @@ export default function LeadDetailModal({
                   {/* Caliper measurement bracket */}
                   <line
                     x1="320"
-                    y1="200"
+                    y1="180"
                     x2="320"
                     y2={voltToY(caliperMm * 0.1)}
                     stroke="#10b981"
@@ -356,7 +356,7 @@ export default function LeadDetailModal({
                   />
                   <rect
                     x="325"
-                    y={Math.min(200, voltToY(caliperMm * 0.1)) - 10}
+                    y={Math.min(180, voltToY(caliperMm * 0.1)) - 10}
                     width="145"
                     height="26"
                     rx="5"
@@ -366,7 +366,7 @@ export default function LeadDetailModal({
                   />
                   <text
                     x="332"
-                    y={Math.min(200, voltToY(caliperMm * 0.1)) + 7}
+                    y={Math.min(180, voltToY(caliperMm * 0.1)) + 7}
                     fill="#a7f3d0"
                     fontSize="9.5"
                     fontWeight="bold"

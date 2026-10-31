@@ -98,22 +98,21 @@ export default function ECGWaveformMonitor({
         const h = rect.height;
         const actualLead = leadKey === 'II_RHYTHM' ? 'II' : leadKey;
         const delta = territory.waveformDeltas[actualLead];
+        const isRhythmStrip = leadKey === 'II_RHYTHM';
 
-        // Standard 25 mm/s paper speed
-        // Lead cards show 2.5s of ECG (62.5 mm); continuous Lead II rhythm strip shows 5.0s (125 mm)
-        const durationSec = leadKey === 'II_RHYTHM' ? 5.0 : 2.5;
-        const totalHorizontalMm = durationSec * 25;
-
-        // Calibrated isometric ECG scale:
-        // 1 mm small box = pxPerMm (0.04s horizontally, 0.1 mV vertically)
-        // 5 mm large box = pxPerMm * 5 (0.20s horizontally, 0.5 mV vertically)
-        // 10 mm = 1.0 mV = 10 * pxPerMm
-        const smallBox = w / totalHorizontalMm;
+        // Standard 25 mm/s paper speed & 10 mm/mV voltage calibration
+        // Calibrate physical millimeter scale on screen to ensure tall R waves and deep S waves never clip:
+        const targetMm = isRhythmStrip ? Math.max(150, w / 4.0) : 62.5; // 2.5s = 62.5 mm
+        const smallBox = Math.max(3.5, Math.min(4.2, w / targetMm));
         const largeBox = smallBox * 5;
-        const voltScale = smallBox * 10;
+        const voltScale = smallBox * 10; // 1.0 mV = 10 mm = 10 small boxes
+        const durationSec = isRhythmStrip ? (w / (smallBox * 25)) : 2.5;
 
-        // Place isoelectric baseline (0.0 mV) strictly on a major horizontal grid line
-        const baselineRow = Math.max(1, Math.round((h * 0.55) / largeBox));
+        // Place isoelectric baseline (0.0 mV) strictly on a major horizontal grid line with anti-clipping clearance:
+        // Lead II rhythm strip: 60% height gives 30+ px clearance above for tall Lead II R waves (1.25 mV)
+        // 3x4 lead cards: 52% height balances clearance for tall R (V4-V5: 1.45 mV) and deep S (V1-V2: -1.45 mV)
+        const baselineRatio = isRhythmStrip ? 0.60 : 0.52;
+        const baselineRow = Math.max(1, Math.round((h * baselineRatio) / largeBox));
         const centerY = baselineRow * largeBox;
 
         // 1. Draw Calibrated ECG Grid directly on canvas
@@ -159,8 +158,8 @@ export default function ECGWaveformMonitor({
         ctx.setLineDash([]);
 
         // Standard Calibration Pulse on Lead II rhythm strip: 10 mm (1.0 mV) high, 5 mm (0.20s) wide
-        if (leadKey === 'II_RHYTHM') {
-          const pulseX = 4;
+        if (isRhythmStrip) {
+          const pulseX = 6;
           const pulseW = largeBox;
           const pulseH = voltScale;
           ctx.lineWidth = 1.8;
@@ -444,7 +443,7 @@ export default function ECGWaveformMonitor({
                   {/* Animated Lead Canvas */}
                   <canvas
                     ref={el => { canvasRefs.current[leadName] = el; }}
-                    className="w-full h-24 block rounded"
+                    className="w-full h-28 sm:h-30 block rounded"
                   />
                 </div>
               );
@@ -477,7 +476,7 @@ export default function ECGWaveformMonitor({
           }`}>
             <canvas
               ref={el => { canvasRefs.current['II_RHYTHM'] = el; }}
-              className="w-full h-24 block rounded"
+              className="w-full h-36 sm:h-40 block rounded"
             />
           </div>
         </div>
@@ -531,7 +530,7 @@ export default function ECGWaveformMonitor({
 
                     <canvas
                       ref={el => { canvasRefs.current[leadName] = el; }}
-                      className="w-full h-20 block rounded"
+                      className="w-full h-28 block rounded"
                     />
                   </div>
                 );

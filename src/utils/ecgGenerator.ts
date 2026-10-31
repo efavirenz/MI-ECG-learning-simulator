@@ -20,7 +20,7 @@ export const BASE_LEADS: Record<string, BaseLeadConfig> = {
   'I':   { pAmp: 0.10, pWidth: 0.035, pPos: 0.16, qAmp: -0.05, qWidth: 0.012, rAmp: 0.85, rWidth: 0.018, sAmp: -0.12, sWidth: 0.015, tAmp: 0.25, tWidth: 0.045, tPos: 0.57 },
   'II':  { pAmp: 0.15, pWidth: 0.035, pPos: 0.16, qAmp: -0.05, qWidth: 0.012, rAmp: 1.25, rWidth: 0.020, sAmp: -0.22, sWidth: 0.016, tAmp: 0.35, tWidth: 0.050, tPos: 0.57 },
   'III': { pAmp: 0.07, pWidth: 0.035, pPos: 0.16, qAmp: -0.06, qWidth: 0.012, rAmp: 0.55, rWidth: 0.018, sAmp: -0.25, sWidth: 0.016, tAmp: 0.15, tWidth: 0.045, tPos: 0.57 },
-  'aVR': { pAmp: -0.12, pWidth: 0.035, pPos: 0.16, qAmp: 0.08, qWidth: 0.012, rAmp: 0.12, rWidth: 0.015, sAmp: -1.05, sWidth: 0.022, tAmp: -0.25, tWidth: 0.045, tPos: 0.57 },
+  'aVR': { pAmp: -0.12, pWidth: 0.035, pPos: 0.16, qAmp: 0.0,   qWidth: 0.012, rAmp: 0.12, rWidth: 0.015, sAmp: -1.05, sWidth: 0.022, tAmp: -0.25, tWidth: 0.045, tPos: 0.57 },
   'aVL': { pAmp: 0.06, pWidth: 0.035, pPos: 0.16, qAmp: -0.05, qWidth: 0.012, rAmp: 0.55, rWidth: 0.018, sAmp: -0.12, sWidth: 0.015, tAmp: 0.20, tWidth: 0.045, tPos: 0.57 },
   'aVF': { pAmp: 0.11, pWidth: 0.035, pPos: 0.16, qAmp: -0.06, qWidth: 0.012, rAmp: 0.90, rWidth: 0.019, sAmp: -0.18, sWidth: 0.016, tAmp: 0.25, tWidth: 0.048, tPos: 0.57 },
   'V1':  { pAmp: 0.08, pWidth: 0.032, pPos: 0.16, qAmp: 0.0,   qWidth: 0.010, rAmp: 0.25, rWidth: 0.015, sAmp: -1.25, sWidth: 0.022, tAmp: 0.16, tWidth: 0.045, tPos: 0.57 },
