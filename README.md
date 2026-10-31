@@ -1,0 +1,127 @@
+# Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator
+
+A clinically accurate, fully interactive educational web application designed for healthcare professionals (Registered Nurses, Paramedics / EMTs, Emergency and Critical Care staff, and Medical Trainees).
+
+The simulator bridges three core electrophysiological concepts:
+$$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrightarrow \text{ECG Lead Abnormalities}$$
+
+---
+
+## 🚀 Key Features & Modules
+
+### 1. Standard 12-Lead ECG Electrode Placement
+- **10 Electrodes vs 12 Leads**: Clarifies physical sensors vs electrical vector projections.
+- **Interactive 2D Anterior Adult Torso**: Vector SVG chest model with toggleable skeletal ribcage, sternum, and reference vertical lines (Midclavicular, Anterior Axillary, Midaxillary).
+- **The Angle of Louis (Sternal Angle)**: Step-by-step guidance on locating the 2nd costal cartilage and counting intercostal spaces down to the 4th and 5th ICS.
+- **Sequence Best Practices**: Emphasizes placing V4 before V3 for proper spacing.
+- **Female Patient Landmarks**: Chest wall placement in the inframammary fold, avoiding breast tissue and nipples.
+- **Mason-Likar Torso Warning**: Cautions against modified torso placement for formal STEMI diagnosis due to axis shifts and false Q waves.
+- **Practice Mode**: Test electrode landmarking skills with immediate feedback and scoring.
+
+### 2. Supplemental ECG Leads (Right-Sided & Posterior)
+- **Right-Sided ECG (V3R, V4R)**:
+  - Indicated in inferior STEMI (30–50% co-involvement) and unexplained hypotension.
+  - V4R (5th ICS right MCL) threshold: $\ge 0.5\text{ mm}$ ($\ge 1.0\text{ mm}$ in males < 30).
+  - Hemodynamic collapse risk: Withhold nitrates, morphine, and diuretics; treat with rapid IV fluid volume boluses.
+- **Posterior ECG (V7, V8, V9)**:
+  - Indicated for reciprocal ST depression and tall R waves in V1–V3.
+  - Placement: Horizontal plane of V6 at left posterior axillary line (V7), midscapular line (V8), and paraspinal line (V9).
+  - Diagnostic threshold: $\ge 0.5\text{ mm}$ ST elevation.
+- **Step-by-Step Acquisition Workflow**: Based on Queensland Ambulance Service (QAS) March 2026 guidelines. Includes cable reassignment table and mandatory manual re-labeling warnings.
+
+### 3. Myocardial Infarction Anatomical Localization
+- **Interactive 2D Vector Heart**: Anterior (Sternocostal) and Posterior/Inferior (Diaphragmatic) coronary views.
+- **Coronary Arteries Visualized**: LMCA, LAD (D1, D2, S1), LCx (OM, PLB), and RCA (acute marginals, PDA).
+- **Territories Covered**:
+  - Septal (V1–V2, LAD septal branches)
+  - Anterior (V3–V4, LAD diagonal branches)
+  - Anteroseptal (V1–V4, proximal LAD)
+  - Extensive Anterior / Tombstone (V1–V6, I, aVL, proximal LAD / Left Main)
+  - Lateral (I, aVL, V5, V6, LCx or diagonal LAD)
+  - High Lateral (I, aVL, 1st diagonal LAD or OM1, reciprocal II, III, aVF)
+  - Inferior (II, III, aVF, RCA ~85% or LCx ~15%, reciprocal I, aVL)
+  - Posterior (V7–V9, reciprocal horizontal ST depression & tall R in V1–V3)
+  - Right Ventricular (V3R, V4R, proximal RCA)
+- **Clinical Clarification**: Explains coronary dominance and highlights lead findings as typical and supportive rather than an absolute isolated geometry.
+
+### 4. Calibrated ECG Waveform Simulator
+- **Standard Clinical Layout**: $3 \times 4$ layout (I, II, III; aVR, aVL, aVF; V1, V2, V3; V4, V5, V6) plus a continuous Lead II rhythm strip.
+- **Supplemental Leads Toggle**: View V3R, V4R, V7, V8, V9.
+- **Clinical Grid Standards**: Calibrated to $25\text{ mm/s}$ paper speed and $10\text{ mm/mV}$ voltage calibration with $1.0\text{ mV}$ calibration pulse.
+- **Animation Controls**: Real-time continuous sweep beam, play/pause, speed controls ($0.5\times$, $1.0\times$, $2.0\times$), reset.
+- **Dual Display Modes**: Modern Dark Clinical Monitor vs Pink ECG Paper.
+- **Normal Overlay Comparison**: Displays normal baseline morphology as a dashed line behind the active pathological waveform.
+- **Magnified Single-Lead Analysis Modal**: Click any lead to inspect P, PR segment, Q, R, S, J point, ST segment, T wave, and use the interactive caliper to measure ST deviation in mm.
+
+### 5. Clinical Criteria, STEMI Mimics & Equivalents
+- **Guideline Diagnostic Thresholds**: 2025 ACC/AHA and 2023 ESC criteria by age and sex (including V2–V3 specific cutoffs).
+- **STEMI Mimics Comparison Table**: Distinguishes acute STEMI from Acute Pericarditis, Benign Early Repolarization (BER), LVH with strain, and Left Bundle Branch Block (LBBB).
+- **High-Risk Equivalents**: Wellens Syndrome (Type A and B), de Winter pattern, and Modified Sgarbossa criteria.
+
+### 6. Clinical Scenarios & Knowledge Check Quiz
+- **5 Realistic Cases**:
+  1. Inferior STEMI & Right Ventricular Assessment
+  2. The "Hidden" Posterior Wall Infarction
+  3. Acute Anterior STEMI & LAD Occlusion
+  4. High Lateral STEMI & The Pitfall of Reciprocal Depression
+  5. Combined Inferior and RV Infarction & Nitroglycerin Collapse
+- **10-Question Knowledge Quiz**: Covers electrode positioning, Angle of Louis, female patient techniques, J-point measurement, and STEMI diagnosis.
+
+---
+
+## 🛠️ Technology Stack
+
+- **Framework**: React 18 + TypeScript (Strict mode)
+- **Build Tool**: Vite 6
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **Graphics**: Interactive custom SVG anatomical models & HTML5 Canvas ECG rendering
+
+---
+
+## 📦 Getting Started
+
+### Prerequisites
+- Node.js (v18+ recommended)
+- npm or pnpm
+
+### Installation
+```bash
+# Clone the repository
+git clone <repository-url>
+cd MI-ECG-learning-simulator
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+### Production Build
+```bash
+# Type check and bundle for production
+npm run build
+
+# Preview production build locally
+npm run preview
+```
+
+---
+
+## 📚 Authoritative Clinical References
+
+1. **2025 ACC/AHA/ACEP/NAEMSP/SCAI Guideline for the Management of Patients With Acute Coronary Syndromes**  
+   [American College of Cardiology / AHA Guidelines](https://professional.heart.org/en/science-news/2025-guideline-for-the-management-of-patients-with-acute-coronary-syndromes)
+2. **2023 ESC Guidelines for the Management of Acute Coronary Syndromes**  
+   [European Heart Journal](https://academic.oup.com/eurheartj/article/44/38/3720/7243210)
+3. **Fifth Universal Definition of Myocardial Infarction (2026)**  
+   [European Society of Cardiology Pocket Guidelines](https://www.escardio.org/guidelines/clinical-practice-guidelines/pocket-guidelines/universal-definition-of-myocardial-infarction/)
+4. **Queensland Ambulance Service Clinical Practice Procedures: 12-Lead ECG Acquisition and Interpretation (March 2026)**  
+   [Queensland Ambulance Service CPP](https://www.ambulance.qld.gov.au/__data/assets/pdf_file/0033/475791/CPP_12-lead-ECG-acquisition-and-interpretation.pdf)
+
+---
+
+## ⚖️ Clinical Disclaimer
+
+This interactive simulator is strictly an educational tool for healthcare professionals and students. Simulated ECG signals and case studies are synthesized mathematical and educational models. This software does not provide medical diagnoses or real-time patient treatment guidance.

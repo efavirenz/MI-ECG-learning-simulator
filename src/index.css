@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+}
+
+/* Custom ECG grid styling */
+.ecg-grid-background {
+  background-color: #0b1329;
+  background-image: 
+    linear-gradient(rgba(30, 58, 138, 0.25) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 58, 138, 0.25) 1px, transparent 1px),
+    linear-gradient(rgba(37, 99, 235, 0.6) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.6) 1px, transparent 1px);
+  background-size: 5px 5px, 5px 5px, 25px 25px, 25px 25px;
+}
+
+.ecg-grid-paper {
+  background-color: #fff9f5;
+  background-image: 
+    linear-gradient(rgba(244, 63, 94, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(244, 63, 94, 0.15) 1px, transparent 1px),
+    linear-gradient(rgba(225, 29, 72, 0.45) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(225, 29, 72, 0.45) 1px, transparent 1px);
+  background-size: 5px 5px, 5px 5px, 25px 25px, 25px 25px;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.5);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.8);
+}
