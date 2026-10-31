@@ -40,7 +40,7 @@ export default function ECGWaveformMonitor({
   // Canvas elements refs
   const canvasRefs = useRef<Record<string, HTMLCanvasElement | null>>({});
 
-  // 12 Leads organized in standard clinical 3x4 layout
+  // 12 Leads in standard clinical 3x4 layout
   const standardLayout: string[][] = [
     ['I', 'aVR', 'V1', 'V4'],
     ['II', 'aVL', 'V2', 'V5'],
@@ -56,7 +56,7 @@ export default function ECGWaveformMonitor({
     }
   }, [selectedTerritoryId]);
 
-  // Render loop
+  // Main synchronized rendering loop
   useEffect(() => {
     const render = (timestamp: number) => {
       if (!lastTimestampRef.current) lastTimestampRef.current = timestamp;
@@ -67,7 +67,7 @@ export default function ECGWaveformMonitor({
         timeRef.current += deltaSec * playbackSpeed;
       }
 
-      // Draw each active canvas
+      // Leads to render
       const leadsToDraw = [
         ...standardLayout.flat(),
         'II_RHYTHM',
@@ -80,8 +80,22 @@ export default function ECGWaveformMonitor({
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        const w = canvas.width;
-        const h = canvas.height;
+        // Auto-scale canvas internal buffer for crisp High-DPI / Retina display
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        const targetWidth = Math.floor(rect.width * dpr);
+        const targetHeight = Math.floor(rect.height * dpr);
+
+        if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+        }
+
+        ctx.save();
+        ctx.scale(dpr, dpr);
+
+        const w = rect.width;
+        const h = rect.height;
         const actualLead = leadKey === 'II_RHYTHM' ? 'II' : leadKey;
         const delta = territory.waveformDeltas[actualLead];
 
@@ -89,26 +103,33 @@ export default function ECGWaveformMonitor({
         ctx.clearRect(0, 0, w, h);
 
         // Standard 25 mm/s paper speed
-        // If canvas represents 2.5 seconds (standard 12-lead strip per lead)
+        // Lead cards show 2.5s of ECG; continuous Lead II rhythm strip shows 5.0s
         const durationSec = leadKey === 'II_RHYTHM' ? 5.0 : 2.5;
-        const sweepTime = timeRef.current % durationSec;
-        const sweepX = (sweepTime / durationSec) * w;
 
         // Baseline (0 mV) in vertical center
-        const centerY = h * 0.58;
-        const voltScale = (h * 0.4) / 1.5; // 1.5 mV fits nicely
+        const centerY = h * 0.55;
+        // Standard calibration: 10 mm/mV. On screen, scale so 1.0 mV occupies ~38-42% of half-height
+        const voltScale = (h * 0.38) / 1.0;
 
-        // Draw Normal Overlay if requested & territory is abnormal
+        // Calculate sweep position
+        const sweepTime = timeRef.current % durationSec;
+        const sweepX = (sweepTime / durationSec) * w;
+        // Width of the blanking erase gap ahead of the sweep beam
+        const eraseWidth = Math.max(14, w * 0.05);
+
+        // 1. Draw Normal Reference Overlay (if enabled & current territory is abnormal)
         if (showNormalOverlay && selectedTerritoryId !== 'normal') {
           ctx.beginPath();
-          ctx.strokeStyle = paperMode === 'paper' ? 'rgba(148, 163, 184, 0.7)' : 'rgba(100, 116, 139, 0.6)';
-          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = paperMode === 'paper' ? 'rgba(148, 163, 184, 0.65)' : 'rgba(100, 116, 139, 0.55)';
+          ctx.lineWidth = 1.2;
           ctx.setLineDash([3, 3]);
 
-          const steps = Math.floor(w / 2);
-          for (let i = 0; i < steps; i++) {
-            const x = (i / steps) * w;
-            const t = (i / steps) * durationSec;
+          // Draw normal overlay up to the sweep line
+          const maxNormalX = isPlaying ? sweepX : w;
+          const normalSteps = Math.max(10, Math.floor(maxNormalX));
+          for (let i = 0; i <= normalSteps; i++) {
+            const x = (i / normalSteps) * maxNormalX;
+            const t = (x / w) * durationSec;
             const v = getEcgVoltage(actualLead, t, 'normal', 75);
             const y = centerY - v * voltScale;
             if (i === 0) ctx.moveTo(x, y);
@@ -118,39 +139,88 @@ export default function ECGWaveformMonitor({
           ctx.setLineDash([]);
         }
 
-        // Draw Active Waveform
-        ctx.beginPath();
+        // Determine active waveform trace color
+        let activeColor = paperMode === 'paper' ? '#0f172a' : '#38bdf8';
         if (delta?.stElevationMm) {
-          ctx.strokeStyle = paperMode === 'paper' ? '#dc2626' : '#f87171'; // Red for ST deviation
+          activeColor = paperMode === 'paper' ? '#dc2626' : '#f87171'; // Red for ST deviation
         } else if (territory.reciprocalLeads.includes(actualLead)) {
-          ctx.strokeStyle = paperMode === 'paper' ? '#0284c7' : '#38bdf8'; // Cyan for reciprocal
-        } else {
-          ctx.strokeStyle = paperMode === 'paper' ? '#0f172a' : '#38bdf8';
+          activeColor = paperMode === 'paper' ? '#0284c7' : '#38bdf8'; // Cyan for reciprocal
         }
-        ctx.lineWidth = 2.2;
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'round';
 
-        const steps = Math.floor(w / 1.5);
-        for (let i = 0; i < steps; i++) {
-          const x = (i / steps) * w;
-          const t = (i / steps) * durationSec;
-          const v = getEcgVoltage(actualLead, t, selectedTerritoryId, 75);
-          const y = centerY - v * voltScale;
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
+        // 2. Draw Previous Cycle Trace (Beyond the erase gap ahead of the cursor)
+        // This shows the prior sweep until the beam arrives to overwrite it
+        if (isPlaying && sweepX + eraseWidth < w) {
+          ctx.beginPath();
+          ctx.strokeStyle = paperMode === 'paper' ? 'rgba(15, 23, 42, 0.30)' : 'rgba(56, 189, 248, 0.30)';
+          ctx.lineWidth = 1.8;
+          ctx.lineJoin = 'round';
+          ctx.lineCap = 'round';
+
+          const startOldX = sweepX + eraseWidth;
+          const oldSteps = Math.max(10, Math.floor(w - startOldX));
+          for (let i = 0; i <= oldSteps; i++) {
+            const x = startOldX + (i / oldSteps) * (w - startOldX);
+            const t = (x / w) * durationSec;
+            const v = getEcgVoltage(actualLead, t, selectedTerritoryId, 75);
+            const y = centerY - v * voltScale;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
         }
-        ctx.stroke();
 
-        // Draw animated sweeping cursor beam
+        // 3. Draw Active Fresh Trace (From x = 0 up to sweepX)
+        // This dynamically grows and updates in sync with the moving beam!
+        let headY = centerY;
+        const currentTraceWidth = isPlaying ? sweepX : w;
+
+        if (currentTraceWidth > 0.5) {
+          ctx.beginPath();
+          ctx.strokeStyle = activeColor;
+          ctx.lineWidth = 2.2;
+          ctx.lineJoin = 'round';
+          ctx.lineCap = 'round';
+
+          const activeSteps = Math.max(10, Math.floor(currentTraceWidth * 1.2));
+          for (let i = 0; i <= activeSteps; i++) {
+            const x = (i / activeSteps) * currentTraceWidth;
+            const t = (x / w) * durationSec;
+            const v = getEcgVoltage(actualLead, t, selectedTerritoryId, 75);
+            const y = centerY - v * voltScale;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+
+            if (i === activeSteps) {
+              headY = y;
+            }
+          }
+          ctx.stroke();
+        }
+
+        // 4. Draw Animated Sweep Cursor & Glowing Lead Head
         if (isPlaying) {
+          // Vertical sweeping line
           ctx.beginPath();
           ctx.strokeStyle = paperMode === 'paper' ? '#ea580c' : '#22d3ee';
           ctx.lineWidth = 1.5;
           ctx.moveTo(sweepX, 0);
           ctx.lineTo(sweepX, h);
           ctx.stroke();
+
+          // Glowing cursor point at current lead waveform voltage
+          ctx.beginPath();
+          ctx.arc(sweepX, headY, 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = paperMode === 'paper' ? '#ea580c' : '#ffffff';
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(sweepX, headY, 6.5, 0, Math.PI * 2);
+          ctx.strokeStyle = paperMode === 'paper' ? 'rgba(234, 88, 12, 0.4)' : 'rgba(34, 211, 238, 0.5)';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
         }
+
+        ctx.restore();
       });
 
       animFrameRef.current = requestAnimationFrame(render);
@@ -185,7 +255,7 @@ export default function ECGWaveformMonitor({
           <button
             onClick={handleReset}
             className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition"
-            title="Reset sweep animation"
+            title="Reset sweep animation to start"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
@@ -227,7 +297,7 @@ export default function ECGWaveformMonitor({
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            Normal Overlay (Dashed)
+            Normal Baseline Overlay (Dashed)
           </button>
         </div>
 
@@ -278,7 +348,7 @@ export default function ECGWaveformMonitor({
                   {/* Lead Header */}
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-mono font-bold text-sm px-1.5 py-0.5 rounded bg-slate-900/60 text-white border border-slate-700">
+                      <span className="font-mono font-bold text-sm px-1.5 py-0.5 rounded bg-slate-900/80 text-white border border-slate-700">
                         {leadName}
                       </span>
                       {isPrimary && (
@@ -306,8 +376,6 @@ export default function ECGWaveformMonitor({
                   {/* Animated Lead Canvas */}
                   <canvas
                     ref={el => { canvasRefs.current[leadName] = el; }}
-                    width={280}
-                    height={100}
                     className="w-full h-24 block"
                   />
                 </div>
@@ -341,8 +409,6 @@ export default function ECGWaveformMonitor({
           }`}>
             <canvas
               ref={el => { canvasRefs.current['II_RHYTHM'] = el; }}
-              width={1000}
-              height={110}
               className="w-full h-24 block"
             />
           </div>
@@ -393,8 +459,6 @@ export default function ECGWaveformMonitor({
 
                     <canvas
                       ref={el => { canvasRefs.current[leadName] = el; }}
-                      width={280}
-                      height={90}
                       className="w-full h-20 block"
                     />
                   </div>

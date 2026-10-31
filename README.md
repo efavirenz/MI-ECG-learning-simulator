@@ -122,6 +122,25 @@ npm run preview
 
 ---
 
+## 📝 Update History & Changelog
+
+### [2026-10-31] — Clinical ECG Waveform Precision & Interactive State Enhancements
+- **Global Active MI State Dropdown**:
+  - Replaced the static text badge in the top-right header with an interactive grouped `<select>` dropdown menu.
+  - Allows instant switching between Normal Baseline, 9 STEMI territories, and STEMI mimics from any screen or module.
+- **Accurate & Clinically Calibrated ECG Tracings**:
+  - Overhauled the mathematical electrophysiological cardiac cycle synthesizer in `src/utils/ecgGenerator.ts`.
+  - **Normal Baseline**: Strict $0\text{ mV}$ isoelectric PR and TP segments, crisp QRS deflections, and physiological asymmetric T-wave transitions.
+  - **Acute ST Elevation (STEMI & Mimics)**: S-wave terminates directly at the elevated J-point with a smooth coved "tombstone" dome merging into the T wave; concave "saddleback" ST elevation with PR depression for acute pericarditis; J-point slurring for benign early repolarization.
+  - **ST Depression & Reciprocal Changes**: Clean horizontal ischemic shelf and downsloping ST depression starting strictly at the depressed J-point; tall R waves ($R/S > 1$) and upright prominent T waves for reciprocal posterior STEMI patterns.
+- **Synchronized Real-Time Sweeping Beam**:
+  - Fixed the static waveform issue during playback in `src/components/ECGWaveformMonitor.tsx`.
+  - Waveforms now actively draw and reveal point-by-point in direct synchronization with the sweeping vertical beam from left to right ($25\text{ mm/s}$ paper speed).
+  - Implemented an erase bar gap ahead of the sweep head with dim phosphor persistence for previous traces, matching clinical bedside monitors.
+  - Added high-DPI (Retina) canvas scaling for razor-sharp, crystal-clear trace rendering.
+
+---
+
 ## ⚖️ Clinical Disclaimer
 
 This interactive simulator is strictly an educational tool for healthcare professionals and students. Simulated ECG signals and case studies are synthesized mathematical and educational models. This software does not provide medical diagnoses or real-time patient treatment guidance.

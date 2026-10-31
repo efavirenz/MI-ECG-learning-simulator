@@ -30,6 +30,7 @@ export default function App() {
         activeTab={activeTab}
         onSelectTab={setActiveTab}
         selectedTerritoryId={selectedTerritoryId}
+        onSelectTerritory={setSelectedTerritoryId}
       />
 
       {/* Main Content Area */}
