@@ -359,14 +359,25 @@ export default function LeadDetailModal({
                 opacity="0.8"
               />
               <text
-                x="18"
+                x="20"
                 y="215"
                 fill={paperMode === 'paper' ? '#be123c' : '#38bdf8'}
                 fontSize="8.5"
                 fontWeight="700"
                 opacity="0.9"
               >
-                Isoelectric Baseline (0 mV / PR Segment)
+                0.0 mV Baseline
+              </text>
+              <text
+                x="705"
+                y="215"
+                textAnchor="end"
+                fill={paperMode === 'paper' ? '#be123c' : '#38bdf8'}
+                fontSize="8.5"
+                fontWeight="700"
+                opacity="0.9"
+              >
+                PR Segment Isoelectric Reference (0 mV)
               </text>
 
               {/* Standard Calibration Pulse (10 mm = 1.0 mV high = 100px, 0.20s = 5 mm wide = 50px) */}
@@ -438,9 +449,9 @@ export default function LeadDetailModal({
                 </g>
               )}
 
-              {/* Landmark Clickable Circles & Badges (Annotated on Cycle 1) */}
+              {/* Landmark Clickable Circles & Badges (Centered on Cycle 2) */}
               {landmarks.map(lm => {
-                const lx = timeToX(lm.timeSec);
+                const lx = timeToX(lm.timeSec + 0.8);
                 const ly = voltToY(lm.voltageMv);
                 const isActive = activeLandmarkCode === lm.code;
 
