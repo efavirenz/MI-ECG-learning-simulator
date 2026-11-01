@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MI_TERRITORIES } from '../data/miTerritories';
 import { getCycleLandmarks, getEcgVoltage } from '../utils/ecgGenerator';
-import { X, ZoomIn, Info, CheckCircle2, Sliders, AlertTriangle } from 'lucide-react';
+import { X, ZoomIn, Info, CheckCircle2, Sliders, AlertTriangle, Play, Pause, RotateCcw } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
 interface LeadDetailModalProps {
@@ -21,6 +21,11 @@ export default function LeadDetailModal({
   const [showNormalComparison, setShowNormalComparison] = useState(true);
   const [activeLandmarkCode, setActiveLandmarkCode] = useState<string | null>('J-Pt');
   const [caliperMm, setCaliperMm] = useState<number | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [sweepTime, setSweepTime] = useState(0);
+
+  const animRef = useRef<number | null>(null);
+  const lastTimeRef = useRef<number | null>(null);
 
   const territory = MI_TERRITORIES[territoryId] || MI_TERRITORIES['normal'];
   const delta = territory.waveformDeltas[lead];
@@ -31,14 +36,39 @@ export default function LeadDetailModal({
   // ViewBox: 0 0 600 320
   // Standard calibration: 10 mm/mV (1 mm = 0.1 mV = 8 px; 10 mm = 1.0 mV = 80 px)
   // Baseline (0 mV) placed at Y = 180 (centered on a major grid line with clearance above & below)
-  // Calibration pulse placed at X = 20 to 60 (width 40 px = 0.20s; height 80 px = 1.0 mV)
-  // Waveform mapped from X = 80 to 580 (0.8s cardiac cycle = 500 px)
+  // Calibration pulse placed at X = 25 to 65 (width 40 px = 0.20s; height 80 px = 1.0 mV)
+  // Isoelectric lead-in connects X = 65 to X = 80
+  // Waveform mapped from X = 80 to 570 (0.8s cardiac cycle = 490 px)
+  // Isoelectric run-out connects X = 570 to X = 590
   const timeToX = (t: number) => 80 + (t / 0.8) * 490;
   const voltToY = (v: number) => 180 - v * 80;
 
+  // Live animation loop
+  useEffect(() => {
+    if (!isPlaying) {
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+      lastTimeRef.current = null;
+      return;
+    }
+
+    const animate = (timestamp: number) => {
+      if (!lastTimeRef.current) lastTimeRef.current = timestamp;
+      const deltaSec = Math.min(0.1, (timestamp - lastTimeRef.current) / 1000);
+      lastTimeRef.current = timestamp;
+
+      setSweepTime(prev => (prev + deltaSec) % 0.8);
+      animRef.current = requestAnimationFrame(animate);
+    };
+
+    animRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+    };
+  }, [isPlaying]);
+
   // Generate SVG path points with high sampling density for smooth curves
-  const abnormalPoints: string[] = [];
-  const normalPoints: string[] = [];
+  const abnormalPoints: string[] = ['25,180', '25,100', '65,100', '65,180', '80,180'];
+  const normalPoints: string[] = ['25,180', '25,100', '65,100', '65,180', '80,180'];
 
   const sampleCount = 350;
   for (let i = 0; i <= sampleCount; i++) {
@@ -56,8 +86,17 @@ export default function LeadDetailModal({
     }
   }
 
+  // Connect to end of strip
+  abnormalPoints.push('590,180');
+  normalPoints.push('590,180');
+
   const abnormalPathD = `M ${abnormalPoints.join(' L ')}`;
   const normalPathD = showNormalComparison ? `M ${normalPoints.join(' L ')}` : '';
+
+  // Sweep cursor position
+  const currentCursorX = timeToX(sweepTime);
+  const currentCursorVoltage = getEcgVoltage(lead, sweepTime, territoryId, 75);
+  const currentCursorY = voltToY(currentCursorVoltage);
 
   // Clinical guideline criteria evaluator for this lead
   const getClinicalThresholdEvaluation = (deviationMm: number) => {
@@ -111,7 +150,7 @@ export default function LeadDetailModal({
         isBright ? 'bg-white border-slate-200 text-slate-800' : 'bg-slate-900 border-slate-800 text-slate-100'
       }`}>
         {/* Modal Header */}
-        <div className={`flex items-center justify-between px-6 py-4 border-b ${
+        <div className={`flex flex-wrap items-center justify-between px-6 py-4 border-b gap-3 ${
           isBright ? 'bg-slate-50 border-slate-200' : 'bg-slate-950/50 border-slate-800'
         }`}>
           <div className="flex items-center gap-3">
@@ -131,6 +170,31 @@ export default function LeadDetailModal({
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Live Animation Toggle Button */}
+            <button
+              onClick={() => setIsPlaying(!isPlaying)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition flex items-center gap-1.5 ${
+                isPlaying
+                  ? `${theme.accentBg} ${theme.accentHoverBg} shadow`
+                  : isBright ? 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100' : 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white'
+              }`}
+            >
+              {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+              {isPlaying ? 'Pause Sweep' : 'Live Sweep'}
+            </button>
+
+            {isPlaying && (
+              <button
+                onClick={() => setSweepTime(0)}
+                className={`p-1.5 rounded-lg border transition ${
+                  isBright ? 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100' : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white'
+                }`}
+                title="Reset sweep"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+              </button>
+            )}
+
             <button
               onClick={() => setShowNormalComparison(!showNormalComparison)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition flex items-center gap-1.5 ${
@@ -292,6 +356,36 @@ export default function LeadDetailModal({
                 strokeLinejoin="round"
               />
 
+              {/* Animated Live Sweep Beam & Cursor Point */}
+              {isPlaying && (
+                <g>
+                  <line
+                    x1={currentCursorX}
+                    y1={0}
+                    x2={currentCursorX}
+                    y2={320}
+                    stroke={paperMode === 'paper' ? '#ea580c' : '#22d3ee'}
+                    strokeWidth="1.6"
+                    opacity="0.9"
+                  />
+                  <circle
+                    cx={currentCursorX}
+                    cy={currentCursorY}
+                    r="4"
+                    fill={paperMode === 'paper' ? '#ea580c' : '#ffffff'}
+                  />
+                  <circle
+                    cx={currentCursorX}
+                    cy={currentCursorY}
+                    r="7"
+                    fill="none"
+                    stroke={paperMode === 'paper' ? 'rgba(234, 88, 12, 0.4)' : 'rgba(34, 211, 238, 0.6)'}
+                    strokeWidth="1.8"
+                    className="animate-pulse"
+                  />
+                </g>
+              )}
+
               {/* Landmark Clickable Circles & Badges */}
               {landmarks.map(lm => {
                 const lx = timeToX(lm.timeSec);
@@ -365,17 +459,17 @@ export default function LeadDetailModal({
                   <rect
                     x="325"
                     y={Math.min(180, voltToY(caliperMm * 0.1)) - 10}
-                    width="145"
+                    width="148"
                     height="26"
                     rx="5"
-                    fill="#064e3b"
+                    fill={paperMode === 'paper' ? '#ecfdf5' : '#064e3b'}
                     stroke="#10b981"
-                    strokeWidth="1"
+                    strokeWidth="1.5"
                   />
                   <text
                     x="332"
                     y={Math.min(180, voltToY(caliperMm * 0.1)) + 7}
-                    fill="#a7f3d0"
+                    fill={paperMode === 'paper' ? '#065f46' : '#a7f3d0'}
                     fontSize="9.5"
                     fontWeight="bold"
                   >
@@ -387,39 +481,45 @@ export default function LeadDetailModal({
           </div>
 
           {/* Caliper & Diagnosis Info Pill */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-950/70 border border-slate-800 rounded-xl text-xs">
+          <div className={`flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl text-xs border ${
+            isBright ? 'bg-slate-100/90 border-slate-200 text-slate-800' : 'bg-slate-950/70 border-slate-800 text-slate-300'
+          }`}>
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-slate-300">Measured J-Point Status:</span>
+              <span className={`font-semibold ${isBright ? 'text-slate-800' : 'text-slate-300'}`}>Measured J-Point Status:</span>
               <span
                 className={`font-mono font-bold px-2 py-0.5 rounded text-xs ${
                   currentDev > 0
                     ? 'bg-rose-950 text-rose-300 border border-rose-800'
                     : currentDev < 0
                     ? 'bg-cyan-950 text-cyan-300 border border-cyan-800'
-                    : 'bg-slate-800 text-slate-300'
+                    : isBright ? 'bg-slate-200 text-slate-800' : 'bg-slate-800 text-slate-300'
                 }`}
               >
                 {currentDev > 0 ? '+' : ''}{currentDev.toFixed(1)} mm ({(currentDev * 0.1).toFixed(2)} mV)
               </span>
             </div>
 
-            <div className="flex items-center gap-2 text-slate-300 text-[11px]">
+            <div className={`flex items-center gap-2 text-[11px] ${isBright ? 'text-slate-700' : 'text-slate-300'}`}>
               {evalResult.meets ? (
-                <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
                   <CheckCircle2 className="w-3.5 h-3.5" /> {evalResult.text}
                 </span>
               ) : (
-                <span className="text-slate-400 flex items-center gap-1">
-                  <AlertTriangle className="w-3.5 h-3.5 text-amber-400" /> {evalResult.text}
+                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-500" /> {evalResult.text}
                 </span>
               )}
             </div>
           </div>
 
           {/* Interactive Landmark Inspection Bar */}
-          <div className="flex flex-wrap items-center gap-1.5 border-b border-slate-800 pb-3">
-            <span className="text-xs text-slate-400 font-medium mr-1 flex items-center gap-1">
-              <ZoomIn className="w-3.5 h-3.5 text-cyan-400" /> Inspect Landmark:
+          <div className={`flex flex-wrap items-center gap-1.5 border-b pb-3 ${
+            isBright ? 'border-slate-200' : 'border-slate-800'
+          }`}>
+            <span className={`text-xs font-medium mr-1 flex items-center gap-1 ${
+              isBright ? 'text-slate-700' : 'text-slate-400'
+            }`}>
+              <ZoomIn className="w-3.5 h-3.5 text-cyan-500" /> Inspect Landmark:
             </span>
             {landmarks.map(lm => (
               <button
@@ -427,7 +527,9 @@ export default function LeadDetailModal({
                 onClick={() => setActiveLandmarkCode(lm.code)}
                 className={`px-2.5 py-1 rounded text-xs font-semibold transition border ${
                   activeLandmarkCode === lm.code
-                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow'
+                    ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/60 shadow'
+                    : isBright
+                    ? 'bg-white text-slate-700 border-slate-300 hover:border-slate-400'
                     : 'bg-slate-800/80 text-slate-400 border-slate-700 hover:text-white'
                 }`}
               >

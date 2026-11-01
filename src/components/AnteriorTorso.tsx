@@ -224,6 +224,16 @@ export default function AnteriorTorso({
                 >
                   Midsternal Line
                 </text>
+                <text
+                  x="200"
+                  y="475"
+                  fill={isBright ? "#0369a1" : "#38bdf8"}
+                  fontSize={isBright ? "7.5" : "6.5"}
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
+                  Midsternal Line
+                </text>
 
                 {/* Left Midclavicular Line (Patient Left = diagram right) */}
                 <line
@@ -244,6 +254,16 @@ export default function AnteriorTorso({
                 >
                   Left Midclavicular (MCL)
                 </text>
+                <text
+                  x="276"
+                  y="464"
+                  fill={isBright ? "#312e81" : "#818cf8"}
+                  fontSize={isBright ? "7" : "6.5"}
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
+                  Left MCL
+                </text>
 
                 {/* Left Anterior Axillary Line */}
                 <line
@@ -261,6 +281,16 @@ export default function AnteriorTorso({
                   fill={isBright ? "#581c87" : "#a78bfa"}
                   fontSize={isBright ? "7.5" : "6.5"}
                   fontWeight="bold"
+                >
+                  Ant. Axillary (AAL)
+                </text>
+                <text
+                  x="315"
+                  y="476"
+                  fill={isBright ? "#581c87" : "#a78bfa"}
+                  fontSize={isBright ? "7" : "6.5"}
+                  fontWeight="bold"
+                  textAnchor="middle"
                 >
                   Ant. Axillary (AAL)
                 </text>
@@ -284,6 +314,16 @@ export default function AnteriorTorso({
                 >
                   Midaxillary (MAL)
                 </text>
+                <text
+                  x="352"
+                  y="464"
+                  fill={isBright ? "#6b21a8" : "#c084fc"}
+                  fontSize={isBright ? "7" : "6.5"}
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
+                  Midaxillary (MAL)
+                </text>
 
                 {/* Right Midclavicular Line (for V4R) */}
                 {showSupplementalRight && (
@@ -303,6 +343,16 @@ export default function AnteriorTorso({
                       fill={isBright ? "#78350f" : "#fbbf24"}
                       fontSize={isBright ? "7.5" : "6.5"}
                       fontWeight="bold"
+                    >
+                      Right MCL (V4R)
+                    </text>
+                    <text
+                      x="120"
+                      y="475"
+                      fill={isBright ? "#78350f" : "#fbbf24"}
+                      fontSize={isBright ? "7.5" : "6.5"}
+                      fontWeight="bold"
+                      textAnchor="middle"
                     >
                       Right MCL (V4R)
                     </text>
@@ -456,41 +506,69 @@ export default function AnteriorTorso({
         {!practiceMode && (
           <div className="flex flex-wrap items-center justify-center gap-2 mt-3 text-xs">
             <span className={theme.subtextColor}>Precordial:</span>
-            {STANDARD_ELECTRODES.filter(e => e.type === 'precordial').map(e => (
-              <button
-                key={e.id}
-                onClick={() => handleElectrodeClick(e)}
-                className={`px-2.5 py-1 rounded-lg font-mono font-bold text-xs transition border ${
-                  selectedElectrodeId === e.id
-                    ? 'border-white text-white shadow ring-2 ring-white/50'
-                    : isBright
-                    ? 'border-slate-300 text-slate-700 hover:border-slate-500'
-                    : 'border-transparent text-slate-300 hover:border-slate-600'
-                }`}
-                style={{ backgroundColor: e.color + '26', color: isBright ? undefined : e.color }}
-              >
-                {e.code}
-              </button>
-            ))}
+            {STANDARD_ELECTRODES.filter(e => e.type === 'precordial').map(e => {
+              const isSelected = selectedElectrodeId === e.id;
+              return (
+                <button
+                  key={e.id}
+                  onClick={() => handleElectrodeClick(e)}
+                  className={`px-2.5 py-1 rounded-lg font-mono font-bold text-xs transition border ${
+                    isSelected
+                      ? isBright
+                        ? 'border-slate-800 shadow-md ring-2 ring-slate-400 font-black'
+                        : 'border-white text-white shadow ring-2 ring-white/50'
+                      : isBright
+                      ? 'border-slate-300 text-slate-700 hover:border-slate-500'
+                      : 'border-transparent text-slate-300 hover:border-slate-600'
+                  }`}
+                  style={{
+                    backgroundColor: isSelected
+                      ? isBright
+                        ? e.color + '40'
+                        : e.color + '33'
+                      : e.color + '26',
+                    color: isBright
+                      ? (isSelected ? '#020617' : '#334155')
+                      : (isSelected ? '#ffffff' : e.color)
+                  }}
+                >
+                  {e.code}
+                </button>
+              );
+            })}
             {showSupplementalRight && (
               <>
                 <span className={`${theme.subtextColor} ml-2`}>Right-Sided:</span>
-                {SUPPLEMENTAL_ELECTRODES.filter(e => e.type === 'right-sided').map(e => (
-                  <button
-                    key={e.id}
-                    onClick={() => handleElectrodeClick(e)}
-                    className={`px-2.5 py-1 rounded-lg font-mono font-bold text-xs transition border ${
-                      selectedElectrodeId === e.id
-                        ? 'border-white text-white shadow ring-2 ring-white/50'
-                        : isBright
-                        ? 'border-slate-300 text-slate-700 hover:border-slate-500'
-                        : 'border-transparent text-slate-300 hover:border-slate-600'
-                    }`}
-                    style={{ backgroundColor: e.color + '26', color: isBright ? undefined : e.color }}
-                  >
-                    {e.code}
-                  </button>
-                ))}
+                {SUPPLEMENTAL_ELECTRODES.filter(e => e.type === 'right-sided').map(e => {
+                  const isSelected = selectedElectrodeId === e.id;
+                  return (
+                    <button
+                      key={e.id}
+                      onClick={() => handleElectrodeClick(e)}
+                      className={`px-2.5 py-1 rounded-lg font-mono font-bold text-xs transition border ${
+                        isSelected
+                          ? isBright
+                            ? 'border-slate-800 shadow-md ring-2 ring-slate-400 font-black'
+                            : 'border-white text-white shadow ring-2 ring-white/50'
+                          : isBright
+                          ? 'border-slate-300 text-slate-700 hover:border-slate-500'
+                          : 'border-transparent text-slate-300 hover:border-slate-600'
+                      }`}
+                      style={{
+                        backgroundColor: isSelected
+                          ? isBright
+                            ? e.color + '40'
+                            : e.color + '33'
+                          : e.color + '26',
+                        color: isBright
+                          ? (isSelected ? '#020617' : '#334155')
+                          : (isSelected ? '#ffffff' : e.color)
+                      }}
+                    >
+                      {e.code}
+                    </button>
+                  );
+                })}
               </>
             )}
           </div>

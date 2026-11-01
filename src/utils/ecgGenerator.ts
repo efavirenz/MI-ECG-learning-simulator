@@ -260,6 +260,7 @@ export function getCycleLandmarks(lead: string, territoryId: string = 'normal', 
   const scale = cycleSec / 0.8;
   const territory = MI_TERRITORIES[territoryId] || MI_TERRITORIES['normal'];
   const delta = territory.waveformDeltas[lead];
+  const base = BASE_LEADS[lead] || BASE_LEADS['II'];
 
   const pTime = 0.155 * scale;
   const prSegmentTime = 0.250 * scale;
@@ -270,62 +271,105 @@ export function getCycleLandmarks(lead: string, territoryId: string = 'normal', 
   const stSegmentTime = 0.435 * scale;
   const tTime = 0.570 * scale;
 
-  return [
+  const isQS = (delta?.rAmplitudeMultiplier !== undefined && delta.rAmplitudeMultiplier <= 0.25) ||
+               (delta?.qWaveMm !== undefined && delta.qWaveMm >= 4 && base.rAmp < 0.5);
+
+  const landmarks: LandmarkLabel[] = [
     {
       name: 'P Wave',
       code: 'P',
       timeSec: pTime,
       voltageMv: getEcgVoltage(lead, pTime, territoryId, bpm),
-      description: 'Atrial depolarization (SA node through right and left atria). Normal duration < 0.12s, amplitude < 0.25 mV.'
+      description: lead === 'aVR'
+        ? 'Normally inverted P wave in lead aVR due to atrial depolarization vector traveling away from the right shoulder electrode.'
+        : 'Atrial depolarization (SA node spreading across right and left atria). Normal duration < 0.12s, amplitude < 0.25 mV.'
     },
     {
       name: 'PR Segment',
       code: 'PR Seg',
       timeSec: prSegmentTime,
       voltageMv: getEcgVoltage(lead, prSegmentTime, territoryId, bpm),
-      description: 'Conduction delay through AV node, bundle of His, and bundle branches. The standard isoelectric baseline for J-point reference.'
-    },
-    {
+      description: territoryId === 'pericarditis'
+        ? (['II', 'III', 'aVF', 'V5', 'V6'].includes(lead)
+            ? 'PR segment depression: pathognomonic sign of acute pericarditis due to subepicardial atrial current of injury.'
+            : lead === 'aVR'
+            ? 'PR segment elevation: reciprocal sign in aVR strongly indicative of acute pericarditis.'
+            : 'Conduction delay through AV node, bundle of His, and bundle branches. The standard isoelectric baseline for J-point reference.')
+        : 'Conduction delay through AV node, bundle of His, and bundle branches. The standard isoelectric baseline for J-point reference.'
+    }
+  ];
+
+  if (isQS) {
+    landmarks.push({
+      name: 'QS Complex',
+      code: 'QS',
+      timeSec: 0.335 * scale,
+      voltageMv: getEcgVoltage(lead, 0.335 * scale, territoryId, bpm),
+      description: `Pathological QS complex (depth ≥ ${delta?.qWaveMm || 4} mm, duration ≥ 0.04s): total loss of viable myocardium and electrical transmural necrosis.`
+    });
+  } else {
+    landmarks.push({
       name: 'Q Wave',
       code: 'Q',
       timeSec: qTime,
       voltageMv: getEcgVoltage(lead, qTime, territoryId, bpm),
-      description: delta?.qWaveMm ? `Pathological Q Wave (depth ≥ ${delta.qWaveMm} mm, duration ≥ 0.04s) representing transmural electrical necrosis.` : 'Initial negative deflection of ventricular depolarization (septal depolarization left-to-right).'
-    },
-    {
+      description: delta?.qWaveMm
+        ? `Pathological Q Wave (depth ≥ ${delta.qWaveMm} mm, duration ≥ 0.04s) representing transmural electrical necrosis.`
+        : Math.abs(base.qAmp) < 0.015
+        ? 'Normal absence of Q wave (rS morphology typical of right precordial leads V1-V2).'
+        : 'Initial negative deflection of ventricular depolarization (physiologic septal depolarization left-to-right).'
+    });
+
+    landmarks.push({
       name: 'R Wave',
       code: 'R',
       timeSec: rTime,
       voltageMv: getEcgVoltage(lead, rTime, territoryId, bpm),
-      description: delta?.tallRWave ? 'Abnormally tall, broad reciprocal R wave (R/S > 1) diagnostic of posterior wall STEMI.' : 'Primary positive ventricular depolarization vector (bulk of left and right ventricular free walls).'
-    },
-    {
+      description: delta?.tallRWave
+        ? 'Abnormally tall, broad reciprocal R wave (R/S > 1.0) diagnostic of acute posterior wall STEMI.'
+        : 'Primary positive ventricular depolarization vector (bulk of left and right ventricular free walls).'
+    });
+
+    landmarks.push({
       name: 'S Wave',
       code: 'S',
       timeSec: sTime,
       voltageMv: getEcgVoltage(lead, sTime, territoryId, bpm),
       description: 'Terminal negative deflection of ventricular depolarization (basal LV and RV outflow tract).'
-    },
-    {
-      name: 'J Point',
-      code: 'J-Pt',
-      timeSec: jPointTime,
-      voltageMv: getEcgVoltage(lead, jPointTime, territoryId, bpm),
-      description: 'Junction point between QRS complex and ST segment. The exact anatomical point at which guideline ST elevation or depression is measured relative to PR segment baseline.'
-    },
-    {
-      name: 'ST Segment',
-      code: 'ST',
-      timeSec: stSegmentTime,
-      voltageMv: getEcgVoltage(lead, stSegmentTime, territoryId, bpm),
-      description: delta?.stElevationMm ? `Acute ST deviation (${delta.stElevationMm > 0 ? '+' : ''}${delta.stElevationMm} mm) indicating transmural current of injury / ischemia.` : 'Plateau phase (phase 2) of ventricular action potential. Isoelectric in normal myocardium.'
-    },
-    {
-      name: 'T Wave',
-      code: 'T',
-      timeSec: tTime,
-      voltageMv: getEcgVoltage(lead, tTime, territoryId, bpm),
-      description: delta?.tInverted ? 'Symmetric T-wave inversion reflecting ischemic repolarization delay.' : delta?.tWaveAmplitudeMm ? 'Hyperacute tall T wave or prominent reciprocal upright T wave.' : 'Rapid ventricular repolarization (phase 3). Normal upright morphology concordant with main QRS vector.'
-    }
-  ];
+    });
+  }
+
+  landmarks.push({
+    name: 'J Point',
+    code: 'J-Pt',
+    timeSec: jPointTime,
+    voltageMv: getEcgVoltage(lead, jPointTime, territoryId, bpm),
+    description: 'Junction point between QRS complex and ST segment. The exact anatomical point at which guideline ST elevation or depression is measured relative to PR segment baseline.'
+  });
+
+  landmarks.push({
+    name: 'ST Segment',
+    code: 'ST',
+    timeSec: stSegmentTime,
+    voltageMv: getEcgVoltage(lead, stSegmentTime, territoryId, bpm),
+    description: delta?.stElevationMm
+      ? `Acute ST deviation (${delta.stElevationMm > 0 ? '+' : ''}${delta.stElevationMm} mm) indicating transmural current of injury / ischemia.`
+      : 'Plateau phase (phase 2) of ventricular action potential. Isoelectric in normal myocardium.'
+  });
+
+  landmarks.push({
+    name: 'T Wave',
+    code: 'T',
+    timeSec: tTime,
+    voltageMv: getEcgVoltage(lead, tTime, territoryId, bpm),
+    description: lead === 'aVR'
+      ? 'Normally inverted T wave in lead aVR reflecting repolarization away from right arm electrode.'
+      : delta?.tInverted
+      ? 'Symmetric T-wave inversion reflecting ischemic repolarization delay.'
+      : delta?.tWaveAmplitudeMm && delta.tWaveAmplitudeMm >= 6
+      ? 'Hyperacute tall T wave: earliest recognizable ECG sign of acute coronary occlusion.'
+      : 'Rapid ventricular repolarization (phase 3). Normal upright morphology concordant with main QRS vector.'
+  });
+
+  return landmarks;
 }

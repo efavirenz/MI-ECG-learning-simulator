@@ -1,6 +1,6 @@
-# AGENTS.md — Development & Clinical Guidelines for AI Agents
+# AGENTS.md — Development & Clinical Guidelines for AI Agents (Release v4.2)
 
-This document defines the architecture, project conventions, and clinical accuracy standards for AI agents contributing to the **Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator**.
+This document defines the architecture, project conventions, and clinical accuracy standards for AI agents contributing to the **Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator (v4.2)**.
 
 ---
 
@@ -118,3 +118,6 @@ npm run build
 git status
 ```
 Ensure build exits with code 0 and no console warnings.
+
+---
+*Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator • Release v4.2*

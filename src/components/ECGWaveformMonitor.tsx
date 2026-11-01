@@ -73,9 +73,12 @@ export default function ECGWaveformMonitor({
   // Main synchronized rendering loop with rock-solid, jitter-free fixed pixel sampling
   useEffect(() => {
     const render = (timestamp: number) => {
-      if (!lastTimestampRef.current) lastTimestampRef.current = timestamp;
-      const deltaSec = (timestamp - lastTimestampRef.current) / 1000;
+      if (!lastTimestampRef.current) {
+        lastTimestampRef.current = timestamp;
+      }
+      const rawDelta = (timestamp - lastTimestampRef.current) / 1000;
       lastTimestampRef.current = timestamp;
+      const deltaSec = Math.min(0.1, Math.max(0, rawDelta));
 
       if (isPlaying) {
         timeRef.current += deltaSec * playbackSpeed;
@@ -231,7 +234,7 @@ export default function ECGWaveformMonitor({
         }
 
         // 3. Draw Previous Cycle Trace (Beyond erase gap ahead of sweep beam)
-        if (isPlaying && sweepX + eraseWidth < w) {
+        if (sweepX + eraseWidth < w) {
           ctx.beginPath();
           ctx.strokeStyle = paperMode === 'paper' ? 'rgba(15, 23, 42, 0.25)' : 'rgba(56, 189, 248, 0.25)';
           ctx.lineWidth = 1.8;
@@ -252,7 +255,7 @@ export default function ECGWaveformMonitor({
 
         // 4. Draw Active Fresh Trace (From x = 0 up to sweepX)
         let headY = centerY;
-        const currentTraceWidth = isPlaying ? sweepX : w;
+        const currentTraceWidth = sweepX;
 
         if (currentTraceWidth > 0.5) {
           ctx.beginPath();
@@ -280,27 +283,36 @@ export default function ECGWaveformMonitor({
           ctx.stroke();
         }
 
-        // 5. Draw Animated Sweep Cursor & Glowing Lead Head
-        if (isPlaying) {
-          // Vertical sweeping line
-          ctx.beginPath();
-          ctx.strokeStyle = paperMode === 'paper' ? '#ea580c' : '#22d3ee';
-          ctx.lineWidth = 1.5;
-          ctx.moveTo(sweepX, 0);
-          ctx.lineTo(sweepX, h);
-          ctx.stroke();
+        // 5. Draw Animated Sweep Cursor & Glowing Lead Head (in both playing and paused/frozen state)
+        // Vertical sweeping line
+        ctx.beginPath();
+        ctx.strokeStyle = paperMode === 'paper' ? '#ea580c' : '#22d3ee';
+        ctx.lineWidth = 1.5;
+        if (!isPlaying) {
+          ctx.setLineDash([2, 2]);
+        }
+        ctx.moveTo(sweepX, 0);
+        ctx.lineTo(sweepX, h);
+        ctx.stroke();
+        ctx.setLineDash([]);
 
-          // Glowing cursor point at current lead waveform voltage
-          ctx.beginPath();
-          ctx.arc(sweepX, headY, 3.5, 0, Math.PI * 2);
-          ctx.fillStyle = paperMode === 'paper' ? '#ea580c' : '#ffffff';
-          ctx.fill();
+        // Glowing cursor point at current lead waveform voltage
+        ctx.beginPath();
+        ctx.arc(sweepX, headY, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = paperMode === 'paper' ? '#ea580c' : '#ffffff';
+        ctx.fill();
 
-          ctx.beginPath();
-          ctx.arc(sweepX, headY, 6.5, 0, Math.PI * 2);
-          ctx.strokeStyle = paperMode === 'paper' ? 'rgba(234, 88, 12, 0.4)' : 'rgba(34, 211, 238, 0.5)';
-          ctx.lineWidth = 1.5;
-          ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(sweepX, headY, 6.5, 0, Math.PI * 2);
+        ctx.strokeStyle = paperMode === 'paper' ? 'rgba(234, 88, 12, 0.4)' : 'rgba(34, 211, 238, 0.5)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // If paused, show subtle freeze watermark
+        if (!isPlaying) {
+          ctx.fillStyle = paperMode === 'paper' ? 'rgba(15, 23, 42, 0.45)' : 'rgba(148, 163, 184, 0.45)';
+          ctx.font = 'bold 8px monospace';
+          ctx.fillText('PAUSED', w - 42, 12);
         }
 
         ctx.restore();
@@ -318,6 +330,12 @@ export default function ECGWaveformMonitor({
 
   const handleReset = () => {
     timeRef.current = 0;
+    lastTimestampRef.current = null;
+  };
+
+  const handleTogglePlay = () => {
+    lastTimestampRef.current = null;
+    setIsPlaying(!isPlaying);
   };
 
   return (
@@ -327,7 +345,7 @@ export default function ECGWaveformMonitor({
         <div className="flex flex-wrap items-center gap-2">
           {/* Play / Pause - Theme Accent Highlight */}
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={handleTogglePlay}
             className={`px-3.5 py-1.5 ${theme.accentBg} ${theme.accentHoverBg} rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shadow`}
           >
             {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}

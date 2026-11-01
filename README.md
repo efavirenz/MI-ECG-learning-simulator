@@ -124,6 +124,20 @@ npm run preview
 
 ## 📝 Update History & Changelog
 
+### [v4.2] [2026-11-01] — Reference Line Dual Labels, Anatomical Heart Graphic Overhaul, Waveform Sweep & Lead Contrast
+- **Dual-Ended Thoracic Reference Line Labels**:
+  - In `2. Electrode Placement` and `3. Supplemental Leads` (`Right-Sided Leads V3R, V4R`), added inferior labels at the bottom of all vertical guidelines (`Right MCL (V4R)`, `Midsternal Line`, `Left MCL`, `Ant. Axillary (AAL)`, `Midaxillary (MAL)`).
+- **Posterior Overlay Collision Fix**:
+  - In `3. Supplemental Leads` (`Posterior Leads V7, V8, V9`), moved `Thoracic Spine (T7-T8)` upward to $y=262$ and placed `Horizontal Plane of V6 (Crucial Reference)` directly beneath the horizontal dashed line at $y=288$, preventing label overlap.
+- **Bright Theme Selected Lead Contrast**:
+  - Resolved low-contrast white font on light buttons when selecting precordial and supplemental leads (`V1–V6`, `V3R`, `V4R`, `V7–V9`). Buttons now display prominent dark typography (`#020617`), accented borders, and rich tint fills in bright modes.
+- **High-Fidelity 2D Anatomical Heart UI**:
+  - In `4. MI Localization`, redesigned vector heart graphics for both Sternocostal (Anterior) and Diaphragmatic/Base (Posterior) orientations. Features 3D tubular lighting, aortic arch branches, pulmonary trunk bifurcation, cardiac auricles, 4 pulmonary veins, coronary sinus, and epicardial fat sulci, while retaining 100% synchronization with coronary perfusion territories.
+- **Calibrated Waveform Simulation & Magnified Inspection**:
+  - In `5. Waveform Simulator`, eliminated animation time jumps on pause/resume, stabilized freeze-frame display, and added continuous isoelectric baseline connections.
+  - In `LeadDetailModal`, added live sweep playback toggle at 25 mm/s, lead-specific landmark morphology (pathological QS complexes, aVR inverted vectors, tall reciprocal posterior R waves), and theme-harmonized caliper overlays.
+- **Version Bump**: Updated badges and footer to `v4.2` across `Navbar.tsx`, `App.tsx`, `AGENTS.md`, and `README.md`.
+
 ### [v4.1] [2026-10-31] — Default Homepage, Outside-Tap Dismissal, High-Contrast Overlays & Mobile Table Scrolling
 - **Default Homepage Routing**:
   - Set default landing view to `1. ECG Basics` on startup for optimal pedagogical progression.

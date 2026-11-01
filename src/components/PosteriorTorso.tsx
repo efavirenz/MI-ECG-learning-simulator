@@ -101,7 +101,7 @@ export default function PosteriorTorso({
                 {/* Cervical to Lumbar Spine Line */}
                 <line x1="200" y1="70" x2="200" y2="460" stroke="#94a3b8" strokeWidth="6" strokeDasharray="8,4" />
                 <text x="206" y="90" fill={isBright ? "#334155" : "#cbd5e1"} fontSize="8">Vertebra C7 (Prominens)</text>
-                <text x="206" y="275" fill={isBright ? "#334155" : "#cbd5e1"} fontSize="8">Thoracic Spine (T7-T8)</text>
+                <text x="206" y="262" fill={isBright ? "#334155" : "#cbd5e1"} fontSize="8">Thoracic Spine (T7-T8)</text>
 
                 {/* Left Scapula */}
                 <polygon
@@ -144,7 +144,7 @@ export default function PosteriorTorso({
                 />
                 <text
                   x="375"
-                  y="270"
+                  y="288"
                   fill={isBright ? "#9f1239" : "#e11d48"}
                   fontSize="7.5"
                   fontWeight="bold"
@@ -282,22 +282,36 @@ export default function PosteriorTorso({
         {/* Buttons */}
         <div className="flex items-center gap-3 mt-3 text-xs">
           <span className={theme.subtextColor}>Select Lead:</span>
-          {posteriorElectrodes.map(e => (
-            <button
-              key={e.id}
-              onClick={() => onSelectElectrode(e.id === selectedElectrodeId ? null : e)}
-              className={`px-3 py-1 rounded-lg font-mono font-bold text-xs transition border ${
-                selectedElectrodeId === e.id
-                  ? 'border-white text-white shadow ring-2 ring-white/50'
-                  : isBright
-                  ? 'border-slate-300 text-slate-700 hover:border-slate-500'
-                  : 'border-transparent text-slate-300 hover:border-slate-600'
-              }`}
-              style={{ backgroundColor: e.color + '26', color: isBright ? undefined : e.color }}
-            >
-              {e.code}
-            </button>
-          ))}
+          {posteriorElectrodes.map(e => {
+            const isSelected = selectedElectrodeId === e.id;
+            return (
+              <button
+                key={e.id}
+                onClick={() => onSelectElectrode(isSelected ? null : e)}
+                className={`px-3 py-1 rounded-lg font-mono font-bold text-xs transition border ${
+                  isSelected
+                    ? isBright
+                      ? 'border-slate-800 shadow-md ring-2 ring-slate-400 font-black'
+                      : 'border-white text-white shadow ring-2 ring-white/50'
+                    : isBright
+                    ? 'border-slate-300 text-slate-700 hover:border-slate-500'
+                    : 'border-transparent text-slate-300 hover:border-slate-600'
+                }`}
+                style={{
+                  backgroundColor: isSelected
+                    ? isBright
+                      ? e.color + '40'
+                      : e.color + '33'
+                    : e.color + '26',
+                  color: isBright
+                    ? (isSelected ? '#020617' : '#334155')
+                    : (isSelected ? '#ffffff' : e.color)
+                }}
+              >
+                {e.code}
+              </button>
+            );
+          })}
         </div>
       </div>
 

@@ -83,239 +83,398 @@ export default function HeartTerritoryView({
             <defs>
               <linearGradient id="heartBaseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#4c0519" />
-                <stop offset="50%" stopColor="#881337" />
+                <stop offset="40%" stopColor="#7a0d2e" />
+                <stop offset="70%" stopColor="#881337" />
                 <stop offset="100%" stopColor="#1e1b4b" />
+              </linearGradient>
+              <linearGradient id="aortaTubularGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#7f1d1d" />
+                <stop offset="35%" stopColor="#dc2626" />
+                <stop offset="70%" stopColor="#ef4444" />
+                <stop offset="100%" stopColor="#991b1b" />
+              </linearGradient>
+              <linearGradient id="pulmTubularGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#1e3a8a" />
+                <stop offset="40%" stopColor="#3b82f6" />
+                <stop offset="75%" stopColor="#60a5fa" />
+                <stop offset="100%" stopColor="#1d4ed8" />
+              </linearGradient>
+              <linearGradient id="csTubularGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#1e3a8a" />
+                <stop offset="50%" stopColor="#2563eb" />
+                <stop offset="100%" stopColor="#172554" />
+              </linearGradient>
+              <linearGradient id="fatPadGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#fef08a" stopOpacity="0.8" />
+                <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.4" />
               </linearGradient>
               <linearGradient id="infarctGlow" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#ff4d4d" />
                 <stop offset="100%" stopColor="#990000" />
               </linearGradient>
-              <filter id="heartGlow" x="-20%" y="-20%" width="140%" height="140%">
+              <filter id="heartGlow" x="-30%" y="-30%" width="160%" height="160%">
                 <feGaussianBlur stdDeviation="4" result="blur" />
                 <feComposite in="SourceGraphic" in2="blur" operator="over" />
               </filter>
             </defs>
 
-            {/* ANTERIOR VIEW */}
+            {/* ANTERIOR VIEW (STERNOCOSTAL) */}
             {viewOrientation === 'anterior' ? (
               <g>
-                {/* Great Vessels (Aorta & Pulmonary Artery) */}
-                {/* Superior Vena Cava */}
-                <path d="M 120 40 L 120 120 L 145 120 L 145 40 Z" fill="#1e3a8a" stroke="#3b82f6" strokeWidth="1.5" />
-                <text x="110" y="55" fill="#60a5fa" fontSize="7.5" textAnchor="end">SVC</text>
-
-                {/* Ascending Aorta */}
-                <path d="M 180 30 C 180 20, 225 20, 235 60 L 235 120 L 180 120 Z" fill="#991b1b" stroke="#ef4444" strokeWidth="2" />
-                <text x="210" y="50" fill="#fca5a5" fontSize="8" fontWeight="bold" textAnchor="middle">Aorta</text>
-
-                {/* Pulmonary Trunk */}
-                <path d="M 225 80 C 235 90, 250 110, 245 135 L 210 135 L 210 80 Z" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
-                <text x="260" y="105" fill="#93c5fd" fontSize="7.5">Pulm Trunk</text>
-
-                {/* Main Ventricular Mass Silhouette */}
+                {/* 1. Great Vessels (Posterior Layer) */}
+                {/* Superior Vena Cava (SVC) entering RA */}
                 <path
-                  d="M 120 120
-                     C 90 150, 80 230, 110 290
-                     C 130 330, 180 370, 230 375
-                     C 270 370, 310 320, 320 250
-                     C 325 190, 305 140, 260 120
+                  d="M 116 35 L 116 115 C 120 120, 138 122, 142 118 L 142 35 Z"
+                  fill="url(#pulmTubularGrad)"
+                  stroke="#3b82f6"
+                  strokeWidth="1.8"
+                />
+                <ellipse cx="129" cy="35" rx="13" ry="5" fill="#1e3a8a" stroke="#60a5fa" strokeWidth="1.2" />
+                <text x="105" y="55" fill="#93c5fd" fontSize="7.5" fontWeight="bold" textAnchor="end">SVC</text>
+
+                {/* Ascending Aorta, Aortic Arch & Supra-Aortic Branches */}
+                {/* Aortic Arch branches: Brachiocephalic, Left Common Carotid, Left Subclavian */}
+                <path d="M 186 35 L 186 14 C 186 11, 194 11, 194 14 L 194 35 Z" fill="url(#aortaTubularGrad)" stroke="#ef4444" strokeWidth="1.2" />
+                <path d="M 204 30 L 204 12 C 204 9, 212 9, 212 12 L 212 30 Z" fill="url(#aortaTubularGrad)" stroke="#ef4444" strokeWidth="1.2" />
+                <path d="M 220 35 L 220 15 C 220 12, 228 12, 228 15 L 228 35 Z" fill="url(#aortaTubularGrad)" stroke="#ef4444" strokeWidth="1.2" />
+                <text x="210" y="8" fill="#fca5a5" fontSize="6.5" textAnchor="middle">Supra-Aortic Branches</text>
+
+                {/* Main Aorta Body */}
+                <path
+                  d="M 172 120
+                     L 172 65
+                     C 172 26, 240 24, 246 65
+                     L 246 120
+                     Z"
+                  fill="url(#aortaTubularGrad)"
+                  stroke="#ef4444"
+                  strokeWidth="2"
+                />
+                <text x="210" y="58" fill="#ffffff" fontSize="8.5" fontWeight="bold" textAnchor="middle">Aorta</text>
+
+                {/* Pulmonary Trunk & Bifurcation (Winding anterior to aorta) */}
+                <path
+                  d="M 202 125
+                     C 200 95, 215 75, 252 68
+                     C 265 78, 260 98, 235 128
+                     Z"
+                  fill="url(#pulmTubularGrad)"
+                  stroke="#60a5fa"
+                  strokeWidth="2"
+                />
+                {/* Left & Right Pulmonary Artery Branches */}
+                <path d="M 252 68 C 275 62, 290 70, 298 82 L 288 88 C 278 78, 266 75, 250 78 Z" fill="#1d4ed8" stroke="#3b82f6" strokeWidth="1.2" />
+                <text x="282" y="65" fill="#93c5fd" fontSize="7.5" fontWeight="bold">Pulmonary Trunk</text>
+
+                {/* Right Atrium & Auricle Silhouette */}
+                <path
+                  d="M 120 115
+                     C 85 130, 75 185, 95 235
+                     C 105 255, 115 270, 125 285
+                     L 135 240
+                     C 125 180, 130 140, 142 118 Z"
+                  fill="#581c87"
+                  opacity="0.75"
+                  stroke="#a855f7"
+                  strokeWidth="1.5"
+                />
+                <text x="82" y="195" fill="#e9d5ff" fontSize="7.5" fontWeight="bold" textAnchor="end">Right Atrium</text>
+
+                {/* Left Auricle (Appendage) Silhouette */}
+                <path
+                  d="M 260 120
+                     C 285 125, 298 145, 292 165
+                     C 285 175, 275 170, 265 155 Z"
+                  fill="#581c87"
+                  opacity="0.8"
+                  stroke="#c084fc"
+                  strokeWidth="1.5"
+                />
+                <text x="305" y="145" fill="#e9d5ff" fontSize="7" fontWeight="bold">Left Auricle</text>
+
+                {/* Ventricular Silhouette Base (Sternocostal Surface) */}
+                <path
+                  d="M 125 140
+                     C 92 175, 90 240, 115 295
+                     C 135 335, 185 372, 230 376
+                     C 275 372, 315 320, 322 245
+                     C 326 185, 305 140, 260 125
                      Z"
                   fill="url(#heartBaseGrad)"
                   stroke="#fda4af"
-                  strokeWidth="2"
+                  strokeWidth="2.5"
                 />
 
-                {/* Myocardial Territory Polygons (Clickable & Highlightable) */}
-                {/* 1. Right Ventricle (RV) Region */}
+                {/* Myocardial Territories (Anatomical Segments) */}
+                {/* 1. Right Ventricle (RV) */}
                 <path
                   id="region-rv"
-                  d="M 125 140 C 105 180, 105 240, 130 290 C 150 315, 175 330, 195 340 L 185 140 Z"
+                  d="M 125 140
+                     C 100 185, 102 245, 125 295
+                     C 145 322, 175 336, 195 342
+                     L 186 140 Z"
                   fill={isHighlighted('region-rv') ? '#ef4444' : '#641e2e'}
-                  opacity={isHighlighted('region-rv') ? 0.9 : 0.6}
+                  opacity={isHighlighted('region-rv') ? 0.95 : 0.65}
                   stroke={isHighlighted('region-rv') ? '#fef08a' : '#9f1239'}
-                  strokeWidth={isHighlighted('region-rv') ? 3 : 1}
+                  strokeWidth={isHighlighted('region-rv') ? 3.5 : 1.2}
                   className="transition-all duration-300"
                 />
-                <text x="145" y="230" fill="#ffffff" fontSize="9" fontWeight="bold" opacity="0.9">Right Ventricle</text>
-                <text x="145" y="242" fill="#fbcfe8" fontSize="7.5">(V3R, V4R)</text>
+                <text x="145" y="225" fill="#ffffff" fontSize="9" fontWeight="bold" opacity="0.95">Right Ventricle</text>
+                <text x="145" y="238" fill="#fbcfe8" fontSize="7.5" fontWeight="medium">(V3R, V4R)</text>
 
                 {/* 2. Interventricular Septum (Anterior groove region) */}
                 <path
                   id="region-septum"
-                  d="M 185 140 L 195 340 L 220 360 L 215 140 Z"
+                  d="M 186 140 L 195 342 L 222 362 L 216 140 Z"
                   fill={isHighlighted('region-septum') ? '#f59e0b' : '#831843'}
-                  opacity={isHighlighted('region-septum') ? 0.95 : 0.6}
+                  opacity={isHighlighted('region-septum') ? 0.95 : 0.65}
                   stroke={isHighlighted('region-septum') ? '#ffffff' : '#be123c'}
-                  strokeWidth={isHighlighted('region-septum') ? 3 : 1}
+                  strokeWidth={isHighlighted('region-septum') ? 3.5 : 1.2}
                   className="transition-all duration-300"
                 />
-                <text x="205" y="270" fill="#ffffff" fontSize="8" fontWeight="bold" textAnchor="middle">Septum</text>
-                <text x="205" y="280" fill="#fef08a" fontSize="7" textAnchor="middle">(V1, V2)</text>
+                <text x="204" y="270" fill="#ffffff" fontSize="8" fontWeight="bold" textAnchor="middle">Septum</text>
+                <text x="204" y="281" fill="#fef08a" fontSize="7" fontWeight="bold" textAnchor="middle">(V1, V2)</text>
 
-                {/* 3. Anterior Free Wall of LV */}
+                {/* 3. Anterior Free Wall of Left Ventricle */}
                 <path
                   id="region-anterior"
-                  d="M 215 140 L 220 360 C 235 365, 255 350, 270 320 L 260 140 Z"
+                  d="M 216 140 L 222 362 C 238 366, 258 350, 272 318 L 260 140 Z"
                   fill={isHighlighted('region-anterior') ? '#ef4444' : '#500724'}
-                  opacity={isHighlighted('region-anterior') ? 0.95 : 0.6}
+                  opacity={isHighlighted('region-anterior') ? 0.95 : 0.65}
                   stroke={isHighlighted('region-anterior') ? '#fef08a' : '#be123c'}
-                  strokeWidth={isHighlighted('region-anterior') ? 3 : 1}
+                  strokeWidth={isHighlighted('region-anterior') ? 3.5 : 1.2}
                   className="transition-all duration-300"
                 />
-                <text x="245" y="230" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">Anterior LV</text>
-                <text x="245" y="242" fill="#fbcfe8" fontSize="7.5" textAnchor="middle">(V3, V4)</text>
+                <text x="245" y="225" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">Anterior LV</text>
+                <text x="245" y="238" fill="#fbcfe8" fontSize="7.5" fontWeight="medium" textAnchor="middle">(V3, V4)</text>
 
-                {/* 4. Lateral LV Wall */}
+                {/* 4. Lateral LV Free Wall */}
                 <path
                   id="region-lateral"
-                  d="M 260 140 L 270 320 C 290 280, 310 230, 310 180 C 300 150, 280 140, 260 140 Z"
+                  d="M 260 140 L 272 318 C 292 280, 312 230, 312 180 C 302 150, 280 140, 260 140 Z"
                   fill={isHighlighted('region-lateral') ? '#8b5cf6' : '#3f0c1a'}
-                  opacity={isHighlighted('region-lateral') ? 0.95 : 0.6}
+                  opacity={isHighlighted('region-lateral') ? 0.95 : 0.65}
                   stroke={isHighlighted('region-lateral') ? '#fef08a' : '#be123c'}
-                  strokeWidth={isHighlighted('region-lateral') ? 3 : 1}
+                  strokeWidth={isHighlighted('region-lateral') ? 3.5 : 1.2}
                   className="transition-all duration-300"
                 />
                 <text x="290" y="210" fill="#ffffff" fontSize="8.5" fontWeight="bold" textAnchor="middle">Lateral LV</text>
-                <text x="290" y="222" fill="#e9d5ff" fontSize="7" textAnchor="middle">(I, aVL, V5, V6)</text>
+                <text x="290" y="222" fill="#e9d5ff" fontSize="7" fontWeight="medium" textAnchor="middle">(I, aVL, V5, V6)</text>
 
-                {/* 5. High Lateral Spot */}
+                {/* 5. High Lateral Territory */}
                 <circle
                   id="region-high-lateral"
                   cx="285"
                   cy="155"
-                  r="16"
-                  fill={isHighlighted('region-high-lateral') ? '#38bdf8' : 'none'}
-                  stroke={isHighlighted('region-high-lateral') ? '#ffffff' : 'none'}
-                  strokeWidth="2"
-                  opacity="0.85"
+                  r="18"
+                  fill={isHighlighted('region-high-lateral') ? '#38bdf8' : 'rgba(56, 189, 248, 0.25)'}
+                  stroke={isHighlighted('region-high-lateral') ? '#ffffff' : '#38bdf8'}
+                  strokeWidth={isHighlighted('region-high-lateral') ? 3 : 1.5}
+                  strokeDasharray={isHighlighted('region-high-lateral') ? undefined : '3,3'}
+                  opacity="0.9"
                 />
+                <text x="285" y="158" fill="#ffffff" fontSize="6.5" fontWeight="bold" textAnchor="middle">High Lat</text>
 
-                {/* 6. Inferior border seen anteriorly */}
+                {/* 6. Inferior Margin visible anteriorly */}
                 <path
                   id="region-inferior"
-                  d="M 160 330 C 190 365, 235 375, 260 355 L 230 340 Z"
+                  d="M 160 332 C 190 366, 235 375, 260 354 L 230 340 Z"
                   fill={isHighlighted('region-inferior') ? '#10b981' : '#2b0716'}
-                  opacity={isHighlighted('region-inferior') ? 0.95 : 0.5}
+                  opacity={isHighlighted('region-inferior') ? 0.95 : 0.55}
                   stroke={isHighlighted('region-inferior') ? '#ffffff' : 'none'}
-                  strokeWidth="2"
+                  strokeWidth="2.5"
                 />
 
-                {/* Coronary Arteries (Vivid anatomical overlay) */}
-                {/* RCA Course in right atrioventricular groove */}
+                {/* Subepicardial Adipose Sulcus Highlights */}
+                <path d="M 180 125 C 150 135, 126 155, 120 190" fill="none" stroke="url(#fatPadGrad)" strokeWidth="6" opacity="0.4" />
+                <path d="M 225 140 C 220 170, 205 230, 206 280 C 206 320, 216 350, 228 372" fill="none" stroke="url(#fatPadGrad)" strokeWidth="5" opacity="0.35" />
+
+                {/* Coronary Arteries (High-Fidelity Arterial Network) */}
+                {/* Right Coronary Artery (RCA) in right AV groove */}
                 <path
-                  d="M 180 120 C 145 130, 120 150, 115 190 C 110 230, 120 270, 135 295"
+                  id="artery-rca"
+                  d="M 180 120 C 145 130, 122 152, 116 190 C 110 230, 120 270, 136 295"
                   fill="none"
                   stroke={isHighlighted('artery-rca') ? '#fbbf24' : '#ef4444'}
-                  strokeWidth={isHighlighted('artery-rca') ? 5 : 3.5}
+                  strokeWidth={isHighlighted('artery-rca') ? 5.5 : 3.5}
                   strokeLinecap="round"
                   filter={isHighlighted('artery-rca') ? 'url(#heartGlow)' : undefined}
                 />
                 {/* RCA Acute marginal branches */}
-                <path d="M 115 190 L 140 220" fill="none" stroke="#ef4444" strokeWidth="2" />
-                <path d="M 120 240 L 150 260" fill="none" stroke="#ef4444" strokeWidth="2" />
-                <text x="90" y="180" fill="#fbbf24" fontSize="8" fontWeight="bold">RCA</text>
+                <path d="M 116 190 L 142 218" fill="none" stroke={isHighlighted('artery-rca') ? '#fef08a' : '#ef4444'} strokeWidth="2.2" strokeLinecap="round" />
+                <path d="M 120 240 L 152 260" fill="none" stroke={isHighlighted('artery-rca') ? '#fef08a' : '#ef4444'} strokeWidth="2.2" strokeLinecap="round" />
+                <text x="92" y="178" fill="#fbbf24" fontSize="8" fontWeight="bold">RCA</text>
 
-                {/* Left Main (LMCA) beneath pulmonary trunk */}
-                <path d="M 215 125 L 225 140" fill="none" stroke="#ef4444" strokeWidth="5" />
-                <text x="235" y="135" fill="#f87171" fontSize="7.5" fontWeight="bold">LMCA</text>
-
-                {/* LAD coursing down anterior interventricular sulcus to apex */}
+                {/* Left Main Coronary Artery (LMCA) originating behind pulmonary trunk */}
                 <path
-                  d="M 225 140 C 220 170, 205 230, 205 280 C 205 320, 215 350, 228 370"
+                  id="artery-lmca"
+                  d="M 215 125 L 226 140"
+                  fill="none"
+                  stroke={isHighlighted('artery-lmca') ? '#fbbf24' : '#ef4444'}
+                  strokeWidth={isHighlighted('artery-lmca') ? 6 : 4.5}
+                  strokeLinecap="round"
+                  filter={isHighlighted('artery-lmca') ? 'url(#heartGlow)' : undefined}
+                />
+                <text x="238" y="134" fill={isHighlighted('artery-lmca') ? '#fbbf24' : '#f87171'} fontSize="7.5" fontWeight="bold">LMCA</text>
+
+                {/* Left Anterior Descending Artery (LAD) coursing down anterior IV sulcus */}
+                <path
+                  id="artery-lad"
+                  d="M 226 140 C 220 170, 206 230, 206 280 C 206 320, 216 350, 228 372"
                   fill="none"
                   stroke={isHighlighted('artery-lad') ? '#fbbf24' : '#ef4444'}
-                  strokeWidth={isHighlighted('artery-lad') ? 5 : 3.5}
+                  strokeWidth={isHighlighted('artery-lad') ? 5.5 : 3.5}
                   strokeLinecap="round"
                   filter={isHighlighted('artery-lad') ? 'url(#heartGlow)' : undefined}
                 />
-                {/* LAD Diagonal branches (D1, D2) */}
-                <path d="M 220 175 L 255 210" fill="none" stroke="#ef4444" strokeWidth="2.2" />
-                <text x="260" y="200" fill="#fca5a5" fontSize="7">D1 Branch</text>
-                <path d="M 210 240 L 245 270" fill="none" stroke="#ef4444" strokeWidth="2" />
-                <text x="250" y="265" fill="#fca5a5" fontSize="7">D2 Branch</text>
-                {/* Septal perforators (dashed into septum) */}
-                <path d="M 215 190 L 185 205" fill="none" stroke="#f87171" strokeWidth="1.8" strokeDasharray="2,2" />
-                <path d="M 208 230 L 180 245" fill="none" stroke="#f87171" strokeWidth="1.8" strokeDasharray="2,2" />
-                <text x="160" y="200" fill="#fca5a5" fontSize="6.5">Septal (S1)</text>
+                {/* LAD Diagonal Branches (D1, D2) */}
+                <path d="M 220 175 L 256 210" fill="none" stroke={isHighlighted('artery-lad') ? '#fef08a' : '#ef4444'} strokeWidth="2.4" strokeLinecap="round" />
+                <text x="262" y="200" fill="#fca5a5" fontSize="7" fontWeight="bold">D1 Branch</text>
+                <path d="M 210 240 L 246 270" fill="none" stroke={isHighlighted('artery-lad') ? '#fef08a' : '#ef4444'} strokeWidth="2.2" strokeLinecap="round" />
+                <text x="252" y="266" fill="#fca5a5" fontSize="7" fontWeight="bold">D2 Branch</text>
+                {/* Septal perforating branches (S1, S2 - penetrating septum) */}
+                <path d="M 215 190 L 186 205" fill="none" stroke="#fca5a5" strokeWidth="2" strokeDasharray="3,2" />
+                <path d="M 208 230 L 182 245" fill="none" stroke="#fca5a5" strokeWidth="2" strokeDasharray="3,2" />
+                <text x="162" y="198" fill="#fca5a5" fontSize="6.5">Septal (S1)</text>
 
-                {/* LCx coursing in left AV groove */}
+                {/* Left Circumflex Artery (LCx) coursing in left AV groove */}
                 <path
-                  d="M 225 140 C 255 145, 290 160, 305 190"
+                  id="artery-lcx"
+                  d="M 226 140 C 255 145, 290 160, 305 190"
                   fill="none"
                   stroke={isHighlighted('artery-lcx') ? '#fbbf24' : '#ef4444'}
-                  strokeWidth={isHighlighted('artery-lcx') ? 5 : 3.5}
+                  strokeWidth={isHighlighted('artery-lcx') ? 5.5 : 3.5}
                   strokeLinecap="round"
                   filter={isHighlighted('artery-lcx') ? 'url(#heartGlow)' : undefined}
                 />
-                {/* Obtuse marginal branches (OM1) */}
-                <path d="M 270 155 L 290 200" fill="none" stroke="#ef4444" strokeWidth="2.2" />
-                <text x="310" y="165" fill="#fbbf24" fontSize="8" fontWeight="bold">LCx (OM)</text>
+                {/* Obtuse Marginal Branches (OM1, OM2) */}
+                <path d="M 270 155 L 292 200" fill="none" stroke={isHighlighted('artery-lcx') ? '#fef08a' : '#ef4444'} strokeWidth="2.4" strokeLinecap="round" />
+                <text x="312" y="165" fill="#fbbf24" fontSize="8" fontWeight="bold">LCx (OM)</text>
 
-                {/* Cardiac Apex */}
-                <circle cx="230" cy="372" r="3.5" fill="#ffffff" />
-                <text x="230" y="390" fill="#cbd5e1" fontSize="8" textAnchor="middle" fontWeight="bold">Cardiac Apex</text>
+                {/* Cardiac Apex Landmark */}
+                <circle cx="230" cy="374" r="4" fill="#ffffff" stroke="#e11d48" strokeWidth="1.5" />
+                <text x="230" y="392" fill={isBright ? "#334155" : "#cbd5e1"} fontSize="8" textAnchor="middle" fontWeight="bold">Cardiac Apex (LV)</text>
               </g>
             ) : (
-              /* POSTERIOR / INFERIOR VIEW */
+              /* POSTERIOR / INFERIOR VIEW (DIAPHRAGMATIC & BASE) */
               <g>
-                {/* Posterior Ventricular Mass */}
+                {/* 1. Base of the Heart: Left Atrium with 4 Pulmonary Veins */}
+                {/* Left Atrium Smooth Posterior Wall */}
                 <path
-                  d="M 120 120
-                     C 80 160, 85 240, 115 300
-                     C 145 350, 195 375, 235 370
-                     C 285 365, 320 310, 325 240
-                     C 325 180, 295 130, 250 115
+                  d="M 140 100
+                     C 140 70, 260 70, 260 100
+                     C 275 125, 265 145, 250 145
+                     L 150 145
+                     C 135 145, 125 125, 140 100 Z"
+                  fill="#4c1d95"
+                  stroke="#8b5cf6"
+                  strokeWidth="2"
+                  opacity="0.9"
+                />
+                <text x="200" y="108" fill="#e9d5ff" fontSize="8.5" fontWeight="bold" textAnchor="middle">Left Atrium (Base)</text>
+
+                {/* 4 Pulmonary Veins (Oxygenated Blood from Lungs) */}
+                {/* Left Superior & Inferior PVs (Patient Left = diagram left) */}
+                <ellipse cx="118" cy="98" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
+                <ellipse cx="114" cy="125" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
+                <text x="100" y="98" fill="#93c5fd" fontSize="6.5" textAnchor="end">L. Sup PV</text>
+                <text x="96" y="125" fill="#93c5fd" fontSize="6.5" textAnchor="end">L. Inf PV</text>
+
+                {/* Right Superior & Inferior PVs (Patient Right = diagram right) */}
+                <ellipse cx="282" cy="98" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
+                <ellipse cx="286" cy="125" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
+                <text x="300" y="98" fill="#93c5fd" fontSize="6.5">R. Sup PV</text>
+                <text x="304" y="125" fill="#93c5fd" fontSize="6.5">R. Inf PV</text>
+
+                {/* Inferior Vena Cava (IVC) entering RA from below */}
+                <ellipse cx="270" cy="155" rx="11" ry="6" fill="#1e3a8a" stroke="#3b82f6" strokeWidth="1.5" />
+                <text x="288" y="158" fill="#93c5fd" fontSize="7" fontWeight="bold">IVC</text>
+
+                {/* Posterior Ventricular Silhouette */}
+                <path
+                  d="M 120 140
+                     C 80 175, 84 245, 115 305
+                     C 145 352, 195 375, 235 372
+                     C 285 368, 320 315, 325 245
+                     C 325 185, 295 145, 250 140
                      Z"
                   fill="url(#heartBaseGrad)"
                   stroke="#fda4af"
-                  strokeWidth="2"
+                  strokeWidth="2.5"
                 />
 
                 {/* Posterior Left Ventricle Region (V7-V9 territory) */}
                 <path
                   id="region-posterior"
-                  d="M 125 140 C 95 180, 95 245, 125 300 L 195 340 L 195 140 Z"
+                  d="M 120 140
+                     C 92 180, 94 248, 122 305
+                     L 196 345
+                     L 196 145 Z"
                   fill={isHighlighted('region-posterior') ? '#f97316' : '#4a044e'}
-                  opacity={isHighlighted('region-posterior') ? 0.95 : 0.6}
+                  opacity={isHighlighted('region-posterior') ? 0.95 : 0.65}
                   stroke={isHighlighted('region-posterior') ? '#ffffff' : '#701a75'}
-                  strokeWidth={isHighlighted('region-posterior') ? 3 : 1}
+                  strokeWidth={isHighlighted('region-posterior') ? 3.5 : 1.2}
+                  className="transition-all duration-300"
                 />
-                <text x="145" y="220" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">Posterior Wall</text>
-                <text x="145" y="235" fill="#fed7aa" fontSize="8" textAnchor="middle">(V7, V8, V9)</text>
+                <text x="145" y="222" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">Posterior Wall</text>
+                <text x="145" y="236" fill="#fed7aa" fontSize="8" fontWeight="bold" textAnchor="middle">(V7, V8, V9)</text>
 
                 {/* Inferior / Diaphragmatic Wall (II, III, aVF) */}
                 <path
                   id="region-inferior-post"
-                  d="M 195 140 L 195 340 C 235 370, 275 355, 305 300 L 285 140 Z"
+                  d="M 196 145
+                     L 196 345
+                     C 238 372, 276 355, 305 300
+                     L 285 145 Z"
                   fill={isHighlighted('region-inferior-post') ? '#10b981' : '#312e81'}
-                  opacity={isHighlighted('region-inferior-post') ? 0.95 : 0.6}
+                  opacity={isHighlighted('region-inferior-post') ? 0.95 : 0.65}
                   stroke={isHighlighted('region-inferior-post') ? '#ffffff' : '#3730a3'}
-                  strokeWidth={isHighlighted('region-inferior-post') ? 3 : 1}
+                  strokeWidth={isHighlighted('region-inferior-post') ? 3.5 : 1.2}
+                  className="transition-all duration-300"
                 />
-                <text x="245" y="220" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">Inferior Wall</text>
-                <text x="245" y="235" fill="#a7f3d0" fontSize="8" textAnchor="middle">(II, III, aVF)</text>
+                <text x="245" y="222" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">Inferior Wall</text>
+                <text x="245" y="236" fill="#a7f3d0" fontSize="8" fontWeight="bold" textAnchor="middle">(II, III, aVF)</text>
 
-                {/* Posterior Descending Artery (PDA) coursing in posterior interventricular groove */}
+                {/* Coronary Sinus (Large venous channel in posterior AV groove) */}
+                <path
+                  d="M 148 143 C 180 148, 220 150, 260 152"
+                  fill="none"
+                  stroke="url(#csTubularGrad)"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                />
+                <text x="195" y="140" fill="#93c5fd" fontSize="7" fontWeight="bold" textAnchor="middle">Coronary Sinus</text>
+
+                {/* Posterior Interventricular Sulcus Adipose Pad */}
+                <path d="M 196 145 L 196 355" fill="none" stroke="url(#fatPadGrad)" strokeWidth="6" opacity="0.35" />
+
+                {/* Posterior Descending Artery (PDA) coursing in posterior IV sulcus */}
                 <path
                   id="artery-rca-pda"
-                  d="M 195 130 L 195 350"
+                  d="M 196 142 L 196 355"
                   fill="none"
                   stroke={isHighlighted('artery-rca-pda') ? '#fbbf24' : '#ef4444'}
-                  strokeWidth={isHighlighted('artery-rca-pda') ? 5 : 3.5}
+                  strokeWidth={isHighlighted('artery-rca-pda') ? 5.5 : 3.5}
                   strokeLinecap="round"
                   filter={isHighlighted('artery-rca-pda') ? 'url(#heartGlow)' : undefined}
                 />
-                <text x="200" y="270" fill="#fbbf24" fontSize="8" fontWeight="bold">PDA (from RCA ~85%)</text>
+                <text x="202" y="275" fill="#fbbf24" fontSize="8" fontWeight="bold">PDA (RCA ~85% / LCx ~15%)</text>
 
-                {/* Posterolateral Branches (from LCx or RCA) */}
+                {/* Posterolateral Branches (PLB) */}
                 <path
                   id="artery-lcx-post"
-                  d="M 140 140 C 130 180, 135 220, 150 260"
+                  d="M 146 145 C 132 185, 138 225, 154 265"
                   fill="none"
                   stroke={isHighlighted('artery-lcx-post') ? '#fbbf24' : '#ef4444'}
-                  strokeWidth={isHighlighted('artery-lcx-post') ? 4 : 2.5}
+                  strokeWidth={isHighlighted('artery-lcx-post') ? 4.5 : 2.8}
+                  strokeLinecap="round"
+                  filter={isHighlighted('artery-lcx-post') ? 'url(#heartGlow)' : undefined}
                 />
-                <text x="130" y="170" fill="#fca5a5" fontSize="7.5">PLB Branch</text>
+                <text x="122" y="172" fill="#fca5a5" fontSize="7.5" fontWeight="bold">PLB Branch</text>
+
+                {/* Cardiac Apex Landmark */}
+                <circle cx="230" cy="372" r="4" fill="#ffffff" stroke="#e11d48" strokeWidth="1.5" />
+                <text x="230" y="390" fill={isBright ? "#334155" : "#cbd5e1"} fontSize="8" textAnchor="middle" fontWeight="bold">Cardiac Apex</text>
               </g>
             )}
           </svg>
