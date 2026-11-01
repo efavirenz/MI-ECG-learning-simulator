@@ -90,10 +90,11 @@ export default function LeadDetailModal({
   }, [isPlaying]);
 
   // Generate SVG path points with high sampling density for smooth curves across all 3 cycles
-  const abnormalPoints: string[] = ['20,200', '20,100', '70,100', '70,200', '90,200'];
-  const normalPoints: string[] = ['20,200', '20,100', '70,100', '70,200', '90,200'];
+  // ECG waveform begins at X = 90 (connecting cleanly to calibration pulse lead-in at baseline Y = 200)
+  const abnormalPoints: string[] = ['90,200'];
+  const normalPoints: string[] = ['90,200'];
 
-  const sampleCount = 450;
+  const sampleCount = 600; // 1 sample per pixel = 4.0 ms per sample (sub-millimeter precision)
   for (let i = 0; i <= sampleCount; i++) {
     const t = (i / sampleCount) * totalRecordingSec;
     const x = timeToX(t);
@@ -111,7 +112,9 @@ export default function LeadDetailModal({
 
   // Connect to end of strip
   abnormalPoints.push('710,200');
-  normalPoints.push('710,200');
+  if (showNormalComparison) {
+    normalPoints.push('710,200');
+  }
 
   const abnormalPathD = `M ${abnormalPoints.join(' L ')}`;
   const normalPathD = showNormalComparison ? `M ${normalPoints.join(' L ')}` : '';
@@ -120,6 +123,8 @@ export default function LeadDetailModal({
   const currentCursorX = timeToX(sweepTime);
   const currentCursorVoltage = getEcgVoltage(lead, sweepTime, territoryId, 75);
   const currentCursorY = voltToY(currentCursorVoltage);
+  const normalCursorVoltage = getEcgVoltage(lead, sweepTime, 'normal', 75);
+  const normalCursorY = voltToY(normalCursorVoltage);
 
   // Clinical guideline criteria evaluator for this lead
   const getClinicalThresholdEvaluation = (deviationMm: number) => {
@@ -168,7 +173,8 @@ export default function LeadDetailModal({
   };
 
   const currentDev = delta?.stElevationMm || 0;
-  const evalResult = getClinicalThresholdEvaluation(currentDev);
+  const activeDev = caliper !== null ? caliper.mm : currentDev;
+  const evalResult = getClinicalThresholdEvaluation(activeDev);
 
   // SVG grid lines definition (perfect 10px squares minor; 50px squares major)
   const minorYLines: number[] = [];
@@ -382,7 +388,7 @@ export default function LeadDetailModal({
 
               {/* Standard Calibration Pulse (10 mm = 1.0 mV high = 100px, 0.20s = 5 mm wide = 50px) */}
               <path
-                d="M 20 200 L 20 100 L 70 100 L 70 200"
+                d="M 20 200 L 20 100 L 70 100 L 70 200 L 90 200"
                 fill="none"
                 stroke={paperMode === 'paper' ? '#be123c' : '#38bdf8'}
                 strokeWidth="2"
@@ -431,6 +437,27 @@ export default function LeadDetailModal({
                     strokeWidth="1.6"
                     opacity="0.9"
                   />
+                  {/* Normal Reference Cursor Point (if comparing normal) */}
+                  {showNormalComparison && territoryId !== 'normal' && (
+                    <g>
+                      <line
+                        x1={currentCursorX}
+                        y1={normalCursorY}
+                        x2={currentCursorX}
+                        y2={currentCursorY}
+                        stroke={paperMode === 'paper' ? 'rgba(100, 116, 139, 0.6)' : 'rgba(148, 163, 184, 0.6)'}
+                        strokeWidth="1.5"
+                        strokeDasharray="2,2"
+                      />
+                      <circle
+                        cx={currentCursorX}
+                        cy={normalCursorY}
+                        r="3.5"
+                        fill={paperMode === 'paper' ? '#64748b' : '#94a3b8'}
+                      />
+                    </g>
+                  )}
+                  {/* Active Waveform Cursor Point */}
                   <circle
                     cx={currentCursorX}
                     cy={currentCursorY}
@@ -569,26 +596,33 @@ export default function LeadDetailModal({
           <div className={`flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl text-xs border ${
             isBright ? 'bg-slate-100/90 border-slate-200 text-slate-800' : 'bg-slate-950/70 border-slate-800 text-slate-300'
           }`}>
-            <div className="flex items-center gap-2">
-              <span className={`font-semibold ${isBright ? 'text-slate-800' : 'text-slate-300'}`}>Measured J-Point Status:</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`font-semibold ${isBright ? 'text-slate-800' : 'text-slate-300'}`}>
+                {caliper !== null ? 'Active Caliper Measurement:' : 'Programmed J-Point Deviation:'}
+              </span>
               <span
                 className={`font-mono font-bold px-2 py-0.5 rounded text-xs ${
-                  currentDev > 0
+                  activeDev > 0
                     ? 'bg-rose-950 text-rose-300 border border-rose-800'
-                    : currentDev < 0
+                    : activeDev < 0
                     ? 'bg-cyan-950 text-cyan-300 border border-cyan-800'
                     : isBright ? 'bg-slate-200 text-slate-800' : 'bg-slate-800 text-slate-300'
                 }`}
               >
-                {currentDev > 0 ? '+' : ''}{currentDev.toFixed(1)} mm ({(currentDev * 0.1).toFixed(2)} mV)
+                {activeDev > 0 ? '+' : ''}{activeDev.toFixed(1)} mm ({(activeDev * 0.1).toFixed(2)} mV)
               </span>
-              {caliper && (
-                <button
-                  onClick={() => setCaliper(null)}
-                  className="text-[11px] text-emerald-500 hover:underline ml-2 font-semibold"
-                >
-                  Reset Caliper
-                </button>
+              {caliper !== null && (
+                <>
+                  <span className={`text-[11px] ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
+                    (Nominal: {currentDev > 0 ? '+' : ''}{currentDev.toFixed(1)} mm)
+                  </span>
+                  <button
+                    onClick={() => setCaliper(null)}
+                    className="text-[11px] text-emerald-500 hover:underline font-semibold"
+                  >
+                    Reset Caliper
+                  </button>
+                </>
               )}
             </div>
 

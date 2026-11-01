@@ -118,9 +118,9 @@ export default function ECGWaveformMonitor({
         const isRhythmStrip = leadKey === 'II_RHYTHM';
 
         // Standard 25 mm/s paper speed & 10 mm/mV voltage calibration
-        // 12-lead boxes: calibrated 2.5s duration across box width (62.5 mm at 25 mm/s)
-        // Rhythm strip: calibrated 10.0s continuous recording across full width (250 mm at 25 mm/s)
-        const targetMm = isRhythmStrip ? Math.max(200, w / 4.4) : 62.5;
+        // 12-lead & supplemental boxes: calibrated 2.40s duration across box width (60.0 mm = 12 large boxes = 3 complete cardiac cycles at 75 bpm)
+        // Rhythm strip: calibrated 9.60s continuous recording across full width (240.0 mm = 48 large boxes = 12 complete cardiac cycles at 75 bpm)
+        const targetMm = isRhythmStrip ? 240.0 : 60.0;
         const smallBox = w / targetMm;
         const largeBox = smallBox * 5;
         const voltScale = smallBox * 10; // 1.0 mV = 10 mm = 10 small boxes
@@ -173,7 +173,12 @@ export default function ECGWaveformMonitor({
         ctx.stroke();
         ctx.setLineDash([]);
 
-        const pulseX = 6;
+        // Rhythm strip calibration pulse lead-in: exactly 20.0 mm (4 large boxes = 0.80s = 1 complete cardiac cycle)
+        // This guarantees that beats across the rhythm strip and 12-lead boxes are in 100% synchronous phase lock!
+        const stripLeadInMm = 20.0;
+        const stripLeadInPx = isRhythmStrip ? (stripLeadInMm * smallBox) : 0;
+
+        const pulseX = smallBox * 2.5;
         const pulseW = largeBox;
         const pulseH = voltScale;
 
@@ -192,9 +197,6 @@ export default function ECGWaveformMonitor({
           ctx.font = 'bold 8.5px monospace';
           ctx.fillText('1.0 mV', pulseX + 2, centerY - pulseH - 3);
         }
-
-        // On rhythm strip, insert clean isoelectric distance between Calibration Pulse and 1st P wave
-        const stripLeadInPx = isRhythmStrip ? (pulseX + pulseW + largeBox * 1.5) : 0;
 
         // Trace voltage sampler calibrated to exact 25 mm/s paper speed
         const getTraceVoltage = (x: number, territoryKey: string) => {
@@ -222,17 +224,12 @@ export default function ECGWaveformMonitor({
           ctx.lineWidth = 1.3;
           ctx.setLineDash([3, 3]);
 
-          const maxNormalX = isPlaying ? sweepX : w;
+          const maxNormalX = w;
           for (let x = 0; x <= maxNormalX; x += stepPx) {
             const v = getTraceVoltage(x, 'normal');
             const y = centerY - v * voltScale;
             if (x === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
-          }
-          if (maxNormalX % stepPx !== 0) {
-            const v = getTraceVoltage(maxNormalX, 'normal');
-            const y = centerY - v * voltScale;
-            ctx.lineTo(maxNormalX, y);
           }
           ctx.stroke();
           ctx.setLineDash([]);
@@ -240,18 +237,19 @@ export default function ECGWaveformMonitor({
 
         // Determine active waveform trace color
         let activeColor = paperMode === 'paper' ? '#0f172a' : '#38bdf8';
+        let oldColor = paperMode === 'paper' ? 'rgba(15, 23, 42, 0.25)' : 'rgba(56, 189, 248, 0.25)';
         if (delta?.stElevationMm && delta.stElevationMm > 0) {
           activeColor = paperMode === 'paper' ? '#dc2626' : '#f87171'; // Red for ST elevation
-        } else if (delta?.stElevationMm && delta.stElevationMm < 0) {
-          activeColor = paperMode === 'paper' ? '#0284c7' : '#38bdf8'; // Cyan for ST depression
-        } else if (territory.reciprocalLeads.includes(actualLead)) {
-          activeColor = paperMode === 'paper' ? '#0284c7' : '#38bdf8'; // Cyan for reciprocal
+          oldColor = paperMode === 'paper' ? 'rgba(220, 38, 38, 0.25)' : 'rgba(248, 113, 113, 0.25)';
+        } else if ((delta?.stElevationMm && delta.stElevationMm < 0) || territory.reciprocalLeads.includes(actualLead)) {
+          activeColor = paperMode === 'paper' ? '#0284c7' : '#38bdf8'; // Cyan for ST depression / reciprocal
+          oldColor = paperMode === 'paper' ? 'rgba(2, 132, 199, 0.25)' : 'rgba(56, 189, 248, 0.25)';
         }
 
         // 3. Draw Previous Cycle Trace (Beyond erase gap ahead of sweep beam)
         if (sweepX + eraseWidth < w) {
           ctx.beginPath();
-          ctx.strokeStyle = paperMode === 'paper' ? 'rgba(15, 23, 42, 0.25)' : 'rgba(56, 189, 248, 0.25)';
+          ctx.strokeStyle = oldColor;
           ctx.lineWidth = 1.8;
           ctx.lineJoin = 'round';
           ctx.lineCap = 'round';

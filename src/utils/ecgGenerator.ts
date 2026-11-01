@@ -108,8 +108,7 @@ export function getEcgVoltage(
 
     if (delta?.rAmplitudeMultiplier !== undefined) {
       rAmp *= delta.rAmplitudeMultiplier;
-    }
-    if (delta?.tallRWave) {
+    } else if (delta?.tallRWave) {
       // Reciprocal tall, broad R wave in V1-V3 (posterior wall STEMI)
       rAmp = Math.max(rAmp * 2.2, 1.25);
     }

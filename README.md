@@ -124,6 +124,21 @@ npm run preview
 
 ## 📝 Update History & Changelog
 
+### [v5.1] [2026-11-01] — Multi-Lead Waveform Animation Calibration, Phase-Locking & Magnified Analysis Precision
+- **Synchronized Phase-Locking Across All 12 Leads & Lead II Rhythm Strip**:
+  - In `src/components/ECGWaveformMonitor.tsx`, calibrated 12-lead and supplemental lead boxes strictly to an integer multiple of the cardiac cycle: $2.40\text{ s}$ duration ($60.0\text{ mm}$ width at $25\text{ mm/s} = 3$ complete beats at 75 bpm) and rhythm strip to $9.60\text{ s}$ duration ($240.0\text{ mm} = 12$ complete beats at 75 bpm = $4 \times 2.40\text{ s}$).
+  - Aligned Lead II rhythm strip calibration lead-in to exactly $20.0\text{ mm}$ ($0.80\text{ s} = 1$ cardiac cycle), establishing 100% synchronous phase-lock between Lead II in the 3x4 grid matrix and the continuous Lead II rhythm strip below it.
+  - Eliminated phase wrapping jumps: because durations are exact integer multiples of 0.80s, the sweep line loops seamlessly at the isoelectric electrical diastole baseline ($0.0\text{ mV}$) with zero visual glitching.
+  - Aligned previous cycle trace color to match active injury morphology with 0.25 opacity (faint red for ST elevation, faint cyan for ST depression/reciprocal).
+- **Magnified Waveform Analysis Graphic Accuracy & Calibration Pulse Fix**:
+  - In `src/components/LeadDetailModal.tsx`, eradicated the overlapping calibration pulse artifact where abnormal and normal waveform traces re-stroked the standard calibration mark in dashed or injury colors. Waveform path points now initiate cleanly at $X = 90$ ($t = 0$), preserving a single, crisp, standard 1.0 mV (0.20s) calibration pulse with isoelectric connector.
+  - Increased waveform sampling density from 450 to 600 points (exact 1 px / 4.0 ms resolution) for razor-sharp, sub-millimeter morphology without peak blunting.
+  - In Live Sweep mode, introduced dual-cursor normal baseline tracking: displays a secondary reference cursor point and connecting dashed guide on the normal comparison curve, visualizing instantaneous ST deviation in real time.
+  - Enhanced electronic caliper interaction to dynamically evaluate the clinician's active measurement against 2025 ACC/AHA and 2023 ESC criteria, with clear display of nominal programmed values.
+- **Electrophysiological Headroom & Anti-Clipping Integrity**:
+  - In `src/utils/ecgGenerator.ts` and `src/data/miTerritories.ts`, fixed compound multiplier bug on `tallRWave` in posterior STEMI that previously inflated Lead V3 R waves to $+3.74\text{ mV}$ (causing severe upper boundary clipping and excessive slew rates). R waves across V1–V3 are now accurately calibrated within clinical amplitudes ($1.1\text{--}1.53\text{ mV}$, $R/S > 1.0$ in V2/V3), remaining strictly within the calibrated $2.0\text{ mV}$ headroom.
+- **Version Bump**: Updated badges and footer to `v5.1` across `Navbar.tsx`, `App.tsx`, `AGENTS.md`, and `README.md`.
+
 ### [v5] [2026-11-01] — Waveform Simulator Calibration Overhaul, Magnified Analysis & Anti-Clipping Standards
 - **Waveform Simulator Paper Speed & Grid Calibration Overhaul**:
   - In `src/components/ECGWaveformMonitor.tsx`, eliminated the box clamping bug that caused grid-to-waveform paper speed misalignment. Calibrated 12-lead boxes strictly to 2.5 seconds ($62.5\text{ mm}$ at $25\text{ mm/s}$, $\text{smallBox} = w / 62.5$) and continuous Lead II rhythm strip strictly to 10.0 seconds ($250\text{ mm}$ at $25\text{ mm/s}$, $\text{smallBox} = w / 250$).

@@ -310,9 +310,9 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
       posteriorHighlightSvgId: ['region-posterior', 'artery-lcx-post', 'artery-rca-pda']
     },
     waveformDeltas: {
-      'V1': { stElevationMm: -2.2, stSlope: 'horizontal', tallRWave: true, rAmplitudeMultiplier: 2.2, tWaveAmplitudeMm: 5 },
-      'V2': { stElevationMm: -3.0, stSlope: 'horizontal', tallRWave: true, rAmplitudeMultiplier: 2.5, tWaveAmplitudeMm: 6 },
-      'V3': { stElevationMm: -2.0, stSlope: 'horizontal', tallRWave: true, rAmplitudeMultiplier: 2.0, tWaveAmplitudeMm: 5 },
+      'V1': { stElevationMm: -2.2, stSlope: 'horizontal', tallRWave: true, rAmplitudeMultiplier: 4.5, tWaveAmplitudeMm: 5 },
+      'V2': { stElevationMm: -3.0, stSlope: 'horizontal', tallRWave: true, rAmplitudeMultiplier: 3.4, tWaveAmplitudeMm: 6 },
+      'V3': { stElevationMm: -2.0, stSlope: 'horizontal', tallRWave: true, rAmplitudeMultiplier: 1.8, tWaveAmplitudeMm: 5 },
       'V7': { stElevationMm: 1.8, stSlope: 'convex' },
       'V8': { stElevationMm: 2.2, stSlope: 'convex' },
       'V9': { stElevationMm: 1.6, stSlope: 'convex' }
