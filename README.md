@@ -133,7 +133,8 @@ npm run preview
 - **Magnified Waveform Analysis (1:1 Isometric Square Grid)**:
   - In `src/components/LeadDetailModal.tsx`, eradicated the 3:1 rectangular aspect ratio stretch ($24.5\text{ px} \times 8\text{ px}$) that distorted ECG morphology. Re-architected with true square grid boxes ($10\text{ px} \times 10\text{ px}$ minor, $50\text{ px} \times 50\text{ px}$ major).
   - Calibration pulse calibrated to exactly 1 large box wide ($50\text{ px} = 5\text{ mm} = 0.20\text{ s}$) and 2 large boxes tall ($100\text{ px} = 10\text{ mm} = 1.0\text{ mV}$).
-  - Displays 3 continuous cardiac cycles (2.40s) with 8 interactive landmark pins annotated on Cycle 1.
+  - Displays 3 continuous cardiac cycles (2.40s) with 8 interactive landmark pins centered on Cycle 2.
+  - **Baseline Label Collision Resolution**: Relocated `0.0 mV Baseline` directly beneath the standardization calibration pulse ($x=20, y=215$) and right-aligned `PR Segment Isoelectric Reference (0 mV)` at the far right edge ($x=705, y=215$), keeping all waveform cycles completely clear of overlapping text.
   - Interactive Electronic Caliper anchored directly at the user's clicked $(x, y)$ coordinates with vertical bracket and floating measurement badge.
   - Added dismiss-on-outside-click/tap to modal dialog backdrop per Rule 6.
 - **Electrophysiological Synthesis Fixes**:
