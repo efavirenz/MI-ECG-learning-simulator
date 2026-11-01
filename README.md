@@ -124,6 +124,16 @@ npm run preview
 
 ## 📝 Update History & Changelog
 
+### [v5.2] [2026-11-01] — Magnified Waveform Live Sweep Gray Progression & Reset Control
+- **Magnified Waveform Analysis Live Sweep Gray Progression**:
+  - In `src/components/LeadDetailModal.tsx`, resolved uniform-red waveform display during Live Sweep mode.
+  - Partitioned abnormal waveform into two distinct dynamic segments synchronized with the $25\text{ mm/s}$ sweeping cursor beam:
+    - **Swept Path ($X \le \text{currentCursorX}$)**: Fresh active injury trace displayed in full clinical color (red for ST elevation, cyan for ST depression / reciprocal).
+    - **Unswept Path ($X > \text{currentCursorX}$)**: Waveform ahead of the orange sweep cursor displayed in clean clinical gray (`#94a3b8` in paper mode, `#64748b` in dark mode), matching the sweep phosphor progression in `5. Waveform Simulator`.
+  - When Live Sweep is inactive, the full waveform displays in active clinical color for uninterrupted caliper and landmark analysis.
+  - Added dedicated reset sweep control (`RotateCcw`) accessible anytime sweep is paused or active, smoothly resetting cursor position to baseline.
+- **Version Bump**: Updated badges and footer to `v5.2` across `Navbar.tsx`, `App.tsx`, `AGENTS.md`, and `README.md`.
+
 ### [v5.1] [2026-11-01] — Multi-Lead Waveform Animation Calibration, Phase-Locking & Magnified Analysis Precision
 - **Synchronized Phase-Locking Across All 12 Leads & Lead II Rhythm Strip**:
   - In `src/components/ECGWaveformMonitor.tsx`, calibrated 12-lead and supplemental lead boxes strictly to an integer multiple of the cardiac cycle: $2.40\text{ s}$ duration ($60.0\text{ mm}$ width at $25\text{ mm/s} = 3$ complete beats at 75 bpm) and rhythm strip to $9.60\text{ s}$ duration ($240.0\text{ mm} = 12$ complete beats at 75 bpm = $4 \times 2.40\text{ s}$).

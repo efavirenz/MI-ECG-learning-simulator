@@ -126,6 +126,43 @@ export default function LeadDetailModal({
   const normalCursorVoltage = getEcgVoltage(lead, sweepTime, 'normal', 75);
   const normalCursorY = voltToY(normalCursorVoltage);
 
+  // When Live Sweep is active, partition the abnormal waveform:
+  // - Swept trace (x <= currentCursorX): active clinical injury color (red / cyan)
+  // - Unswept trace (x > currentCursorX): inactive gray ahead of the orange sweep cursor
+  const isSweepActive = isPlaying || sweepTime > 0;
+
+  const sweptPoints: string[] = ['90,200'];
+  const unsweptPoints: string[] = [`${currentCursorX.toFixed(1)},${currentCursorY.toFixed(1)}`];
+
+  for (let i = 0; i <= sampleCount; i++) {
+    const t = (i / sampleCount) * totalRecordingSec;
+    const x = timeToX(t);
+    const vAbnormal = getEcgVoltage(lead, t, territoryId, 75);
+    const yAbnormal = voltToY(vAbnormal);
+    const pt = `${x.toFixed(1)},${yAbnormal.toFixed(1)}`;
+
+    if (x < currentCursorX) {
+      sweptPoints.push(pt);
+    } else if (x > currentCursorX) {
+      unsweptPoints.push(pt);
+    }
+  }
+
+  sweptPoints.push(`${currentCursorX.toFixed(1)},${currentCursorY.toFixed(1)}`);
+  unsweptPoints.push('710,200');
+
+  const sweptPathD = `M ${sweptPoints.join(' L ')}`;
+  const unsweptPathD = `M ${unsweptPoints.join(' L ')}`;
+
+  const activeColor =
+    delta?.stElevationMm && delta.stElevationMm > 0
+      ? (paperMode === 'paper' ? '#dc2626' : '#f87171')
+      : delta?.stElevationMm && delta.stElevationMm < 0
+      ? (paperMode === 'paper' ? '#0284c7' : '#38bdf8')
+      : (paperMode === 'paper' ? '#0f172a' : '#38bdf8');
+
+  const unsweptColor = paperMode === 'paper' ? '#94a3b8' : '#64748b';
+
   // Clinical guideline criteria evaluator for this lead
   const getClinicalThresholdEvaluation = (deviationMm: number) => {
     if (lead === 'V2' || lead === 'V3') {
@@ -237,13 +274,16 @@ export default function LeadDetailModal({
               {isPlaying ? 'Pause Sweep' : 'Live Sweep'}
             </button>
 
-            {isPlaying && (
+            {isSweepActive && (
               <button
-                onClick={() => setSweepTime(0)}
+                onClick={() => {
+                  setSweepTime(0);
+                  setIsPlaying(false);
+                }}
                 className={`p-1.5 rounded-lg border transition ${
                   isBright ? 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100' : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white'
                 }`}
-                title="Reset sweep"
+                title="Reset sweep to start"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
               </button>
@@ -409,24 +449,41 @@ export default function LeadDetailModal({
                 />
               )}
 
-              {/* Active Abnormal Waveform */}
-              <path
-                d={abnormalPathD}
-                fill="none"
-                stroke={
-                  delta?.stElevationMm && delta.stElevationMm > 0
-                    ? (paperMode === 'paper' ? '#dc2626' : '#f87171')
-                    : delta?.stElevationMm && delta.stElevationMm < 0
-                    ? (paperMode === 'paper' ? '#0284c7' : '#38bdf8')
-                    : (paperMode === 'paper' ? '#0f172a' : '#38bdf8')
-                }
-                strokeWidth="2.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+              {/* Active Abnormal Waveform (Swept in active color, Unswept in gray when Live Sweep is active) */}
+              {isSweepActive ? (
+                <g>
+                  {/* Unswept waveform ahead of orange sweep cursor: displayed in clinical gray */}
+                  <path
+                    d={unsweptPathD}
+                    fill="none"
+                    stroke={unsweptColor}
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  {/* Active fresh swept waveform up to orange sweep cursor: displayed in active injury color */}
+                  <path
+                    d={sweptPathD}
+                    fill="none"
+                    stroke={activeColor}
+                    strokeWidth="2.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </g>
+              ) : (
+                <path
+                  d={abnormalPathD}
+                  fill="none"
+                  stroke={activeColor}
+                  strokeWidth="2.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              )}
 
               {/* Animated Live Sweep Beam & Cursor Point */}
-              {isPlaying && (
+              {isSweepActive && (
                 <g>
                   <line
                     x1={currentCursorX}
@@ -435,6 +492,7 @@ export default function LeadDetailModal({
                     y2={360}
                     stroke={paperMode === 'paper' ? '#ea580c' : '#22d3ee'}
                     strokeWidth="1.6"
+                    strokeDasharray={!isPlaying ? '3,3' : undefined}
                     opacity="0.9"
                   />
                   {/* Normal Reference Cursor Point (if comparing normal) */}
