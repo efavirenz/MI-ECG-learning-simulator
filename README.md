@@ -124,7 +124,12 @@ npm run preview
 
 ## 📝 Update History & Changelog
 
-### [v4.3] [2026-11-01] — Rhythm Strip Calibration Distance & Magnified Baseline Label Alignment
+### [v4.3] [2026-11-01] — Torso Graphic Overhaul, Reference Line Alignment & Waveform Calibration
+- **Thoracic Reference Lines & Precordial Alignment**:
+  - In `2. Electrode Placement` and `3. Supplemental Leads` (`Right-Sided Leads V3R, V4R`), fixed all reference line vertical trajectories to strictly align with precordial electrode coordinates: Left MCL ($x=264$) passes precisely through V4, Left AAL ($x=296$) passes through V5, Left MAL ($x=328$) passes through V6, and Right MCL ($x=136$) passes through V4R.
+  - Aligned all electrode coordinates in `src/data/electrodes.ts` to their anatomically calibrated landmark intersections (V1 at right 4th ICS, V2 at left 4th ICS, V3 at diagonal midpoint, V4 at 5th ICS MCL, V5 at 5th ICS AAL, V6 at 5th ICS MAL).
+- **Anatomical Human Body Graphic Recreation**:
+  - Re-rendered vector anterior torso graphic in `src/components/AnteriorTorso.tsx` with proportional athletic silhouette, suprasternal (jugular) notch, realistic clavicular arches with midpoints centered at $x=136$ and $x=264$, pectoralis major contours, sternal body, Angle of Louis bony ridge at 2nd rib, and ribcage ribs 1–5.
 - **Magnified Baseline Label Collision Fix**:
   - In `LeadDetailModal` (`Magnified Waveform Analysis`), relocated the red `Isoelectric Baseline (0 mV / PR Segment)` text label to below the horizontal dotted baseline ($y=195$) and shifted it to the far left ($x=18$), completely eliminating text collisions with the `P` and `PR Seg` landmark labels.
 - **Lead II Continuous Rhythm Strip Calibration Pulse Separation**:

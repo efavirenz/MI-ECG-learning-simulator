@@ -112,7 +112,7 @@ export const STANDARD_ELECTRODES: Electrode[] = [
     femaleLandmarkNotes: 'Palpate the sternal border beneath breast tissue; never place on the nipple or guess without palpating the intercostal spaces.',
     torsoView: 'anterior',
     color: '#ef4444', // Red
-    coords: { x: 44, y: 41 }
+    coords: { x: 46, y: 43.6 }
   },
   {
     id: 'v2',
@@ -134,7 +134,7 @@ export const STANDARD_ELECTRODES: Electrode[] = [
     femaleLandmarkNotes: 'Palpate left 4th ICS medial to or underneath breast tissue using anatomical bony landmarks.',
     torsoView: 'anterior',
     color: '#eab308', // Yellow
-    coords: { x: 56, y: 41 }
+    coords: { x: 54, y: 43.6 }
   },
   {
     id: 'v3',
@@ -156,7 +156,7 @@ export const STANDARD_ELECTRODES: Electrode[] = [
     femaleLandmarkNotes: 'Place under breast fold if necessary; lifting breast gently with back of hand respects patient dignity while securing correct chest wall contact.',
     torsoView: 'anterior',
     color: '#22c55e', // Green
-    coords: { x: 59, y: 47 }
+    coords: { x: 60, y: 47.8 }
   },
   {
     id: 'v4',
@@ -178,7 +178,7 @@ export const STANDARD_ELECTRODES: Electrode[] = [
     femaleLandmarkNotes: 'In female patients with large breasts, elevate breast tissue with back of hand and place electrode on the chest wall in the inframammary fold or 5th ICS, NOT on breast parenchyma.',
     torsoView: 'anterior',
     color: '#3b82f6', // Blue
-    coords: { x: 64, y: 53 }
+    coords: { x: 66, y: 52.0 }
   },
   {
     id: 'v5',
@@ -199,7 +199,7 @@ export const STANDARD_ELECTRODES: Electrode[] = [
     femaleLandmarkNotes: 'Ensure electrode is on thoracic wall beneath lateral breast tissue or lateral to it along the anterior axillary line.',
     torsoView: 'anterior',
     color: '#ec4899', // Orange/Magenta
-    coords: { x: 73, y: 54 }
+    coords: { x: 74, y: 52.0 }
   },
   {
     id: 'v6',
@@ -220,7 +220,7 @@ export const STANDARD_ELECTRODES: Electrode[] = [
     femaleLandmarkNotes: 'Ensure arm is relaxed slightly abducted so midaxillary line can be accurately visualized.',
     torsoView: 'anterior',
     color: '#a855f7', // Purple
-    coords: { x: 80, y: 55 }
+    coords: { x: 82, y: 52.0 }
   }
 ];
 
@@ -240,7 +240,7 @@ export const SUPPLEMENTAL_ELECTRODES: Electrode[] = [
     ],
     torsoView: 'anterior',
     color: '#06b6d4',
-    coords: { x: 38, y: 47 }
+    coords: { x: 40, y: 47.8 }
   },
   {
     id: 'v4r',
@@ -257,7 +257,7 @@ export const SUPPLEMENTAL_ELECTRODES: Electrode[] = [
     ],
     torsoView: 'anterior',
     color: '#3b82f6',
-    coords: { x: 33, y: 53 }
+    coords: { x: 34, y: 52.0 }
   },
   {
     id: 'v7',

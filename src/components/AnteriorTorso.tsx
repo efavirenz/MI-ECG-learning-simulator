@@ -180,47 +180,58 @@ export default function AnteriorTorso({
 
             {/* Torso Silhouette Outline */}
             <path
-              d="M 150 25 C 160 40, 160 65, 160 75
-                 C 120 78, 75 90, 48 120
-                 C 35 135, 25 180, 20 220
-                 C 18 240, 16 320, 15 360
-                 C 45 350, 75 340, 75 320
-                 C 75 370, 80 430, 85 490
-                 L 315 490
-                 C 320 430, 325 370, 325 320
-                 C 325 340, 355 350, 385 360
+              d="M 166 22
+                 C 166 45, 168 62, 175 70
+                 C 140 73, 90 85, 52 108
+                 C 38 122, 26 168, 20 220
+                 C 18 240, 16 320, 14 360
+                 C 45 350, 72 338, 72 310
+                 C 72 345, 78 420, 88 490
+                 L 312 490
+                 C 322 420, 328 345, 328 310
+                 C 328 338, 355 350, 386 360
                  C 384 320, 382 240, 380 220
-                 C 375 180, 365 135, 352 120
-                 C 325 90, 280 78, 240 75
-                 C 240 65, 240 40, 250 25 Z"
+                 C 374 168, 362 122, 348 108
+                 C 310 85, 260 73, 225 70
+                 C 232 62, 234 45, 234 22 Z"
               fill="url(#bodySkinGrad)"
-              stroke={isBright ? "#475569" : "#475569"}
+              stroke={isBright ? "#64748b" : "#475569"}
               strokeWidth="2.5"
             />
 
-            {/* Clavicles */}
-            <path d="M 165 75 Q 120 70 60 90" fill="none" stroke="#64748b" strokeWidth="3" />
-            <path d="M 235 75 Q 280 70 340 90" fill="none" stroke="#64748b" strokeWidth="3" />
+            {/* Suprasternal (Jugular) Notch Curve */}
+            <path d="M 188 70 Q 200 78 212 70" fill="none" stroke={isBright ? "#64748b" : "#475569"} strokeWidth="2.2" />
+
+            {/* Pectoralis Major Muscle Outlines */}
+            <path d="M 186 165 C 160 178, 120 195, 74 215" fill="none" stroke={isBright ? "#94a3b8" : "#475569"} strokeWidth="1.6" opacity="0.6" />
+            <path d="M 214 165 C 240 178, 280 195, 326 215" fill="none" stroke={isBright ? "#94a3b8" : "#475569"} strokeWidth="1.6" opacity="0.6" />
+
+            {/* Clavicles (Exact midpoints at x = 136 and x = 264) */}
+            <path d="M 186 74 Q 136 71 86 86" fill="none" stroke={isBright ? "#475569" : "#94a3b8"} strokeWidth="3.2" strokeLinecap="round" />
+            <path d="M 214 74 Q 264 71 314 86" fill="none" stroke={isBright ? "#475569" : "#94a3b8"} strokeWidth="3.2" strokeLinecap="round" />
+            <text x="136" y="65" fill={isBright ? "#475569" : "#94a3b8"} fontSize="7" fontWeight="bold" textAnchor="middle">Right Clavicle</text>
+            <text x="264" y="65" fill={isBright ? "#475569" : "#94a3b8"} fontSize="7" fontWeight="bold" textAnchor="middle">Left Clavicle</text>
 
             {/* Reference Vertical Lines (High contrast in bright theme) */}
             {showLines && (
-              <g opacity={isBright ? 0.95 : 0.7}>
-                {/* Midsternal Line */}
+              <g opacity={isBright ? 0.95 : 0.75}>
+                {/* Midsternal Line (MSL) */}
                 <line
                   x1="200"
-                  y1="80"
+                  y1="68"
                   x2="200"
-                  y2="460"
+                  y2="465"
                   stroke={isBright ? "#0284c7" : "#38bdf8"}
                   strokeWidth={isBright ? 2.0 : 1.2}
                   strokeDasharray="4,4"
                 />
                 <text
-                  x="203"
-                  y="95"
+                  x="200"
+                  y="85"
                   fill={isBright ? "#0369a1" : "#38bdf8"}
                   fontSize={isBright ? "7.5" : "6.5"}
                   fontWeight="bold"
+                  textAnchor="middle"
                 >
                   Midsternal Line
                 </text>
@@ -235,119 +246,123 @@ export default function AnteriorTorso({
                   Midsternal Line
                 </text>
 
-                {/* Left Midclavicular Line (Patient Left = diagram right) */}
+                {/* Left Midclavicular Line (MCL) - Drops from exact midclavicle x=264 through V4 */}
                 <line
-                  x1="280"
-                  y1="90"
-                  x2="280"
-                  y2="460"
+                  x1="264"
+                  y1="75"
+                  x2="264"
+                  y2="465"
                   stroke={isBright ? "#4338ca" : "#818cf8"}
                   strokeWidth={isBright ? 2.0 : 1.2}
                   strokeDasharray="3,3"
                 />
                 <text
-                  x="283"
-                  y="105"
+                  x="264"
+                  y="98"
                   fill={isBright ? "#312e81" : "#818cf8"}
                   fontSize={isBright ? "7.5" : "6.5"}
                   fontWeight="bold"
+                  textAnchor="middle"
                 >
                   Left Midclavicular (MCL)
                 </text>
                 <text
-                  x="276"
-                  y="464"
+                  x="264"
+                  y="465"
                   fill={isBright ? "#312e81" : "#818cf8"}
                   fontSize={isBright ? "7" : "6.5"}
                   fontWeight="bold"
                   textAnchor="middle"
                 >
-                  Left MCL
+                  Left MCL (V4)
                 </text>
 
-                {/* Left Anterior Axillary Line */}
+                {/* Left Anterior Axillary Line (AAL) - Drops through V5 at x=296 */}
                 <line
-                  x1="315"
-                  y1="120"
-                  x2="315"
-                  y2="460"
+                  x1="296"
+                  y1="110"
+                  x2="296"
+                  y2="465"
                   stroke={isBright ? "#6d28d9" : "#a78bfa"}
                   strokeWidth={isBright ? 2.0 : 1.2}
                   strokeDasharray="3,3"
                 />
                 <text
-                  x="318"
-                  y="130"
+                  x="296"
+                  y="132"
                   fill={isBright ? "#581c87" : "#a78bfa"}
                   fontSize={isBright ? "7.5" : "6.5"}
-                  fontWeight="bold"
-                >
-                  Ant. Axillary (AAL)
-                </text>
-                <text
-                  x="315"
-                  y="476"
-                  fill={isBright ? "#581c87" : "#a78bfa"}
-                  fontSize={isBright ? "7" : "6.5"}
                   fontWeight="bold"
                   textAnchor="middle"
                 >
                   Ant. Axillary (AAL)
                 </text>
+                <text
+                  x="296"
+                  y="478"
+                  fill={isBright ? "#581c87" : "#a78bfa"}
+                  fontSize={isBright ? "7" : "6.5"}
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
+                  Ant. Axillary (V5)
+                </text>
 
-                {/* Left Midaxillary Line */}
+                {/* Left Midaxillary Line (MAL) - Drops through V6 at x=328 */}
                 <line
-                  x1="345"
-                  y1="140"
-                  x2="345"
-                  y2="460"
+                  x1="328"
+                  y1="130"
+                  x2="328"
+                  y2="465"
                   stroke={isBright ? "#7e22ce" : "#c084fc"}
                   strokeWidth={isBright ? 2.0 : 1.2}
                   strokeDasharray="3,3"
                 />
                 <text
-                  x="348"
-                  y="150"
+                  x="328"
+                  y="152"
                   fill={isBright ? "#6b21a8" : "#c084fc"}
                   fontSize={isBright ? "7.5" : "6.5"}
-                  fontWeight="bold"
-                >
-                  Midaxillary (MAL)
-                </text>
-                <text
-                  x="352"
-                  y="464"
-                  fill={isBright ? "#6b21a8" : "#c084fc"}
-                  fontSize={isBright ? "7" : "6.5"}
                   fontWeight="bold"
                   textAnchor="middle"
                 >
                   Midaxillary (MAL)
                 </text>
+                <text
+                  x="332"
+                  y="465"
+                  fill={isBright ? "#6b21a8" : "#c084fc"}
+                  fontSize={isBright ? "7" : "6.5"}
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
+                  Midaxillary (V6)
+                </text>
 
-                {/* Right Midclavicular Line (for V4R) */}
+                {/* Right Midclavicular Line (Right MCL / V4R) - Drops from right midclavicle x=136 through V4R */}
                 {showSupplementalRight && (
                   <>
                     <line
-                      x1="120"
-                      y1="90"
-                      x2="120"
-                      y2="460"
+                      x1="136"
+                      y1="75"
+                      x2="136"
+                      y2="465"
                       stroke={isBright ? "#b45309" : "#fbbf24"}
                       strokeWidth={isBright ? 2.0 : 1.2}
                       strokeDasharray="3,3"
                     />
                     <text
-                      x="65"
-                      y="105"
+                      x="136"
+                      y="98"
                       fill={isBright ? "#78350f" : "#fbbf24"}
                       fontSize={isBright ? "7.5" : "6.5"}
                       fontWeight="bold"
+                      textAnchor="middle"
                     >
                       Right MCL (V4R)
                     </text>
                     <text
-                      x="120"
+                      x="136"
                       y="475"
                       fill={isBright ? "#78350f" : "#fbbf24"}
                       fontSize={isBright ? "7.5" : "6.5"}
@@ -363,61 +378,71 @@ export default function AnteriorTorso({
 
             {/* Ribcage and Sternum Overlay */}
             {showSkeleton && (
-              <g opacity="0.75">
-                {/* Manubrium & Sternum Body */}
-                <path d="M 185 85 L 215 85 L 212 120 L 188 120 Z" fill="#64748b" opacity="0.4" />
-                <line x1="185" y1="120" x2="215" y2="120" stroke="#f59e0b" strokeWidth="3" />
-                <path d="M 188 123 L 212 123 L 208 240 L 192 240 Z" fill="#64748b" opacity="0.35" />
-                <polygon points="194,240 206,240 200,258" fill="#475569" />
+              <g opacity="0.8">
+                {/* Manubrium (Jugular notch to Angle of Louis) */}
+                <path d="M 186 74 L 214 74 L 216 118 L 184 118 Z" fill="#64748b" opacity="0.45" stroke="#94a3b8" strokeWidth="1" />
+                
+                {/* Angle of Louis Transverse Bony Ridge at 2nd Rib Attachment */}
+                <line x1="182" y1="118" x2="218" y2="118" stroke="#f59e0b" strokeWidth="3.5" />
+                
+                {/* Sternal Body (Gladiolus) down to 5th Rib / Xiphoid */}
+                <path d="M 186 120 L 214 120 L 210 238 L 190 238 Z" fill="#64748b" opacity="0.38" stroke="#94a3b8" strokeWidth="1" />
+                
+                {/* Xiphoid Process */}
+                <polygon points="192,238 208,238 200,252" fill="#475569" stroke="#64748b" strokeWidth="1" />
 
-                {/* Rib 1 */}
-                <path d="M 185 92 C 160 95, 120 110, 85 140" fill="none" stroke="#475569" strokeWidth="2.5" />
-                <path d="M 215 92 C 240 95, 280 110, 315 140" fill="none" stroke="#475569" strokeWidth="2.5" />
+                {/* Rib 1 (Manubrial attachment) */}
+                <path d="M 186 86 C 158 90, 120 106, 86 132" fill="none" stroke="#475569" strokeWidth="2.5" />
+                <path d="M 214 86 C 242 90, 280 106, 314 132" fill="none" stroke="#475569" strokeWidth="2.5" />
 
-                {/* Rib 2 (At Angle of Louis) */}
-                <path d="M 186 123 C 150 128, 110 145, 75 180" fill="none" stroke="#cbd5e1" strokeWidth="2.5" />
-                <path d="M 214 123 C 250 128, 290 145, 325 180" fill="none" stroke="#cbd5e1" strokeWidth="2.5" />
-                <text x="140" y="132" fill="#94a3b8" fontSize="7">Rib 2</text>
-                <text x="260" y="132" fill="#94a3b8" fontSize="7">Rib 2</text>
+                {/* Rib 2 (Attaches at Angle of Louis - Critical Landmark) */}
+                <path d="M 184 118 C 148 124, 110 142, 75 174" fill="none" stroke="#cbd5e1" strokeWidth="2.8" />
+                <path d="M 216 118 C 252 124, 290 142, 325 174" fill="none" stroke="#cbd5e1" strokeWidth="2.8" />
+                <text x="140" y="128" fill="#94a3b8" fontSize="7">Rib 2</text>
+                <text x="260" y="128" fill="#94a3b8" fontSize="7">Rib 2</text>
 
                 {/* Rib 3 */}
-                <path d="M 187 155 C 145 160, 105 180, 72 215" fill="none" stroke="#475569" strokeWidth="2.5" />
-                <path d="M 213 155 C 255 160, 295 180, 328 215" fill="none" stroke="#475569" strokeWidth="2.5" />
+                <path d="M 186 158 C 146 164, 106 182, 72 214" fill="none" stroke="#475569" strokeWidth="2.5" />
+                <path d="M 214 158 C 254 164, 294 182, 328 214" fill="none" stroke="#475569" strokeWidth="2.5" />
 
-                {/* Rib 4 */}
-                <path d="M 188 185 C 145 192, 105 215, 70 250" fill="none" stroke="#475569" strokeWidth="2.5" />
-                <path d="M 212 185 C 255 192, 295 215, 330 250" fill="none" stroke="#475569" strokeWidth="2.5" />
+                {/* Rib 4 (Upper boundary of 4th ICS) */}
+                <path d="M 188 198 C 146 204, 106 224, 70 252" fill="none" stroke="#475569" strokeWidth="2.5" />
+                <path d="M 212 198 C 254 204, 294 224, 330 252" fill="none" stroke="#475569" strokeWidth="2.5" />
 
-                {/* Rib 5 */}
-                <path d="M 189 215 C 145 224, 105 248, 70 285" fill="none" stroke="#475569" strokeWidth="2.5" />
-                <path d="M 211 215 C 255 224, 295 248, 330 285" fill="none" stroke="#475569" strokeWidth="2.5" />
+                {/* Rib 5 (Lower boundary of 4th ICS / Upper boundary of 5th ICS) */}
+                <path d="M 189 238 C 146 244, 106 264, 70 290" fill="none" stroke="#475569" strokeWidth="2.5" />
+                <path d="M 211 238 C 254 244, 294 264, 330 290" fill="none" stroke="#475569" strokeWidth="2.5" />
+
+                {/* Costal Margin Arch / Infrasternal Angle */}
+                <path d="M 190 242 C 160 265, 120 300, 85 330" fill="none" stroke="#475569" strokeWidth="2.2" strokeDasharray="3,3" />
+                <path d="M 210 242 C 240 265, 280 300, 315 330" fill="none" stroke="#475569" strokeWidth="2.2" strokeDasharray="3,3" />
 
                 {/* Intercostal Space Indicators */}
-                <text x="170" y="145" fill="#64748b" fontSize="6.5" textAnchor="end">2nd ICS</text>
-                <text x="230" y="145" fill="#64748b" fontSize="6.5">2nd ICS</text>
-                <text x="170" y="175" fill="#64748b" fontSize="6.5" textAnchor="end">3rd ICS</text>
-                <text x="230" y="175" fill="#64748b" fontSize="6.5">3rd ICS</text>
-                <text x="170" y="205" fill="#38bdf8" fontSize="7" fontWeight="bold" textAnchor="end">4th ICS ★</text>
-                <text x="230" y="205" fill="#38bdf8" fontSize="7" fontWeight="bold">4th ICS ★</text>
-                <text x="230" y="240" fill="#38bdf8" fontSize="7" fontWeight="bold">5th ICS ★</text>
+                <text x="174" y="142" fill="#64748b" fontSize="6.5" textAnchor="end">2nd ICS</text>
+                <text x="226" y="142" fill="#64748b" fontSize="6.5">2nd ICS</text>
+                <text x="174" y="180" fill="#64748b" fontSize="6.5" textAnchor="end">3rd ICS</text>
+                <text x="226" y="180" fill="#64748b" fontSize="6.5">3rd ICS</text>
+                <text x="174" y="222" fill="#38bdf8" fontSize="7" fontWeight="bold" textAnchor="end">4th ICS ★</text>
+                <text x="226" y="222" fill="#38bdf8" fontSize="7" fontWeight="bold">4th ICS ★</text>
+                <text x="226" y="264" fill="#38bdf8" fontSize="7" fontWeight="bold">5th ICS ★</text>
               </g>
             )}
 
             {/* Angle of Louis Highlight Banner */}
             {showAngleOfLouis && (
               <g>
-                <rect x="182" y="121" width="36" height="5" fill="#f59e0b" rx="2.5" filter="url(#glowEffect)" />
-                <line x1="218" y1="123" x2="270" y2="115" stroke="#f59e0b" strokeWidth="1.5" />
-                <circle cx="270" cy="115" r="2.5" fill="#f59e0b" />
-                <rect x="272" y="104" width="112" height="22" rx="3" fill="#1e1b4b" stroke="#f59e0b" strokeWidth="1" />
-                <text x="276" y="115" fill="#fbbf24" fontSize="7.5" fontWeight="bold">Angle of Louis (2nd Rib)</text>
-                <text x="276" y="123" fill="#cbd5e1" fontSize="6.5">Locate 2nd rib → count down to 4th ICS</text>
+                <rect x="180" y="115" width="40" height="6" fill="#f59e0b" rx="3" filter="url(#glowEffect)" />
+                <line x1="220" y1="118" x2="268" y2="114" stroke="#f59e0b" strokeWidth="1.5" />
+                <circle cx="268" cy="114" r="2.5" fill="#f59e0b" />
+                <rect x="270" y="102" width="118" height="24" rx="4" fill="#1e1b4b" stroke="#f59e0b" strokeWidth="1" />
+                <text x="275" y="113" fill="#fbbf24" fontSize="7.5" fontWeight="bold">Angle of Louis (2nd Rib)</text>
+                <text x="275" y="122" fill="#cbd5e1" fontSize="6.5">Locate 2nd rib → count down to 4th ICS</text>
               </g>
             )}
 
             {/* Faint Nipple Indicators */}
-            <circle cx="120" cy="235" r="5" fill="#475569" opacity="0.35" />
-            <circle cx="280" cy="235" r="5" fill="#475569" opacity="0.35" />
+            <circle cx="136" cy="255" r="4.5" fill="#475569" opacity="0.3" />
+            <circle cx="264" cy="255" r="4.5" fill="#475569" opacity="0.3" />
 
             {/* Interactive Electrode Markers - Enlarged Hit Target for Touch & Mouse */}
             {activeElectrodeList.map(elec => {
