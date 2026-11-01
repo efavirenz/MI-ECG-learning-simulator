@@ -33,7 +33,7 @@ export const STANDARD_ELECTRODES: Electrode[] = [
     modifiedTorsoNotes: 'Torso/Mason-Likar placement significantly changes frontal QRS axis and ST segments. Only standard limb placement is valid for formal STEMI diagnosis.',
     torsoView: 'anterior',
     color: '#ef4444', // Red
-    coords: { x: 12, y: 32 }
+    coords: { x: 7.0, y: 83.0 }
   },
   {
     id: 'la',
@@ -52,7 +52,7 @@ export const STANDARD_ELECTRODES: Electrode[] = [
     modifiedTorsoNotes: 'Moving to the left shoulder/clavicle may produce false pathological Q waves in inferior leads or falsely mask STEMI.',
     torsoView: 'anterior',
     color: '#eab308', // Yellow
-    coords: { x: 88, y: 32 }
+    coords: { x: 93.0, y: 83.0 }
   },
   {
     id: 'rl',

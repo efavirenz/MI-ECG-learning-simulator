@@ -71,25 +71,44 @@ export default function PosteriorTorso({
               </linearGradient>
             </defs>
 
-            {/* Posterior Torso Silhouette */}
+            {/* Clinical Training Mannequin Posterior Torso & Limbs Silhouette */}
             <path
-              d="M 150 25 C 160 40, 160 65, 160 75
-                 C 120 78, 75 90, 48 120
-                 C 35 135, 25 180, 20 220
-                 C 18 240, 16 320, 15 360
-                 C 45 350, 75 340, 75 320
-                 C 75 370, 80 430, 85 490
-                 L 315 490
-                 C 320 430, 325 370, 325 320
-                 C 325 340, 355 350, 385 360
-                 C 384 320, 382 240, 380 220
-                 C 375 180, 365 135, 352 120
-                 C 325 90, 280 78, 240 75
-                 C 240 65, 240 40, 250 25 Z"
+              d="M 166 22
+                 C 166 45, 168 62, 175 70
+                 C 140 73, 90 85, 52 108
+                 C 36 122, 22 170, 16 220
+                 C 12 260, 10 320, 14 365
+                 C 16 385, 18 400, 22 415
+                 C 20 425, 19 440, 21 452
+                 C 23 462, 31 464, 35 452
+                 C 39 440, 37 428, 34 415
+                 C 32 400, 31 380, 35 350
+                 C 39 310, 52 265, 70 230
+                 C 68 245, 72 280, 72 320
+                 C 72 370, 78 430, 88 490
+                 L 312 490
+                 C 322 430, 328 370, 328 320
+                 C 328 280, 332 245, 330 230
+                 C 348 265, 361 310, 365 350
+                 C 369 380, 368 400, 366 415
+                 C 363 428, 361 440, 365 452
+                 C 369 464, 377 462, 379 452
+                 C 381 440, 380 425, 378 415
+                 C 382 400, 384 385, 386 365
+                 C 390 320, 388 260, 384 220
+                 C 378 170, 364 122, 348 108
+                 C 310 85, 260 73, 225 70
+                 C 232 62, 234 45, 234 22 Z"
               fill="url(#backSkinGrad)"
               stroke="#475569"
               strokeWidth="2.5"
             />
+
+            {/* Dorsal Mannequin Arm Contours (Olecranon / Elbow & Wrist Creases) */}
+            <path d="M 16 295 Q 26 298 36 295" fill="none" stroke={isBright ? "#94a3b8" : "#475569"} strokeWidth="1.2" opacity="0.35" />
+            <path d="M 364 295 Q 374 298 384 295" fill="none" stroke={isBright ? "#94a3b8" : "#475569"} strokeWidth="1.2" opacity="0.35" />
+            <path d="M 22 415 Q 28 418 34 415" fill="none" stroke={isBright ? "#94a3b8" : "#475569"} strokeWidth="1.2" opacity="0.45" />
+            <path d="M 366 415 Q 372 418 378 415" fill="none" stroke={isBright ? "#94a3b8" : "#475569"} strokeWidth="1.2" opacity="0.45" />
 
             {/* Patient Back Orientation Labels */}
             <text x="50" y="55" fill="#0284c7" fontSize="10" fontWeight="bold">PATIENT LEFT</text>

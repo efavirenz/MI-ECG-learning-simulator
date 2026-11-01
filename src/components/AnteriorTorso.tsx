@@ -178,20 +178,32 @@ export default function AnteriorTorso({
               </filter>
             </defs>
 
-            {/* Torso Silhouette Outline */}
+            {/* Clinical Training Mannequin Torso & Limbs Silhouette */}
             <path
               d="M 166 22
                  C 166 45, 168 62, 175 70
                  C 140 73, 90 85, 52 108
-                 C 38 122, 26 168, 20 220
-                 C 18 240, 16 320, 14 360
-                 C 45 350, 72 338, 72 310
-                 C 72 345, 78 420, 88 490
+                 C 36 122, 22 170, 16 220
+                 C 12 260, 10 320, 14 365
+                 C 16 385, 18 400, 22 415
+                 C 20 425, 19 440, 21 452
+                 C 23 462, 31 464, 35 452
+                 C 39 440, 37 428, 34 415
+                 C 32 400, 31 380, 35 350
+                 C 39 310, 52 265, 70 230
+                 C 68 245, 72 280, 72 320
+                 C 72 370, 78 430, 88 490
                  L 312 490
-                 C 322 420, 328 345, 328 310
-                 C 328 338, 355 350, 386 360
-                 C 384 320, 382 240, 380 220
-                 C 374 168, 362 122, 348 108
+                 C 322 430, 328 370, 328 320
+                 C 328 280, 332 245, 330 230
+                 C 348 265, 361 310, 365 350
+                 C 369 380, 368 400, 366 415
+                 C 363 428, 361 440, 365 452
+                 C 369 464, 377 462, 379 452
+                 C 381 440, 380 425, 378 415
+                 C 382 400, 384 385, 386 365
+                 C 390 320, 388 260, 384 220
+                 C 378 170, 364 122, 348 108
                  C 310 85, 260 73, 225 70
                  C 232 62, 234 45, 234 22 Z"
               fill="url(#bodySkinGrad)"
@@ -205,6 +217,15 @@ export default function AnteriorTorso({
             {/* Pectoralis Major Muscle Outlines */}
             <path d="M 186 165 C 160 178, 120 195, 74 215" fill="none" stroke={isBright ? "#94a3b8" : "#475569"} strokeWidth="1.6" opacity="0.6" />
             <path d="M 214 165 C 240 178, 280 195, 326 215" fill="none" stroke={isBright ? "#94a3b8" : "#475569"} strokeWidth="1.6" opacity="0.6" />
+
+            {/* Mannequin Arm Contours (Elbow & Wrist Creases for RA/LA Orientation) */}
+            <path d="M 18 290 Q 28 293 38 290" fill="none" stroke={isBright ? "#94a3b8" : "#475569"} strokeWidth="1.2" opacity="0.45" />
+            <path d="M 362 290 Q 372 293 382 290" fill="none" stroke={isBright ? "#94a3b8" : "#475569"} strokeWidth="1.2" opacity="0.45" />
+            <path d="M 22 415 Q 28 418 34 415" fill="none" stroke={isBright ? "#94a3b8" : "#475569"} strokeWidth="1.3" opacity="0.55" />
+            <path d="M 366 415 Q 372 418 378 415" fill="none" stroke={isBright ? "#94a3b8" : "#475569"} strokeWidth="1.3" opacity="0.55" />
+            {/* Subtle Thenar / Thumb Silhouette Line */}
+            <path d="M 34 424 Q 31 433 34 442" fill="none" stroke={isBright ? "#94a3b8" : "#475569"} strokeWidth="1.0" opacity="0.4" />
+            <path d="M 366 424 Q 369 433 366 442" fill="none" stroke={isBright ? "#94a3b8" : "#475569"} strokeWidth="1.0" opacity="0.4" />
 
             {/* Clavicles (Exact midpoints at x = 136 and x = 264) */}
             <path d="M 186 74 Q 136 71 86 86" fill="none" stroke={isBright ? "#475569" : "#94a3b8"} strokeWidth="3.2" strokeLinecap="round" />
