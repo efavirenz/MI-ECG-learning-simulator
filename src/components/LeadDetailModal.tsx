@@ -307,10 +307,10 @@ export default function LeadDetailModal({
                 opacity="0.8"
               />
               <text
-                x="85"
-                y="175"
+                x="18"
+                y="195"
                 fill={paperMode === 'paper' ? '#be123c' : '#38bdf8'}
-                fontSize="9"
+                fontSize="8.5"
                 fontWeight="700"
                 opacity="0.9"
               >

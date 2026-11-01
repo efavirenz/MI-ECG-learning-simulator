@@ -171,11 +171,12 @@ export default function ECGWaveformMonitor({
         ctx.stroke();
         ctx.setLineDash([]);
 
+        const pulseX = 6;
+        const pulseW = largeBox;
+        const pulseH = voltScale;
+
         // Standard Calibration Pulse on Lead II rhythm strip: 10 mm (1.0 mV) high, 5 mm (0.20s) wide
         if (isRhythmStrip) {
-          const pulseX = 6;
-          const pulseW = largeBox;
-          const pulseH = voltScale;
           ctx.lineWidth = 1.8;
           ctx.strokeStyle = paperMode === 'paper' ? '#be123c' : '#38bdf8';
           ctx.beginPath();
@@ -189,6 +190,20 @@ export default function ECGWaveformMonitor({
           ctx.font = 'bold 8.5px monospace';
           ctx.fillText('1.0 mV', pulseX + 2, centerY - pulseH - 3);
         }
+
+        // On rhythm strip, insert clean isoelectric distance between Calibration Pulse and 1st P wave
+        const stripLeadInPx = isRhythmStrip ? (pulseX + pulseW + largeBox * 1.5) : 0;
+
+        // Trace voltage sampler taking rhythm strip calibration lead-in offset into account
+        const getTraceVoltage = (x: number, territoryKey: string) => {
+          if (isRhythmStrip && x < stripLeadInPx) {
+            return 0.0;
+          }
+          const effX = isRhythmStrip ? (x - stripLeadInPx) : x;
+          const effW = isRhythmStrip ? (w - stripLeadInPx) : w;
+          const t = (effX / effW) * durationSec;
+          return getEcgVoltage(actualLead, t, territoryKey, 75);
+        };
 
         // Calculate sweep position
         const sweepTime = timeRef.current % durationSec;
@@ -207,15 +222,13 @@ export default function ECGWaveformMonitor({
 
           const maxNormalX = isPlaying ? sweepX : w;
           for (let x = 0; x <= maxNormalX; x += stepPx) {
-            const t = (x / w) * durationSec;
-            const v = getEcgVoltage(actualLead, t, 'normal', 75);
+            const v = getTraceVoltage(x, 'normal');
             const y = centerY - v * voltScale;
             if (x === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
           }
           if (maxNormalX % stepPx !== 0) {
-            const t = (maxNormalX / w) * durationSec;
-            const v = getEcgVoltage(actualLead, t, 'normal', 75);
+            const v = getTraceVoltage(maxNormalX, 'normal');
             const y = centerY - v * voltScale;
             ctx.lineTo(maxNormalX, y);
           }
@@ -244,8 +257,7 @@ export default function ECGWaveformMonitor({
           const startOldX = sweepX + eraseWidth;
           const firstOldX = Math.ceil(startOldX);
           for (let x = firstOldX; x <= w; x += stepPx) {
-            const t = (x / w) * durationSec;
-            const v = getEcgVoltage(actualLead, t, selectedTerritoryId, 75);
+            const v = getTraceVoltage(x, selectedTerritoryId);
             const y = centerY - v * voltScale;
             if (x === firstOldX) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
@@ -265,8 +277,7 @@ export default function ECGWaveformMonitor({
           ctx.lineCap = 'round';
 
           for (let x = 0; x <= currentTraceWidth; x += stepPx) {
-            const t = (x / w) * durationSec;
-            const v = getEcgVoltage(actualLead, t, selectedTerritoryId, 75);
+            const v = getTraceVoltage(x, selectedTerritoryId);
             const y = centerY - v * voltScale;
             if (x === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
@@ -274,8 +285,7 @@ export default function ECGWaveformMonitor({
           }
           if (currentTraceWidth % stepPx !== 0) {
             const x = currentTraceWidth;
-            const t = (x / w) * durationSec;
-            const v = getEcgVoltage(actualLead, t, selectedTerritoryId, 75);
+            const v = getTraceVoltage(x, selectedTerritoryId);
             const y = centerY - v * voltScale;
             ctx.lineTo(x, y);
             headY = y;

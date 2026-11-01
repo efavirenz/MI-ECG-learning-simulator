@@ -124,6 +124,13 @@ npm run preview
 
 ## 📝 Update History & Changelog
 
+### [v4.3] [2026-11-01] — Rhythm Strip Calibration Distance & Magnified Baseline Label Alignment
+- **Magnified Baseline Label Collision Fix**:
+  - In `LeadDetailModal` (`Magnified Waveform Analysis`), relocated the red `Isoelectric Baseline (0 mV / PR Segment)` text label to below the horizontal dotted baseline ($y=195$) and shifted it to the far left ($x=18$), completely eliminating text collisions with the `P` and `PR Seg` landmark labels.
+- **Lead II Continuous Rhythm Strip Calibration Pulse Separation**:
+  - In `5. Waveform Simulator` (`Lead II Continuous Rhythm Strip`), inserted a dedicated $1.5\text{ large box}$ ($7.5\text{ mm} / 0.30\text{ s}$) isoelectric lead-in segment between the standardization Calibration Pulse and the emergence of the 1st P wave, aligning with clinical ECG paper standards.
+- **Version Bump**: Updated release badges and footers to `v4.3` across `Navbar.tsx`, `App.tsx`, `AGENTS.md`, and `README.md`.
+
 ### [v4.2] [2026-11-01] — Reference Line Dual Labels, Anatomical Heart Graphic Overhaul, Waveform Sweep & Lead Contrast
 - **Dual-Ended Thoracic Reference Line Labels**:
   - In `2. Electrode Placement` and `3. Supplemental Leads` (`Right-Sided Leads V3R, V4R`), added inferior labels at the bottom of all vertical guidelines (`Right MCL (V4R)`, `Midsternal Line`, `Left MCL`, `Ant. Axillary (AAL)`, `Midaxillary (MAL)`).
