@@ -91,6 +91,20 @@ export default function ECGWaveformMonitor({
         ...(showSupplemental ? supplementalLeads : [])
       ];
 
+      // Unified clinical calibration:
+      // Measure standard lead card width (Lead I or Lead II) to determine the unified millimeter scale.
+      // Standard 12-lead ECG calibration: 25 mm/s paper speed, 10 mm/mV gain.
+      // All leads (12-lead matrix, rhythm strip, supplemental leads) MUST share this identical millimeter scale
+      // so waveforms are never disproportionately shrunken or distorted across devices.
+      const stdCanvas = canvasRefs.current['I'] || canvasRefs.current['II'];
+      const stdRect = stdCanvas?.getBoundingClientRect();
+      const stdWidth = stdRect && stdRect.width > 0 ? stdRect.width : 0;
+      // In desktop 3x4 matrix (4 cols), standard lead width is ~240-300px -> ~4.2-5.0 px/mm.
+      // On mobile (1 col), standard lead width is ~340-390px -> ~5.0-5.8 px/mm.
+      // On tablet (4 cols), standard lead width is ~160-180px -> clamp to minimum 4.6 px/mm so waveforms are never compressed.
+      const baseSmallBox = stdWidth > 0 ? (stdWidth / 60.0) : 4.8;
+      const unifiedSmallBox = Math.max(4.6, Math.min(5.6, baseSmallBox));
+
       leadsToDraw.forEach(leadKey => {
         const canvas = canvasRefs.current[leadKey];
         if (!canvas) return;
@@ -118,16 +132,14 @@ export default function ECGWaveformMonitor({
         const isRhythmStrip = leadKey === 'II_RHYTHM';
 
         // Standard 25 mm/s paper speed & 10 mm/mV voltage calibration
-        // 12-lead & supplemental boxes: calibrated 2.40s duration across box width (60.0 mm = 12 large boxes = 3 complete cardiac cycles at 75 bpm)
-        // Rhythm strip: calibrated 9.60s continuous recording across full width (240.0 mm = 48 large boxes = 12 complete cardiac cycles at 75 bpm)
-        const targetMm = isRhythmStrip ? 240.0 : 60.0;
-        const smallBox = w / targetMm;
+        // All leads share the unified scale so grid boxes and voltage gain are square and identical across leads
+        const smallBox = unifiedSmallBox;
         const largeBox = smallBox * 5;
         const voltScale = smallBox * 10; // 1.0 mV = 10 mm = 10 small boxes
-        const durationSec = targetMm / 25;
+        const durationSec = Math.max(0.8, w / (smallBox * 25));
 
         // Place isoelectric baseline strictly on a major horizontal grid line with anti-clipping headroom
-        const baselineRatio = isRhythmStrip ? 0.58 : 0.52;
+        const baselineRatio = isRhythmStrip ? 0.58 : 0.54;
         const baselineRow = Math.max(1, Math.round((h * baselineRatio) / largeBox));
         const centerY = baselineRow * largeBox;
 
@@ -506,7 +518,7 @@ export default function ECGWaveformMonitor({
                 {/* Animated Lead Canvas */}
                 <canvas
                   ref={el => { canvasRefs.current[leadName] = el; }}
-                  className="w-full h-36 sm:h-40 block rounded"
+                  className="w-full h-40 sm:h-44 block rounded"
                 />
               </div>
             );
@@ -560,7 +572,7 @@ export default function ECGWaveformMonitor({
               </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               {supplementalLeads.map(leadName => {
                 const delta = territory.waveformDeltas[leadName];
                 const isPrimary = territory.primaryLeads.includes(leadName);
@@ -592,7 +604,7 @@ export default function ECGWaveformMonitor({
 
                     <canvas
                       ref={el => { canvasRefs.current[leadName] = el; }}
-                      className="w-full h-36 sm:h-40 block rounded"
+                      className="w-full h-40 sm:h-44 block rounded"
                     />
                   </div>
                 );

@@ -21,3 +21,6 @@ __pycache__/
 
 _NoGit/
 
+# Local screenshot attachments
+*.jpg
+

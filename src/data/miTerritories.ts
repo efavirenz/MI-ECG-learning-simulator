@@ -313,9 +313,9 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
       'V1': { stElevationMm: -2.2, stSlope: 'horizontal', tallRWave: true, rAmplitudeMultiplier: 4.5, tWaveAmplitudeMm: 5 },
       'V2': { stElevationMm: -3.0, stSlope: 'horizontal', tallRWave: true, rAmplitudeMultiplier: 3.4, tWaveAmplitudeMm: 6 },
       'V3': { stElevationMm: -2.0, stSlope: 'horizontal', tallRWave: true, rAmplitudeMultiplier: 1.8, tWaveAmplitudeMm: 5 },
-      'V7': { stElevationMm: 1.8, stSlope: 'convex' },
-      'V8': { stElevationMm: 2.2, stSlope: 'convex' },
-      'V9': { stElevationMm: 1.6, stSlope: 'convex' }
+      'V7': { stElevationMm: 1.8, stSlope: 'convex', tWaveAmplitudeMm: 4.0 },
+      'V8': { stElevationMm: 2.2, stSlope: 'convex', tWaveAmplitudeMm: 4.5 },
+      'V9': { stElevationMm: 1.6, stSlope: 'convex', tWaveAmplitudeMm: 3.8 }
     }
   },
 
@@ -354,8 +354,8 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
       'aVL': { stElevationMm: -2.2, stSlope: 'horizontal', tInverted: true },
       'V1': { stElevationMm: 1.2, stSlope: 'convex' },
       'V2': { stElevationMm: -0.5, stSlope: 'horizontal' },
-      'V3R': { stElevationMm: 1.8, stSlope: 'convex' },
-      'V4R': { stElevationMm: 2.5, stSlope: 'convex', tWaveAmplitudeMm: 3 }
+      'V3R': { stElevationMm: 1.8, stSlope: 'convex', tWaveAmplitudeMm: 3.2 },
+      'V4R': { stElevationMm: 2.5, stSlope: 'convex', tWaveAmplitudeMm: 3.5 }
     }
   },
 

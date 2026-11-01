@@ -124,6 +124,19 @@ npm run preview
 
 ## 📝 Update History & Changelog
 
+### [v5.3] [2026-11-01] — Unified Electrophysiological Calibration Across All Viewports (iPhone, iPad, PC)
+- **Unified Millimeter Calibration Scale Across All Leads & Rhythm Strips**:
+  - In `src/components/ECGWaveformMonitor.tsx`, eliminated disparate scaling calculations where Lead II rhythm strip divided width by $240\text{ mm}$ (collapsing scale to $1.4\text{ px/mm}$ on mobile) and supplemental lead columns divided width by $60\text{ mm}$ (collapsing scale to $2.2\text{--}3.3\text{ px/mm}$).
+  - Established a unified, clinically calibrated baseline scale ($\ge 4.6\text{ px/mm}$) derived from standard 12-lead dimensions and shared across all 12 standard leads, Lead II continuous rhythm strip, and all 5 supplemental leads (V3R, V4R, V7, V8, V9).
+  - Resolved tiny waveform rendering on iPhone: Lead II continuous rhythm strip and supplemental leads now display with full, proportional amplitude and crisp grid resolution identical to standard leads.
+  - Resolved tiny waveform rendering on iPad and PC Browser: supplemental leads maintain high-definition amplitude and proper vertical headroom.
+  - Adapted duration proportionally ($W / (\text{smallBox} \times 25)$) so paper speed remains strictly $25\text{ mm/s}$ and voltage gain remains strictly $10\text{ mm/mV}$ across all screen sizes.
+- **Supplemental Leads Layout & Height Harmonization**:
+  - Adjusted supplemental leads grid from `md:grid-cols-5` to `lg:grid-cols-5` (`sm:grid-cols-3`), giving iPad tablets spacious cards instead of crammed narrow columns.
+  - Harmonized canvas height across all leads to `h-40 sm:h-44` (160px on mobile, 176px on desktop), providing generous headroom against vertical clipping for both tall R waves and deep S waves.
+  - In `src/data/miTerritories.ts`, calibrated hyperacute T waves for acute posterior STEMI (V7–V9) and RV infarction (V3R, V4R) to enhance visual clarity and clinical morphology.
+- **Version Bump**: Updated badges and footer to `v5.3` across `Navbar.tsx`, `App.tsx`, `AGENTS.md`, and `README.md`.
+
 ### [v5.2] [2026-11-01] — Magnified Waveform Live Sweep Gray Progression & Reset Control
 - **Magnified Waveform Analysis Live Sweep Gray Progression**:
   - In `src/components/LeadDetailModal.tsx`, resolved uniform-red waveform display during Live Sweep mode.
