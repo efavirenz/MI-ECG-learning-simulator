@@ -124,6 +124,25 @@ npm run preview
 
 ## 📝 Update History & Changelog
 
+### [v5] [2026-11-01] — Waveform Simulator Calibration Overhaul, Magnified Analysis & Anti-Clipping Standards
+- **Waveform Simulator Paper Speed & Grid Calibration Overhaul**:
+  - In `src/components/ECGWaveformMonitor.tsx`, eliminated the box clamping bug that caused grid-to-waveform paper speed misalignment. Calibrated 12-lead boxes strictly to 2.5 seconds ($62.5\text{ mm}$ at $25\text{ mm/s}$, $\text{smallBox} = w / 62.5$) and continuous Lead II rhythm strip strictly to 10.0 seconds ($250\text{ mm}$ at $25\text{ mm/s}$, $\text{smallBox} = w / 250$).
+  - Corrected Lead II rhythm strip elapsed time calculations so trace waveform time advances at strictly $25\text{ mm/s}$ without compression.
+- **Anti-Clipping & Vertical Headroom Standards**:
+  - Increased 12-lead and supplemental lead canvas heights from `h-28` to `h-36 sm:h-40`, and rhythm strip to `h-40 sm:h-44`, ensuring ample headroom ($\ge 2.0\text{ mV}$ positive, $\ge 1.6\text{ mV}$ negative) for deep S waves (down to $-1.45\text{ mV}$ in V1/V2) and tall R waves (+1.45 mV) + STEMI ST elevations (up to $+6.0\text{ mm}$ in extensive anterior MI).
+- **Magnified Waveform Analysis (1:1 Isometric Square Grid)**:
+  - In `src/components/LeadDetailModal.tsx`, eradicated the 3:1 rectangular aspect ratio stretch ($24.5\text{ px} \times 8\text{ px}$) that distorted ECG morphology. Re-architected with true square grid boxes ($10\text{ px} \times 10\text{ px}$ minor, $50\text{ px} \times 50\text{ px}$ major).
+  - Calibration pulse calibrated to exactly 1 large box wide ($50\text{ px} = 5\text{ mm} = 0.20\text{ s}$) and 2 large boxes tall ($100\text{ px} = 10\text{ mm} = 1.0\text{ mV}$).
+  - Displays 3 continuous cardiac cycles (2.40s) with 8 interactive landmark pins annotated on Cycle 1.
+  - Interactive Electronic Caliper anchored directly at the user's clicked $(x, y)$ coordinates with vertical bracket and floating measurement badge.
+  - Added dismiss-on-outside-click/tap to modal dialog backdrop per Rule 6.
+- **Electrophysiological Synthesis Fixes**:
+  - In `src/utils/ecgGenerator.ts`, fixed ST segment slope evaluation when $\text{stMv} = 0$, ensuring baseline normal ECG ST segments remain strictly isoelectric ($0.0\text{ mV}$) without false convex elevation arches.
+  - Calibrated P-wave landmark apex time to $0.150\text{ s}$ matching mathematical peak of raised sine lobe.
+  - Fixed Q-wave landmark when absent (V1/V2 rS morphology), placing landmark at QRS onset baseline ($0.0\text{ mV}$) rather than midway up the R-wave upstroke.
+  - Enhanced clinical threshold evaluator to accurately recognize reciprocal ST depression in V1–V3 as acute posterior STEMI criteria.
+- **Version Bump**: Updated release badges, footers, and guidelines to `v5` across `Navbar.tsx`, `App.tsx`, `AGENTS.md`, and `README.md`.
+
 ### [v4.3] [2026-11-01] — Torso Graphic Overhaul, Reference Line Alignment & Waveform Calibration
 - **Torso Electrode Hover Stability Fix**:
   - In `src/components/AnteriorTorso.tsx` and `src/components/PosteriorTorso.tsx`, removed `group-hover:scale-125 origin-center` which caused SVG transform coordinate misalignment and button jumping on mouse hover. Replaced with rock-solid `group-hover:brightness-110 drop-shadow-md` keeping the colored marker and text label perfectly centered.

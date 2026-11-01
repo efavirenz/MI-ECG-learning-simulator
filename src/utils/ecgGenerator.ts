@@ -59,7 +59,7 @@ export function getEcgVoltage(
 
   // 1 mm ST deviation = 0.1 mV
   const stMv = (delta?.stElevationMm || 0) * 0.1;
-  const slopeType = delta?.stSlope || (stMv >= 0 ? 'convex' : 'horizontal');
+  const slopeType = delta?.stSlope || (Math.abs(stMv) < 0.02 ? 'horizontal' : (stMv > 0 ? 'convex' : 'horizontal'));
 
   // Key physiological timing markers normalized to 0.8s cycle (75 bpm):
   const tPStart = 0.08;
@@ -262,7 +262,7 @@ export function getCycleLandmarks(lead: string, territoryId: string = 'normal', 
   const delta = territory.waveformDeltas[lead];
   const base = BASE_LEADS[lead] || BASE_LEADS['II'];
 
-  const pTime = 0.155 * scale;
+  const pTime = 0.150 * scale;
   const prSegmentTime = 0.250 * scale;
   const qTime = 0.305 * scale;
   const rTime = 0.335 * scale;
@@ -308,15 +308,19 @@ export function getCycleLandmarks(lead: string, territoryId: string = 'normal', 
       description: `Pathological QS complex (depth ≥ ${delta?.qWaveMm || 4} mm, duration ≥ 0.04s): total loss of viable myocardium and electrical transmural necrosis.`
     });
   } else {
+    const hasQ = (delta?.qWaveMm ? -(delta.qWaveMm * 0.1) : base.qAmp) < -0.015;
+    const effectiveQTime = hasQ ? qTime : (0.280 * scale);
+    const effectiveQVoltage = hasQ ? getEcgVoltage(lead, qTime, territoryId, bpm) : 0.0;
+
     landmarks.push({
       name: 'Q Wave',
       code: 'Q',
-      timeSec: qTime,
-      voltageMv: getEcgVoltage(lead, qTime, territoryId, bpm),
+      timeSec: effectiveQTime,
+      voltageMv: effectiveQVoltage,
       description: delta?.qWaveMm
         ? `Pathological Q Wave (depth ≥ ${delta.qWaveMm} mm, duration ≥ 0.04s) representing transmural electrical necrosis.`
-        : Math.abs(base.qAmp) < 0.015
-        ? 'Normal absence of Q wave (rS morphology typical of right precordial leads V1-V2).'
+        : !hasQ
+        ? 'Normal absence of Q wave (rS morphology typical of right precordial leads V1-V2). QRS onset begins directly from baseline.'
         : 'Initial negative deflection of ventricular depolarization (physiologic septal depolarization left-to-right).'
     });
 

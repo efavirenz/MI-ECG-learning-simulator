@@ -58,7 +58,7 @@ export default function Navbar({
   return (
     <header className={`sticky top-0 z-40 backdrop-blur-md border-b transition-colors ${currentTheme.navBg} ${currentTheme.borderCol}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Row 1: Top Bar with Hamburger, Red HeartPulse Icon (Untouched), Clinical Title, and v4.3 Badge */}
+        {/* Row 1: Top Bar with Hamburger, Red HeartPulse Icon (Untouched), Clinical Title, and v5 Badge */}
         <div className="flex items-center justify-between h-16 gap-3">
           {/* Top Left: Hamburger Menu Button + Logo + Title */}
           <div className="flex items-center gap-3">
@@ -96,10 +96,10 @@ export default function Navbar({
             </div>
           </div>
 
-          {/* Top Right: Version Number (v4.3 in rounded rectangle) */}
+          {/* Top Right: Version Number (v5 in rounded rectangle) */}
           <div className="flex items-center gap-2">
             <span
-              title="Simulator Version 4.3"
+              title="Simulator Version 5"
               className={`px-2.5 py-1 rounded-lg border font-mono font-bold text-xs tracking-wider shadow-sm flex items-center gap-1.5 transition-colors ${
                 isBright
                   ? `${currentTheme.badgeBg} ${currentTheme.badgeBorder} ${currentTheme.badgeText}`
@@ -107,7 +107,7 @@ export default function Navbar({
               }`}
             >
               <span className={`w-1.5 h-1.5 rounded-full ${isBright ? 'bg-current' : 'bg-current'} animate-ping`} />
-              v4.3
+              v5
             </span>
           </div>
         </div>
@@ -226,7 +226,7 @@ export default function Navbar({
                       ? `${currentTheme.badgeBg} ${currentTheme.badgeBorder} ${currentTheme.badgeText} border`
                       : `bg-slate-800 ${currentTheme.accentText} border border-slate-700`
                   }`}>
-                    v4.3
+                    v5
                   </span>
                   <button
                     onClick={() => setIsMenuOpen(false)}
@@ -361,7 +361,7 @@ export default function Navbar({
             {/* Drawer Footer */}
             <div className="pt-3 border-t border-slate-700/50 text-[11px] text-slate-400 flex items-center justify-between">
               <span>ACC/AHA 2025 • ESC 2023</span>
-              <span className={`font-mono font-bold ${currentTheme.accentText}`}>Release v4.3</span>
+              <span className={`font-mono font-bold ${currentTheme.accentText}`}>Release v5</span>
             </div>
           </div>
         </div>

@@ -118,14 +118,16 @@ export default function ECGWaveformMonitor({
         const isRhythmStrip = leadKey === 'II_RHYTHM';
 
         // Standard 25 mm/s paper speed & 10 mm/mV voltage calibration
-        const targetMm = isRhythmStrip ? Math.max(150, w / 4.0) : 62.5; // 2.5s = 62.5 mm
-        const smallBox = Math.max(3.5, Math.min(4.2, w / targetMm));
+        // 12-lead boxes: calibrated 2.5s duration across box width (62.5 mm at 25 mm/s)
+        // Rhythm strip: calibrated 10.0s continuous recording across full width (250 mm at 25 mm/s)
+        const targetMm = isRhythmStrip ? Math.max(200, w / 4.4) : 62.5;
+        const smallBox = w / targetMm;
         const largeBox = smallBox * 5;
         const voltScale = smallBox * 10; // 1.0 mV = 10 mm = 10 small boxes
-        const durationSec = isRhythmStrip ? (w / (smallBox * 25)) : 2.5;
+        const durationSec = targetMm / 25;
 
-        // Place isoelectric baseline strictly on a major horizontal grid line
-        const baselineRatio = isRhythmStrip ? 0.60 : 0.52;
+        // Place isoelectric baseline strictly on a major horizontal grid line with anti-clipping headroom
+        const baselineRatio = isRhythmStrip ? 0.58 : 0.52;
         const baselineRow = Math.max(1, Math.round((h * baselineRatio) / largeBox));
         const centerY = baselineRow * largeBox;
 
@@ -194,14 +196,14 @@ export default function ECGWaveformMonitor({
         // On rhythm strip, insert clean isoelectric distance between Calibration Pulse and 1st P wave
         const stripLeadInPx = isRhythmStrip ? (pulseX + pulseW + largeBox * 1.5) : 0;
 
-        // Trace voltage sampler taking rhythm strip calibration lead-in offset into account
+        // Trace voltage sampler calibrated to exact 25 mm/s paper speed
         const getTraceVoltage = (x: number, territoryKey: string) => {
           if (isRhythmStrip && x < stripLeadInPx) {
             return 0.0;
           }
-          const effX = isRhythmStrip ? (x - stripLeadInPx) : x;
-          const effW = isRhythmStrip ? (w - stripLeadInPx) : w;
-          const t = (effX / effW) * durationSec;
+          const t = isRhythmStrip
+            ? (x - stripLeadInPx) / (smallBox * 25)
+            : (x / (smallBox * 25));
           return getEcgVoltage(actualLead, t, territoryKey, 75);
         };
 
@@ -506,7 +508,7 @@ export default function ECGWaveformMonitor({
                 {/* Animated Lead Canvas */}
                 <canvas
                   ref={el => { canvasRefs.current[leadName] = el; }}
-                  className="w-full h-28 sm:h-30 block rounded"
+                  className="w-full h-36 sm:h-40 block rounded"
                 />
               </div>
             );
@@ -538,7 +540,7 @@ export default function ECGWaveformMonitor({
           }`}>
             <canvas
               ref={el => { canvasRefs.current['II_RHYTHM'] = el; }}
-              className="w-full h-36 sm:h-40 block rounded"
+              className="w-full h-40 sm:h-44 block rounded"
             />
           </div>
         </div>
@@ -592,7 +594,7 @@ export default function ECGWaveformMonitor({
 
                     <canvas
                       ref={el => { canvasRefs.current[leadName] = el; }}
-                      className="w-full h-28 block rounded"
+                      className="w-full h-36 sm:h-40 block rounded"
                     />
                   </div>
                 );

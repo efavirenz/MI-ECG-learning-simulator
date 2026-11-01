@@ -11,6 +11,13 @@ interface LeadDetailModalProps {
   onClose: () => void;
 }
 
+interface CaliperMeasurement {
+  x: number;
+  y: number;
+  mm: number;
+  mv: number;
+}
+
 export default function LeadDetailModal({
   lead,
   territoryId,
@@ -20,7 +27,7 @@ export default function LeadDetailModal({
   const { theme, isBright } = useTheme();
   const [showNormalComparison, setShowNormalComparison] = useState(true);
   const [activeLandmarkCode, setActiveLandmarkCode] = useState<string | null>('J-Pt');
-  const [caliperMm, setCaliperMm] = useState<number | null>(null);
+  const [caliper, setCaliper] = useState<CaliperMeasurement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [sweepTime, setSweepTime] = useState(0);
 
@@ -32,16 +39,32 @@ export default function LeadDetailModal({
   const landmarks = getCycleLandmarks(lead, territoryId, 75);
   const activeLandmark = landmarks.find(l => l.code === activeLandmarkCode) || landmarks[0];
 
-  // Calibrated SVG Coordinate System:
-  // ViewBox: 0 0 600 320
-  // Standard calibration: 10 mm/mV (1 mm = 0.1 mV = 8 px; 10 mm = 1.0 mV = 80 px)
-  // Baseline (0 mV) placed at Y = 180 (centered on a major grid line with clearance above & below)
-  // Calibration pulse placed at X = 25 to 65 (width 40 px = 0.20s; height 80 px = 1.0 mV)
-  // Isoelectric lead-in connects X = 65 to X = 80
-  // Waveform mapped from X = 80 to 570 (0.8s cardiac cycle = 490 px)
-  // Isoelectric run-out connects X = 570 to X = 590
-  const timeToX = (t: number) => 80 + (t / 0.8) * 490;
-  const voltToY = (v: number) => 180 - v * 80;
+  // Calibrated Clinical Coordinate System:
+  // ViewBox: 0 0 720 360
+  // Standard calibration: 10 mm/mV -> 1 mm = 0.1 mV = 10 px; 10 mm = 1.0 mV = 100 px.
+  // Standard paper speed: 25 mm/s -> 1 mm = 0.04 s = 10 px; 5 mm = 0.20 s = 50 px; 250 px/second.
+  // Both X and Y axes have strictly 1:1 isometric square grid boxes (10px x 10px minor; 50px x 50px major).
+  //
+  // Layout along horizontal X axis:
+  // - Calibration pulse: X = 20 to 70 (width 50 px = 0.20s = 1 large box; height 100 px = 1.0 mV = 2 large boxes).
+  // - Isoelectric connector: X = 70 to 90 (20 px = 2 mm).
+  // - Waveform recording: X = 90 to 690 (600 px = 60 mm = 12 large boxes = 2.40s = 3 complete cardiac cycles at 75 bpm).
+  //   - Cycle 1: X = 90 to 290 (200 px = 0.80s = 4 large boxes). Annotated with interactive landmark pins.
+  //   - Cycle 2: X = 290 to 490 (200 px = 0.80s).
+  //   - Cycle 3: X = 490 to 690 (200 px = 0.80s).
+  // - Isoelectric runout: X = 690 to 710.
+  //
+  // Layout along vertical Y axis:
+  // - Height: 360 px (36 mm = 3.6 mV = 7.2 large boxes).
+  // - Isoelectric PR segment baseline: strictly centered at Y = 200 (major grid line).
+  // - Headroom above baseline: from Y = 200 to Y = 0 is 200 px = 2.0 mV (20 mm = 4 large boxes).
+  //   Safely accommodates tall R waves (Lead II, V4, V5 up to 1.45 mV) + acute STEMI ST elevation (+0.6 mV) without clipping.
+  // - Headroom below baseline: from Y = 200 to Y = 360 is 160 px = 1.6 mV (16 mm = 3.2 large boxes).
+  //   Safely accommodates deep S waves (V1, V2 down to -1.45 mV) without clipping.
+  const timeToX = (t: number) => 90 + t * 250;
+  const voltToY = (v: number) => 200 - v * 100;
+
+  const totalRecordingSec = 2.40; // 3 cardiac cycles at 75 bpm (0.8s each)
 
   // Live animation loop
   useEffect(() => {
@@ -56,7 +79,7 @@ export default function LeadDetailModal({
       const deltaSec = Math.min(0.1, (timestamp - lastTimeRef.current) / 1000);
       lastTimeRef.current = timestamp;
 
-      setSweepTime(prev => (prev + deltaSec) % 0.8);
+      setSweepTime(prev => (prev + deltaSec) % totalRecordingSec);
       animRef.current = requestAnimationFrame(animate);
     };
 
@@ -66,13 +89,13 @@ export default function LeadDetailModal({
     };
   }, [isPlaying]);
 
-  // Generate SVG path points with high sampling density for smooth curves
-  const abnormalPoints: string[] = ['25,180', '25,100', '65,100', '65,180', '80,180'];
-  const normalPoints: string[] = ['25,180', '25,100', '65,100', '65,180', '80,180'];
+  // Generate SVG path points with high sampling density for smooth curves across all 3 cycles
+  const abnormalPoints: string[] = ['20,200', '20,100', '70,100', '70,200', '90,200'];
+  const normalPoints: string[] = ['20,200', '20,100', '70,100', '70,200', '90,200'];
 
-  const sampleCount = 350;
+  const sampleCount = 450;
   for (let i = 0; i <= sampleCount; i++) {
-    const t = (i / sampleCount) * 0.8;
+    const t = (i / sampleCount) * totalRecordingSec;
     const x = timeToX(t);
 
     const vAbnormal = getEcgVoltage(lead, t, territoryId, 75);
@@ -87,8 +110,8 @@ export default function LeadDetailModal({
   }
 
   // Connect to end of strip
-  abnormalPoints.push('590,180');
-  normalPoints.push('590,180');
+  abnormalPoints.push('710,200');
+  normalPoints.push('710,200');
 
   const abnormalPathD = `M ${abnormalPoints.join(' L ')}`;
   const normalPathD = showNormalComparison ? `M ${normalPoints.join(' L ')}` : '';
@@ -107,19 +130,38 @@ export default function LeadDetailModal({
         return { meets: true, text: 'Meets STEMI criteria for Men ≥ 40 (≥ 2.0 mm) and Women (≥ 1.5 mm).' };
       } else if (deviationMm >= 1.5) {
         return { meets: true, text: 'Meets STEMI criteria for Women of all ages (≥ 1.5 mm).' };
+      } else if (deviationMm <= -0.5) {
+        return { meets: true, text: 'Meets Posterior STEMI reciprocal criteria (≥ 0.5 mm ST depression in V1–V3; verify in V7–V9!).' };
       } else {
         return { meets: false, text: 'Below precordial V2-V3 STEMI cutoffs (≥1.5 mm Women, ≥2.0 mm Men ≥40, ≥2.5 mm Men <40).' };
       }
-    } else if (['V3R', 'V4R', 'V7', 'V8', 'V9'].includes(lead)) {
-      if (deviationMm >= 0.5) {
-        return { meets: true, text: 'Meets Supplemental Lead criteria (≥ 0.5 mm ST elevation).' };
+    } else if (lead === 'V1') {
+      if (deviationMm >= 1.0) {
+        return { meets: true, text: 'Meets Septal / RV STEMI criteria (≥ 1.0 mm ST elevation in V1).' };
+      } else if (deviationMm <= -0.5) {
+        return { meets: true, text: 'Meets Posterior STEMI reciprocal criteria (≥ 0.5 mm ST depression in V1; verify in V7–V9!).' };
       }
-      return { meets: false, text: 'Below supplemental lead cutoff (≥ 0.5 mm).' };
+      return { meets: false, text: 'Within normal limits (< 1.0 mm ST deviation in V1).' };
+    } else if (['V3R', 'V4R'].includes(lead)) {
+      if (deviationMm >= 0.5) {
+        return { meets: true, text: 'Meets Right-Sided STEMI criteria (≥ 0.5 mm ST elevation; ≥ 1.0 mm in men < 30).' };
+      }
+      return { meets: false, text: 'Below right-sided lead cutoff (≥ 0.5 mm).' };
+    } else if (['V7', 'V8', 'V9'].includes(lead)) {
+      if (deviationMm >= 0.5) {
+        return { meets: true, text: 'Meets Posterior STEMI criteria (≥ 0.5 mm ST elevation in supplemental V7–V9).' };
+      }
+      return { meets: false, text: 'Below posterior supplemental cutoff (≥ 0.5 mm).' };
+    } else if (lead === 'aVR') {
+      if (deviationMm >= 1.0) {
+        return { meets: true, text: 'Meets Left Main / Proximal LAD occlusion criteria (ST elevation in aVR ≥ 1.0 mm with multi-lead ST depression).' };
+      }
+      return { meets: false, text: 'Within normal baseline limits in lead aVR.' };
     } else {
       if (deviationMm >= 1.0) {
-        return { meets: true, text: 'Meets standard STEMI criteria (≥ 1.0 mm in ≥ 2 contiguous leads).' };
+        return { meets: true, text: 'Meets standard STEMI criteria (≥ 1.0 mm ST elevation in ≥ 2 contiguous leads).' };
       } else if (deviationMm <= -1.0) {
-        return { meets: true, text: 'Significant reciprocal ST depression (≥ 1.0 mm mirror image).' };
+        return { meets: true, text: 'Significant reciprocal ST depression (≥ 1.0 mm mirror image injury).' };
       }
       return { meets: false, text: 'Within normal limits (< 1.0 mm standard threshold).' };
     }
@@ -128,27 +170,33 @@ export default function LeadDetailModal({
   const currentDev = delta?.stElevationMm || 0;
   const evalResult = getClinicalThresholdEvaluation(currentDev);
 
-  // SVG grid lines definition
+  // SVG grid lines definition (perfect 10px squares minor; 50px squares major)
   const minorYLines: number[] = [];
-  for (let y = 12; y <= 308; y += 8) {
+  for (let y = 10; y <= 350; y += 10) {
     minorYLines.push(y);
   }
-  const majorYLines = [20, 60, 100, 140, 180, 220, 260, 300];
+  const majorYLines = [0, 50, 100, 150, 200, 250, 300, 350];
 
   const minorXLines: number[] = [];
-  for (let x = 18; x <= 590; x += 24.5) {
+  for (let x = 10; x <= 710; x += 10) {
     minorXLines.push(x);
   }
   const majorXLines: number[] = [];
-  for (let x = 18; x <= 590; x += 122.5) {
+  for (let x = 0; x <= 720; x += 50) {
     majorXLines.push(x);
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
-      <div className={`border rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] transition-colors ${
-        isBright ? 'bg-white border-slate-200 text-slate-800' : 'bg-slate-900 border-slate-800 text-slate-100'
-      }`}>
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={`border rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] transition-colors ${
+          isBright ? 'bg-white border-slate-200 text-slate-800' : 'bg-slate-900 border-slate-800 text-slate-100'
+        }`}
+      >
         {/* Modal Header */}
         <div className={`flex flex-wrap items-center justify-between px-6 py-4 border-b gap-3 ${
           isBright ? 'bg-slate-50 border-slate-200' : 'bg-slate-950/50 border-slate-800'
@@ -164,7 +212,7 @@ export default function LeadDetailModal({
                 Lead {lead} Magnified Waveform Analysis
               </h2>
               <span className={`text-xs ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
-                Pattern: <strong className={theme.accentText}>{territory.name}</strong> • Calibrated 25 mm/s • 10 mm/mV
+                Pattern: <strong className={theme.accentText}>{territory.name}</strong> • Calibrated 25 mm/s • 10 mm/mV (1:1 Square Grid)
               </span>
             </div>
           </div>
@@ -210,6 +258,7 @@ export default function LeadDetailModal({
             <button
               onClick={onClose}
               className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              title="Close modal"
             >
               <X className="w-5 h-5" />
             </button>
@@ -234,26 +283,29 @@ export default function LeadDetailModal({
               </span>
             </div>
 
-            {/* SVG High-Res Waveform */}
+            {/* SVG High-Res Waveform with 1:1 isometric square grid */}
             <svg
-              viewBox="0 0 600 320"
+              viewBox="0 0 720 360"
               className="w-full h-auto cursor-crosshair block"
               onClick={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
                 const clickY = e.clientY - rect.top;
-                const svgY = (clickY / rect.height) * 320;
-                // Baseline 0 mV is at Y = 180. 1 mV = 80px => 0.1 mV (1 mm) = 8px
-                const deviationMv = (180 - svgY) / 80;
-                setCaliperMm(parseFloat((deviationMv * 10).toFixed(1)));
+                const svgX = (clickX / rect.width) * 720;
+                const svgY = (clickY / rect.height) * 360;
+                // Baseline 0 mV is at Y = 200. 1 mV = 100px => 0.1 mV (1 mm) = 10px
+                const devMv = (200 - svgY) / 100;
+                const devMm = parseFloat((devMv * 10).toFixed(1));
+                setCaliper({ x: svgX, y: svgY, mm: devMm, mv: devMv });
               }}
             >
-              {/* Minor Grid Lines (1 mm) */}
+              {/* Minor Grid Lines (1 mm / 0.04s / 0.1 mV) */}
               {minorYLines.map(y => (
                 <line
                   key={`min-y-${y}`}
                   x1="0"
                   y1={y}
-                  x2="600"
+                  x2="720"
                   y2={y}
                   stroke={paperMode === 'paper' ? 'rgba(244, 63, 94, 0.15)' : 'rgba(30, 58, 138, 0.30)'}
                   strokeWidth="0.5"
@@ -265,19 +317,19 @@ export default function LeadDetailModal({
                   x1={x}
                   y1="0"
                   x2={x}
-                  y2="320"
+                  y2="360"
                   stroke={paperMode === 'paper' ? 'rgba(244, 63, 94, 0.15)' : 'rgba(30, 58, 138, 0.30)'}
                   strokeWidth="0.5"
                 />
               ))}
 
-              {/* Major Grid Lines (5 mm = 1 large box) */}
+              {/* Major Grid Lines (5 mm = 1 large box = 0.20s / 0.5 mV) */}
               {majorYLines.map(y => (
                 <line
                   key={`maj-y-${y}`}
                   x1="0"
                   y1={y}
-                  x2="600"
+                  x2="720"
                   y2={y}
                   stroke={paperMode === 'paper' ? 'rgba(225, 29, 72, 0.40)' : 'rgba(37, 99, 235, 0.50)'}
                   strokeWidth="0.9"
@@ -289,7 +341,7 @@ export default function LeadDetailModal({
                   x1={x}
                   y1="0"
                   x2={x}
-                  y2="320"
+                  y2="360"
                   stroke={paperMode === 'paper' ? 'rgba(225, 29, 72, 0.40)' : 'rgba(37, 99, 235, 0.50)'}
                   strokeWidth="0.9"
                 />
@@ -298,9 +350,9 @@ export default function LeadDetailModal({
               {/* Isoelectric PR/TP Baseline Line (0.0 mV) */}
               <line
                 x1="10"
-                y1="180"
-                x2="590"
-                y2="180"
+                y1="200"
+                x2="710"
+                y2="200"
                 stroke={paperMode === 'paper' ? '#be123c' : '#38bdf8'}
                 strokeWidth="1.2"
                 strokeDasharray="4,3"
@@ -308,7 +360,7 @@ export default function LeadDetailModal({
               />
               <text
                 x="18"
-                y="195"
+                y="215"
                 fill={paperMode === 'paper' ? '#be123c' : '#38bdf8'}
                 fontSize="8.5"
                 fontWeight="700"
@@ -317,18 +369,18 @@ export default function LeadDetailModal({
                 Isoelectric Baseline (0 mV / PR Segment)
               </text>
 
-              {/* Standard Calibration Pulse (10 mm = 1.0 mV high = 80px, 0.20s = 5 mm wide = 40px) */}
+              {/* Standard Calibration Pulse (10 mm = 1.0 mV high = 100px, 0.20s = 5 mm wide = 50px) */}
               <path
-                d="M 25 180 L 25 100 L 65 100 L 65 180"
+                d="M 20 200 L 20 100 L 70 100 L 70 200"
                 fill="none"
                 stroke={paperMode === 'paper' ? '#be123c' : '#38bdf8'}
                 strokeWidth="2"
               />
-              <text x="45" y="95" textAnchor="middle" fill={paperMode === 'paper' ? '#be123c' : '#38bdf8'} fontSize="8" fontWeight="bold">
-                1.0 mV
+              <text x="45" y="94" textAnchor="middle" fill={paperMode === 'paper' ? '#be123c' : '#38bdf8'} fontSize="8" fontWeight="bold">
+                1.0 mV (0.20s)
               </text>
 
-              {/* Normal Baseline Comparison Waveform (Dashed gray/slate) */}
+              {/* Normal Baseline Comparison Waveform (Dashed slate) */}
               {showNormalComparison && (
                 <path
                   d={normalPathD}
@@ -363,7 +415,7 @@ export default function LeadDetailModal({
                     x1={currentCursorX}
                     y1={0}
                     x2={currentCursorX}
-                    y2={320}
+                    y2={360}
                     stroke={paperMode === 'paper' ? '#ea580c' : '#22d3ee'}
                     strokeWidth="1.6"
                     opacity="0.9"
@@ -386,7 +438,7 @@ export default function LeadDetailModal({
                 </g>
               )}
 
-              {/* Landmark Clickable Circles & Badges */}
+              {/* Landmark Clickable Circles & Badges (Annotated on Cycle 1) */}
               {landmarks.map(lm => {
                 const lx = timeToX(lm.timeSec);
                 const ly = voltToY(lm.voltageMv);
@@ -434,47 +486,69 @@ export default function LeadDetailModal({
                 );
               })}
 
-              {/* Caliper measuring indicator if set by user click */}
-              {caliperMm !== null && (
+              {/* Interactive Electronic Caliper anchored at clicked coordinates */}
+              {caliper !== null && (
                 <g>
-                  {/* Caliper level dashed line */}
+                  {/* Caliper level dashed line across width */}
                   <line
                     x1="20"
-                    y1={voltToY(caliperMm * 0.1)}
-                    x2="580"
-                    y2={voltToY(caliperMm * 0.1)}
+                    y1={caliper.y}
+                    x2="700"
+                    y2={caliper.y}
                     stroke="#10b981"
                     strokeWidth="1.5"
                     strokeDasharray="3,3"
                   />
-                  {/* Caliper measurement bracket */}
+                  {/* Vertical measurement bracket from baseline Y=200 to clicked Y at caliper.x */}
                   <line
-                    x1="320"
-                    y1="180"
-                    x2="320"
-                    y2={voltToY(caliperMm * 0.1)}
+                    x1={caliper.x}
+                    y1="200"
+                    x2={caliper.x}
+                    y2={caliper.y}
+                    stroke="#10b981"
+                    strokeWidth="2.5"
+                  />
+                  {/* Top and bottom bracket ticks */}
+                  <line
+                    x1={caliper.x - 6}
+                    y1="200"
+                    x2={caliper.x + 6}
+                    y2="200"
                     stroke="#10b981"
                     strokeWidth="2"
                   />
-                  <rect
-                    x="325"
-                    y={Math.min(180, voltToY(caliperMm * 0.1)) - 10}
-                    width="148"
-                    height="26"
-                    rx="5"
-                    fill={paperMode === 'paper' ? '#ecfdf5' : '#064e3b'}
+                  <line
+                    x1={caliper.x - 6}
+                    y1={caliper.y}
+                    x2={caliper.x + 6}
+                    y2={caliper.y}
                     stroke="#10b981"
-                    strokeWidth="1.5"
+                    strokeWidth="2"
                   />
-                  <text
-                    x="332"
-                    y={Math.min(180, voltToY(caliperMm * 0.1)) + 7}
-                    fill={paperMode === 'paper' ? '#065f46' : '#a7f3d0'}
-                    fontSize="9.5"
-                    fontWeight="bold"
-                  >
-                    Measured: {caliperMm > 0 ? '+' : ''}{caliperMm} mm ({(caliperMm * 0.1).toFixed(2)} mV)
-                  </text>
+                  {/* Caliper Floating Measurement Pill */}
+                  <g transform={`translate(${Math.min(caliper.x + 10, 540)}, ${Math.min(200, caliper.y) + Math.abs(caliper.y - 200) / 2 - 12})`}>
+                    <rect
+                      x="0"
+                      y="0"
+                      width="160"
+                      height="24"
+                      rx="5"
+                      fill={paperMode === 'paper' ? '#ecfdf5' : '#064e3b'}
+                      stroke="#10b981"
+                      strokeWidth="1.5"
+                      className="shadow-md"
+                    />
+                    <text
+                      x="8"
+                      y="16"
+                      fill={paperMode === 'paper' ? '#065f46' : '#a7f3d0'}
+                      fontSize="9.5"
+                      fontWeight="bold"
+                      fontFamily="monospace"
+                    >
+                      {caliper.mm > 0 ? '+' : ''}{caliper.mm} mm ({caliper.mv > 0 ? '+' : ''}{caliper.mv.toFixed(2)} mV)
+                    </text>
+                  </g>
                 </g>
               )}
             </svg>
@@ -497,6 +571,14 @@ export default function LeadDetailModal({
               >
                 {currentDev > 0 ? '+' : ''}{currentDev.toFixed(1)} mm ({(currentDev * 0.1).toFixed(2)} mV)
               </span>
+              {caliper && (
+                <button
+                  onClick={() => setCaliper(null)}
+                  className="text-[11px] text-emerald-500 hover:underline ml-2 font-semibold"
+                >
+                  Reset Caliper
+                </button>
+              )}
             </div>
 
             <div className={`flex items-center gap-2 text-[11px] ${isBright ? 'text-slate-700' : 'text-slate-300'}`}>
@@ -595,7 +677,7 @@ export default function LeadDetailModal({
                 Caliper & J-Point Measurement Guide:
               </span>
               <p className={`leading-snug ${isBright ? 'text-slate-700' : 'text-slate-300'}`}>
-                Click anywhere on the ECG grid above to position the electronic caliper and measure elevation/depression relative to the isoelectric PR segment baseline.
+                Click anywhere on the ECG grid above to place the electronic caliper and measure elevation/depression relative to the isoelectric PR segment baseline.
               </p>
               <div className={`text-[11px] pt-1 ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
                 Per 2025 ACC/AHA & 2023 ESC guidelines, STEMI criteria strictly require measurement at the <strong className="text-amber-600 dark:text-amber-300">J point</strong> relative to the preceding <strong className="text-cyan-600 dark:text-cyan-300">PR segment</strong>.
