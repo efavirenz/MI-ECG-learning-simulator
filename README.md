@@ -125,7 +125,8 @@ npm run preview
 ## 📝 Update History & Changelog
 
 ### [v4.3] [2026-11-01] — Torso Graphic Overhaul, Reference Line Alignment & Waveform Calibration
-- **Thoracic Reference Lines & Precordial Alignment**:
+- **Torso Electrode Hover Stability Fix**:
+  - In `src/components/AnteriorTorso.tsx` and `src/components/PosteriorTorso.tsx`, removed `group-hover:scale-125 origin-center` which caused SVG transform coordinate misalignment and button jumping on mouse hover. Replaced with rock-solid `group-hover:brightness-110 drop-shadow-md` keeping the colored marker and text label perfectly centered.
   - In `2. Electrode Placement` and `3. Supplemental Leads` (`Right-Sided Leads V3R, V4R`), fixed all reference line vertical trajectories to strictly align with precordial electrode coordinates: Left MCL ($x=264$) passes precisely through V4, Left AAL ($x=296$) passes through V5, Left MAL ($x=328$) passes through V6, and Right MCL ($x=136$) passes through V4R.
   - Aligned all electrode coordinates in `src/data/electrodes.ts` to their anatomically calibrated landmark intersections (V1 at right 4th ICS, V2 at left 4th ICS, V3 at diagonal midpoint, V4 at 5th ICS MCL, V5 at 5th ICS AAL, V6 at 5th ICS MAL).
 - **Anatomical Human Body Graphic Recreation**:

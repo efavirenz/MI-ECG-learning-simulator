@@ -512,8 +512,8 @@ export default function AnteriorTorso({
                     r={isSelected ? 15 : 12}
                     fill={dotFill}
                     stroke={dotStroke}
-                    strokeWidth="2.5"
-                    className="transition-all duration-200 group-hover:scale-125 origin-center shadow-lg"
+                    strokeWidth={isSelected ? "3" : "2.5"}
+                    className="transition-all duration-150 group-hover:brightness-110 drop-shadow-md"
                   />
 
                   {/* Electrode Code Text (HIDDEN in practice mode for unknown test) */}
