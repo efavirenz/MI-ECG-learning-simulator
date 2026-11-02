@@ -363,7 +363,7 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
     id: 'pericarditis',
     name: 'STEMI Mimic: Acute Pericarditis',
     shortDescription: 'Inflammation of pericardial sac producing widespread concave ST elevation and PR depression.',
-    primaryLeads: ['I', 'II', 'III', 'aVF', 'V2', 'V3', 'V4', 'V5', 'V6'],
+    primaryLeads: ['I', 'II', 'III', 'aVL', 'aVF', 'V2', 'V3', 'V4', 'V5', 'V6'],
     reciprocalLeads: ['aVR'],
     culpritArtery: 'Non-ischemic (Pericardial inflammation — viral, post-infarct, uremic)',
     coronaryAnatomyNotes: 'No epicardial coronary artery occlusion. Epicardial sub-surface irritation causes widespread current of injury.',

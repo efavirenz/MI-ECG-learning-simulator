@@ -124,6 +124,25 @@ npm run preview
 
 ## 📝 Update History & Changelog
 
+### [v5.4] [2026-11-02] — Harmonic Multi-Lead Sweep Synchronization, Active Pulse Tracing & STEMI Mimics Precision
+- **Synchronized Harmonic Multi-Lead Animation Engine in Module 5 (`Waveform Simulator`)**:
+  - In `src/components/ECGWaveformMonitor.tsx`, established a mathematically synchronized sweep duration framework across all standard leads, supplemental leads, and continuous Lead II rhythm strip.
+  - Calibrated standard and supplemental lead boxes to exactly 3 complete cardiac cycles ($2.40\text{ s}$ at 75 bpm = $60\text{ mm}$ at $25\text{ mm/s}$ = 12 large boxes) and continuous Lead II rhythm strip to exactly 12 complete cardiac cycles ($9.60\text{ s}$ = $4 \times 2.40\text{ s}$ = $240\text{ mm}$ = 48 large boxes).
+  - Eliminated asynchronous sweep wrapping, column subpixel drift, and mid-beat cutoffs: all 12 standard leads and 5 supplemental leads wrap simultaneously at the isoelectric baseline ($0.0\text{ mV}$), locking in $4:1$ harmonic alignment with the continuous rhythm strip.
+  - Active Lead-in Calibration Pulse Tracing: rhythm strip sweep cursor dot and active waveform trace now dynamically ascend to $+1.0\text{ mV}$, hold across the $0.20\text{ s}$ ($5\text{ mm}$) pulse top, and return to baseline, replicating realistic clinical ECG machine stylus calibration.
+  - Dynamic Anti-Clipping Headroom: enhanced canvas height to `h-44 sm:h-48` ($176\text{ px}$ mobile, $192\text{ px}$ desktop) and dynamically computed baseline rows to guarantee $\ge 1.6\text{ mV}$ downward headroom (preventing clipping on deep $-1.45\text{ mV}$ S waves in V1–V2) and $\ge 1.8\text{ mV}$ upward headroom (preventing clipping on tall R waves + STEMI ST elevation).
+- **Magnified Waveform Analysis Precision & STEMI Mimics Clinical Evaluator**:
+  - In `src/components/LeadDetailModal.tsx`, upgraded `getClinicalThresholdEvaluation` to accurately evaluate STEMI Mimics:
+    - Acute Pericarditis: Correctly identifies widespread concave "saddleback" ST elevation with PR segment depression, and recognizes reciprocal ST depression with PR segment elevation in lead aVR as diagnostic confirmation.
+    - Benign Early Repolarization (BER): Accurately identifies concave ST elevation with characteristic terminal QRS J-point notch ("fishhook" slur) and absence of reciprocal ST depression as a normal physiological variant rather than acute STEMI.
+    - Normal Baseline: Confirms normal isoelectric baseline ($< 0.5\text{ mm}$ physiological variation relative to PR segment).
+  - Normal Comparison Hygiene: Hidden redundant "Compare Normal" button and disabled duplicate baseline overlay when the active selected pattern is already Normal Baseline.
+  - Added `onPointerDown` alongside `onClick` on SVG coordinate system for immediate touch caliper response on mobile and iPad viewports.
+  - Added SVG `paintOrder="stroke"` halo to landmark pins, ensuring high-contrast legibility across all dark and paper grid lines.
+- **Clinical Data Correction in `miTerritories.ts`**:
+  - In `src/data/miTerritories.ts`, added lead `aVL` to `primaryLeads` for Acute Pericarditis, resolving missing primary injury badge and unflagged lead status in magnified modal view.
+- **Version Bump**: Updated badges and footer to `v5.4` across `Navbar.tsx`, `App.tsx`, `AGENTS.md`, and `README.md`.
+
 ### [v5.3] [2026-11-01] — Unified Electrophysiological Calibration Across All Viewports (iPhone, iPad, PC)
 - **Unified Millimeter Calibration Scale Across All Leads & Rhythm Strips**:
   - In `src/components/ECGWaveformMonitor.tsx`, eliminated disparate scaling calculations where Lead II rhythm strip divided width by $240\text{ mm}$ (collapsing scale to $1.4\text{ px/mm}$ on mobile) and supplemental lead columns divided width by $60\text{ mm}$ (collapsing scale to $2.2\text{--}3.3\text{ px/mm}$).

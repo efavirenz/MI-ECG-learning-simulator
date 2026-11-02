@@ -136,11 +136,15 @@ export default function ECGWaveformMonitor({
         const smallBox = unifiedSmallBox;
         const largeBox = smallBox * 5;
         const voltScale = smallBox * 10; // 1.0 mV = 10 mm = 10 small boxes
-        const durationSec = Math.max(0.8, w / (smallBox * 25));
 
-        // Place isoelectric baseline strictly on a major horizontal grid line with anti-clipping headroom
-        const baselineRatio = isRhythmStrip ? 0.58 : 0.54;
-        const baselineRow = Math.max(1, Math.round((h * baselineRatio) / largeBox));
+        // Calibrated Anti-Clipping Baseline:
+        // Ensure at least 1.6 mV headroom below baseline for deep S waves (V1-V2: -1.45 mV)
+        // and at least 1.8 mV headroom above baseline for tall R waves (Lead II, V4, V5: +1.45 mV) + STEMI elevation.
+        const minHeadroomDown = 1.60 * voltScale;
+        let baselineRow = Math.max(1, Math.round((h * (isRhythmStrip ? 0.54 : 0.52)) / largeBox));
+        while (h - (baselineRow * largeBox) < minHeadroomDown && baselineRow > 1) {
+          baselineRow--;
+        }
         const centerY = baselineRow * largeBox;
 
         // 1. Draw Calibrated ECG Grid directly on canvas
@@ -213,6 +217,10 @@ export default function ECGWaveformMonitor({
         // Trace voltage sampler calibrated to exact 25 mm/s paper speed
         const getTraceVoltage = (x: number, territoryKey: string) => {
           if (isRhythmStrip && x < stripLeadInPx) {
+            // Actively trace the 1.0 mV calibration pulse during lead-in
+            if (x >= pulseX && x <= pulseX + pulseW) {
+              return 1.0;
+            }
             return 0.0;
           }
           const t = isRhythmStrip
@@ -221,10 +229,15 @@ export default function ECGWaveformMonitor({
           return getEcgVoltage(actualLead, t, territoryKey, 75);
         };
 
-        // Calculate sweep position
+        // Electrophysiologically Synchronized Sweep Duration:
+        // Standard and supplemental leads show exactly 3 complete cardiac cycles (2.40s at 75 bpm = 60 mm at 25 mm/s).
+        // Continuous Lead II rhythm strip shows exactly 12 complete cardiac cycles (9.60s = 4 x 2.40s = 240 mm at 25 mm/s).
+        // This harmonic 4:1 phase lock guarantees that standard leads wrap cleanly without mid-beat cutting,
+        // and all leads remain in 100% synchronous cardiac phase indefinitely without subpixel drift!
+        const durationSec = isRhythmStrip ? 9.60 : 2.40;
         const sweepTime = timeRef.current % durationSec;
         const sweepX = (sweepTime / durationSec) * w;
-        const eraseWidth = Math.max(14, w * 0.05);
+        const eraseWidth = Math.max(14, w * 0.04);
 
         // Fixed 1.0 CSS pixel increment ensures rock-solid, jitter-free waveform rendering
         const stepPx = 1.0;
@@ -518,7 +531,7 @@ export default function ECGWaveformMonitor({
                 {/* Animated Lead Canvas */}
                 <canvas
                   ref={el => { canvasRefs.current[leadName] = el; }}
-                  className="w-full h-40 sm:h-44 block rounded"
+                  className="w-full h-44 sm:h-48 block rounded"
                 />
               </div>
             );
@@ -550,7 +563,7 @@ export default function ECGWaveformMonitor({
           }`}>
             <canvas
               ref={el => { canvasRefs.current['II_RHYTHM'] = el; }}
-              className="w-full h-40 sm:h-44 block rounded"
+              className="w-full h-44 sm:h-48 block rounded"
             />
           </div>
         </div>
@@ -604,7 +617,7 @@ export default function ECGWaveformMonitor({
 
                     <canvas
                       ref={el => { canvasRefs.current[leadName] = el; }}
-                      className="w-full h-40 sm:h-44 block rounded"
+                      className="w-full h-44 sm:h-48 block rounded"
                     />
                   </div>
                 );

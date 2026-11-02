@@ -103,7 +103,7 @@ export default function LeadDetailModal({
     const yAbnormal = voltToY(vAbnormal);
     abnormalPoints.push(`${x.toFixed(1)},${yAbnormal.toFixed(1)}`);
 
-    if (showNormalComparison) {
+    if (showNormalComparison && territoryId !== 'normal') {
       const vNormal = getEcgVoltage(lead, t, 'normal', 75);
       const yNormal = voltToY(vNormal);
       normalPoints.push(`${x.toFixed(1)},${yNormal.toFixed(1)}`);
@@ -112,12 +112,12 @@ export default function LeadDetailModal({
 
   // Connect to end of strip
   abnormalPoints.push('710,200');
-  if (showNormalComparison) {
+  if (showNormalComparison && territoryId !== 'normal') {
     normalPoints.push('710,200');
   }
 
   const abnormalPathD = `M ${abnormalPoints.join(' L ')}`;
-  const normalPathD = showNormalComparison ? `M ${normalPoints.join(' L ')}` : '';
+  const normalPathD = showNormalComparison && territoryId !== 'normal' ? `M ${normalPoints.join(' L ')}` : '';
 
   // Sweep cursor position
   const currentCursorX = timeToX(sweepTime);
@@ -149,15 +149,21 @@ export default function LeadDetailModal({
   }
 
   sweptPoints.push(`${currentCursorX.toFixed(1)},${currentCursorY.toFixed(1)}`);
+  if (currentCursorX >= 690) {
+    sweptPoints.push('710,200');
+  }
   unsweptPoints.push('710,200');
 
   const sweptPathD = `M ${sweptPoints.join(' L ')}`;
   const unsweptPathD = `M ${unsweptPoints.join(' L ')}`;
 
+  const isPrimary = territory.primaryLeads.includes(lead);
+  const isReciprocal = territory.reciprocalLeads.includes(lead);
+
   const activeColor =
-    delta?.stElevationMm && delta.stElevationMm > 0
+    (delta?.stElevationMm && delta.stElevationMm > 0) || (isPrimary && territoryId !== 'normal')
       ? (paperMode === 'paper' ? '#dc2626' : '#f87171')
-      : delta?.stElevationMm && delta.stElevationMm < 0
+      : (delta?.stElevationMm && delta.stElevationMm < 0) || (isReciprocal && territoryId !== 'normal')
       ? (paperMode === 'paper' ? '#0284c7' : '#38bdf8')
       : (paperMode === 'paper' ? '#0f172a' : '#38bdf8');
 
@@ -165,6 +171,37 @@ export default function LeadDetailModal({
 
   // Clinical guideline criteria evaluator for this lead
   const getClinicalThresholdEvaluation = (deviationMm: number) => {
+    // 1. STEMI Mimic: Acute Pericarditis
+    if (territoryId === 'pericarditis') {
+      if (lead === 'aVR') {
+        if (deviationMm <= -0.5) {
+          return { meets: true, text: 'Meets Acute Pericarditis criteria (reciprocal ST depression and PR elevation in aVR; hallmark of subepicardial atrial injury).' };
+        }
+        return { meets: true, text: 'Reciprocal lead aVR in Acute Pericarditis: typically displays PR elevation and ST depression.' };
+      }
+      if (deviationMm >= 0.5) {
+        return { meets: true, text: 'Meets Acute Pericarditis criteria (widespread concave "saddleback" ST elevation with PR depression; distinguishes from localized convex STEMI).' };
+      }
+      return { meets: false, text: 'ST segment deviation below pericarditis threshold in this lead.' };
+    }
+
+    // 2. STEMI Mimic: Benign Early Repolarization (BER)
+    if (territoryId === 'early_repolarization') {
+      if (deviationMm >= 0.5) {
+        return { meets: true, text: 'Benign Early Repolarization (normal variant): concave ST elevation with characteristic J-point notching / fishhook slur and absence of reciprocal ST depression.' };
+      }
+      return { meets: false, text: 'Within physiological baseline limits for Benign Early Repolarization.' };
+    }
+
+    // 3. Normal Baseline
+    if (territoryId === 'normal') {
+      if (Math.abs(deviationMm) < 0.5) {
+        return { meets: true, text: 'Normal isoelectric baseline (< 0.5 mm physiological deviation relative to PR segment baseline).' };
+      }
+      return { meets: false, text: `Measured ${deviationMm > 0 ? '+' : ''}${deviationMm} mm deviation from normal isoelectric PR baseline.` };
+    }
+
+    // 4. Precordial leads V2 - V3
     if (lead === 'V2' || lead === 'V3') {
       if (deviationMm >= 2.5) {
         return { meets: true, text: 'Meets STEMI criteria for Men < 40 (≥ 2.5 mm), Men ≥ 40 (≥ 2.0 mm), and Women (≥ 1.5 mm).' };
@@ -289,17 +326,19 @@ export default function LeadDetailModal({
               </button>
             )}
 
-            <button
-              onClick={() => setShowNormalComparison(!showNormalComparison)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition flex items-center gap-1.5 ${
-                showNormalComparison
-                  ? 'bg-cyan-950 border-cyan-500/60 text-cyan-300'
-                  : 'bg-slate-800 border-slate-700 text-slate-400'
-              }`}
-            >
-              <Sliders className="w-3.5 h-3.5" />
-              Compare Normal
-            </button>
+            {territoryId !== 'normal' && (
+              <button
+                onClick={() => setShowNormalComparison(!showNormalComparison)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition flex items-center gap-1.5 ${
+                  showNormalComparison
+                    ? 'bg-cyan-950 border-cyan-500/60 text-cyan-300'
+                    : 'bg-slate-800 border-slate-700 text-slate-400'
+                }`}
+              >
+                <Sliders className="w-3.5 h-3.5" />
+                Compare Normal
+              </button>
+            )}
 
             <button
               onClick={onClose}
@@ -332,7 +371,18 @@ export default function LeadDetailModal({
             {/* SVG High-Res Waveform with 1:1 isometric square grid */}
             <svg
               viewBox="0 0 720 360"
-              className="w-full h-auto cursor-crosshair block"
+              className="w-full h-auto cursor-crosshair block touch-none"
+              onPointerDown={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const clickY = e.clientY - rect.top;
+                const svgX = (clickX / rect.width) * 720;
+                const svgY = (clickY / rect.height) * 360;
+                // Baseline 0 mV is at Y = 200. 1 mV = 100px => 0.1 mV (1 mm) = 10px
+                const devMv = (200 - svgY) / 100;
+                const devMm = parseFloat((devMv * 10).toFixed(1));
+                setCaliper({ x: svgX, y: svgY, mm: devMm, mv: devMv });
+              }}
               onClick={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const clickX = e.clientX - rect.left;
@@ -573,6 +623,10 @@ export default function LeadDetailModal({
                       y={ly - 8}
                       textAnchor="middle"
                       fill={isActive ? '#fbbf24' : (paperMode === 'paper' ? '#0f172a' : '#cbd5e1')}
+                      stroke={paperMode === 'paper' ? '#fff9f5' : '#080d1a'}
+                      strokeWidth="3.5"
+                      strokeLinejoin="round"
+                      paintOrder="stroke"
                       fontSize={isActive ? '10' : '8.5'}
                       fontWeight="bold"
                     >
