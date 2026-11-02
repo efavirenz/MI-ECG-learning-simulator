@@ -29,7 +29,7 @@ export default function ECGWaveformMonitor({
   const [isPlaying, setIsPlaying] = useState(true);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
   const [showSupplemental, setShowSupplemental] = useState(false);
-  const [showNormalOverlay, setShowNormalOverlay] = useState(true);
+  const [showNormalOverlay, setShowNormalOverlay] = useState(false);
   const [detailLead, setDetailLead] = useState<string | null>(null);
 
   const territory = MI_TERRITORIES[selectedTerritoryId] || MI_TERRITORIES['normal'];

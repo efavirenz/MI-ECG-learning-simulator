@@ -204,7 +204,8 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
       'Check for posterior involvement (LCx often supplies posterobasal myocardium).'
     ],
     heartRegionCoords: {
-      anteriorHighlightSvgId: ['region-lateral', 'artery-lcx']
+      anteriorHighlightSvgId: ['region-lateral', 'artery-lcx'],
+      posteriorHighlightSvgId: ['artery-lcx-post']
     },
     waveformDeltas: {
       'I': { stElevationMm: 2.2, stSlope: 'convex' },
@@ -344,7 +345,8 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
       'TREATMENT: Aggressive IV fluid resuscitation (normal saline bolus), inotropes if needed, emergent PCI.'
     ],
     heartRegionCoords: {
-      anteriorHighlightSvgId: ['region-rv', 'artery-rca']
+      anteriorHighlightSvgId: ['region-rv', 'artery-rca'],
+      posteriorHighlightSvgId: ['region-inferior-post', 'artery-rca-pda']
     },
     waveformDeltas: {
       'II': { stElevationMm: 2.5, stSlope: 'convex' },

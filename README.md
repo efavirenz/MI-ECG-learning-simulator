@@ -124,6 +124,22 @@ npm run preview
 
 ## 📝 Update History & Changelog
 
+### [v5.5] [2026-11-02] — Heart Diagram Anatomical Accuracy & Waveform Overlay Default Off
+- **Normal Baseline Overlay Default Off**: Changed `showNormalOverlay` default to `false` in `ECGWaveformMonitor.tsx` — normal dashed baseline hidden on initial load, reducing visual clutter.
+- **Posterior Heart View Complete Anatomical Rebuild** (`HeartTerritoryView.tsx`):
+  - Added anatomically correct Right Atrium shape and label on posterior view.
+  - Repositioned IVC (Inferior Vena Cava) to patient's right with correct placement.
+  - Corrected Pulmonary Vein approach angles: Left PVs enter from viewer's left, Right PVs from viewer's right.
+  - Added RCA path running along right AV groove on posterior view (previously missing).
+  - Added Right Ventricle sliver visible on posterior view.
+  - Added patient orientation compass labels (Patient Right / Patient Left).
+  - Fixed Coronary Sinus label placement and text.
+- **Heart Territory Auto-Orientation**: Added `useEffect` to auto-switch to posterior view when Posterior STEMI territory selected.
+- **Territory Data Corrections** (`miTerritories.ts`):
+  - Added `posteriorHighlightSvgId: ['artery-lcx-post']` to Lateral STEMI territory.
+  - Added `posteriorHighlightSvgId: ['region-inferior-post', 'artery-rca-pda']` to Right Ventricular Infarction territory.
+- **Version Bump**: Updated badges and footer to `v5.5` across `Navbar.tsx`, `App.tsx`, `AGENTS.md`, and `README.md`.
+
 ### [v5.4] [2026-11-02] — Harmonic Multi-Lead Sweep Synchronization, Active Pulse Tracing & STEMI Mimics Precision
 - **Synchronized Harmonic Multi-Lead Animation Engine in Module 5 (`Waveform Simulator`)**:
   - In `src/components/ECGWaveformMonitor.tsx`, established a mathematically synchronized sweep duration framework across all standard leads, supplemental leads, and continuous Lead II rhythm strip.

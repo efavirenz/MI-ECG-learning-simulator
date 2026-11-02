@@ -107,7 +107,7 @@ export default function Navbar({
               }`}
             >
               <span className={`w-1.5 h-1.5 rounded-full ${isBright ? 'bg-current' : 'bg-current'} animate-ping`} />
-              v5.4
+              v5.5
             </span>
           </div>
         </div>
@@ -226,7 +226,7 @@ export default function Navbar({
                       ? `${currentTheme.badgeBg} ${currentTheme.badgeBorder} ${currentTheme.badgeText} border`
                       : `bg-slate-800 ${currentTheme.accentText} border border-slate-700`
                   }`}>
-                    v5.4
+                    v5.5
                   </span>
                   <button
                     onClick={() => setIsMenuOpen(false)}
@@ -361,7 +361,7 @@ export default function Navbar({
             {/* Drawer Footer */}
             <div className="pt-3 border-t border-slate-700/50 text-[11px] text-slate-400 flex items-center justify-between">
               <span>ACC/AHA 2025 • ESC 2023</span>
-              <span className={`font-mono font-bold ${currentTheme.accentText}`}>Release v5.4</span>
+              <span className={`font-mono font-bold ${currentTheme.accentText}`}>Release v5.5</span>
             </div>
           </div>
         </div>

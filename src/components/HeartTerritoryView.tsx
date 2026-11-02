@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MI_TERRITORIES, MITerritory } from '../data/miTerritories';
 import { Activity, ShieldAlert, Sparkles, CheckCircle2, ChevronRight } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
@@ -14,6 +14,13 @@ export default function HeartTerritoryView({
 }: HeartTerritoryViewProps) {
   const { theme, isBright } = useTheme();
   const [viewOrientation, setViewOrientation] = useState<'anterior' | 'posterior'>('anterior');
+
+  // Automatically switch to posterior orientation when Posterior STEMI is selected
+  useEffect(() => {
+    if (selectedTerritoryId === 'posterior') {
+      setViewOrientation('posterior');
+    }
+  }, [selectedTerritoryId]);
 
   const currentTerritory: MITerritory = MI_TERRITORIES[selectedTerritoryId] || MI_TERRITORIES['normal'];
 
@@ -113,6 +120,10 @@ export default function HeartTerritoryView({
                 <stop offset="100%" stopColor="#990000" />
               </linearGradient>
               <filter id="heartGlow" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="4" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+              </filter>
+              <filter id="pericarditisGlow" x="-20%" y="-20%" width="140%" height="140%">
                 <feGaussianBlur stdDeviation="4" result="blur" />
                 <feComposite in="SourceGraphic" in2="blur" operator="over" />
               </filter>
@@ -358,123 +369,158 @@ export default function HeartTerritoryView({
             ) : (
               /* POSTERIOR / INFERIOR VIEW (DIAPHRAGMATIC & BASE) */
               <g>
-                {/* 1. Base of the Heart: Left Atrium with 4 Pulmonary Veins */}
-                {/* Left Atrium Smooth Posterior Wall */}
+                {/* ─── Posterior View Anatomical Key ─────────────────────
+                    Orientation: as if looking at the back of the heart
+                    (patient's right = viewer's right; patient's left = viewer's left).
+                    Top:   base of heart (LA, atria, great veins).
+                    Bottom: cardiac apex.
+                    Left (viewer's left = patient's right): RCA territory, RA.
+                    Right (viewer's left = patient's left): LCx territory, LA.
+                ─────────────────────────────────────────────────────── */}
+
+                {/* 1. Left Atrium — posterior wall, occupying most of the base */}
                 <path
-                  d="M 140 100
-                     C 140 70, 260 70, 260 100
-                     C 275 125, 265 145, 250 145
-                     L 150 145
-                     C 135 145, 125 125, 140 100 Z"
+                  d="M 130 95 C 128 65, 272 65, 270 95 C 280 122, 268 148, 252 150 L 148 150 C 132 148, 120 122, 130 95 Z"
                   fill="#4c1d95"
                   stroke="#8b5cf6"
                   strokeWidth="2"
                   opacity="0.9"
                 />
-                <text x="200" y="108" fill="#e9d5ff" fontSize="8.5" fontWeight="bold" textAnchor="middle">Left Atrium (Base)</text>
+                <text x="200" y="110" fill="#e9d5ff" fontSize="8.5" fontWeight="bold" textAnchor="middle">Left Atrium (Posterior Wall)</text>
 
-                {/* 4 Pulmonary Veins (Oxygenated Blood from Lungs) */}
-                {/* Left Superior & Inferior PVs (Patient Left = diagram left) */}
-                <ellipse cx="118" cy="98" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
-                <ellipse cx="114" cy="125" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
-                <text x="100" y="98" fill="#93c5fd" fontSize="6.5" textAnchor="end">L. Sup PV</text>
-                <text x="96" y="125" fill="#93c5fd" fontSize="6.5" textAnchor="end">L. Inf PV</text>
-
-                {/* Right Superior & Inferior PVs (Patient Right = diagram right) */}
-                <ellipse cx="282" cy="98" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
-                <ellipse cx="286" cy="125" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
-                <text x="300" y="98" fill="#93c5fd" fontSize="6.5">R. Sup PV</text>
-                <text x="304" y="125" fill="#93c5fd" fontSize="6.5">R. Inf PV</text>
-
-                {/* Inferior Vena Cava (IVC) entering RA from below */}
-                <ellipse cx="270" cy="155" rx="11" ry="6" fill="#1e3a8a" stroke="#3b82f6" strokeWidth="1.5" />
-                <text x="288" y="158" fill="#93c5fd" fontSize="7" fontWeight="bold">IVC</text>
-
-                {/* Posterior Ventricular Silhouette */}
+                {/* 2. Right Atrium — visible on the right side of the base (patient's right = viewer's right) */}
                 <path
-                  d="M 120 140
-                     C 80 175, 84 245, 115 305
-                     C 145 352, 195 375, 235 372
-                     C 285 368, 320 315, 325 245
-                     C 325 185, 295 145, 250 140
-                     Z"
+                  d="M 270 95 C 285 80, 330 88, 338 120 C 340 138, 328 152, 310 155 L 270 152 C 280 135, 280 115, 270 95 Z"
+                  fill="#4c1d95"
+                  stroke="#8b5cf6"
+                  strokeWidth="1.5"
+                  opacity="0.75"
+                />
+                <text x="305" y="120" fill="#e9d5ff" fontSize="7" fontWeight="bold" textAnchor="middle">Right</text>
+                <text x="305" y="130" fill="#e9d5ff" fontSize="7" fontWeight="bold" textAnchor="middle">Atrium</text>
+
+                {/* 3. Pulmonary Veins (4 veins entering LA from lungs)
+                    In posterior view: Left PVs enter from the patient's left (viewer's left),
+                    Right PVs enter from the patient's right (viewer's right). */}
+                {/* Left Sup + Inf PVs (patient left = viewer left) */}
+                <ellipse cx="115" cy="95" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
+                <ellipse cx="110" cy="122" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
+                <text x="97" y="95" fill="#93c5fd" fontSize="6.5" textAnchor="end">L. Sup PV</text>
+                <text x="92" y="122" fill="#93c5fd" fontSize="6.5" textAnchor="end">L. Inf PV</text>
+
+                {/* Right Sup + Inf PVs (patient right = viewer right, approaching from right side) */}
+                <ellipse cx="255" cy="78" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
+                <ellipse cx="260" cy="102" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
+                <text x="268" y="78" fill="#93c5fd" fontSize="6.5">R. Sup PV</text>
+                <text x="273" y="102" fill="#93c5fd" fontSize="6.5">R. Inf PV</text>
+
+                {/* 4. Inferior Vena Cava (IVC) entering RA inferiorly — on patient's right = viewer's right */}
+                <ellipse cx="318" cy="157" rx="11" ry="6" fill="#1e3a8a" stroke="#3b82f6" strokeWidth="1.5" />
+                <text x="338" y="160" fill="#93c5fd" fontSize="7" fontWeight="bold">IVC</text>
+
+                {/* 5. Posterior Ventricular Silhouette (main body of both ventricles) */}
+                <path
+                  d="M 118 148 C 78 182, 80 252, 112 310 C 142 358, 196 380, 236 378 C 278 375, 318 322, 322 252 C 322 188, 296 148, 256 148 Z"
                   fill="url(#heartBaseGrad)"
                   stroke="#fda4af"
                   strokeWidth="2.5"
                 />
 
-                {/* Posterior Left Ventricle Region (V7-V9 territory) */}
+                {/* 6. Posterior LV wall — posterobasal territory (V7-V9; LCx territory on patient's left = viewer's left) */}
                 <path
                   id="region-posterior"
-                  d="M 120 140
-                     C 92 180, 94 248, 122 305
-                     L 196 345
-                     L 196 145 Z"
+                  d="M 118 148 C 86 188, 86 258, 116 316 L 195 352 L 195 152 Z"
                   fill={isHighlighted('region-posterior') ? '#f97316' : '#4a044e'}
                   opacity={isHighlighted('region-posterior') ? 0.95 : 0.65}
                   stroke={isHighlighted('region-posterior') ? '#ffffff' : '#701a75'}
                   strokeWidth={isHighlighted('region-posterior') ? 3.5 : 1.2}
                   className="transition-all duration-300"
                 />
-                <text x="145" y="222" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">Posterior Wall</text>
-                <text x="145" y="236" fill="#fed7aa" fontSize="8" fontWeight="bold" textAnchor="middle">(V7, V8, V9)</text>
+                <text x="145" y="230" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">Posterior LV</text>
+                <text x="145" y="244" fill="#fed7aa" fontSize="8" fontWeight="bold" textAnchor="middle">(V7, V8, V9)</text>
 
-                {/* Inferior / Diaphragmatic Wall (II, III, aVF) */}
+                {/* 7. Inferior / Diaphragmatic wall (II, III, aVF; RCA/PDA territory — straddles the septum at the bottom) */}
                 <path
                   id="region-inferior-post"
-                  d="M 196 145
-                     L 196 345
-                     C 238 372, 276 355, 305 300
-                     L 285 145 Z"
+                  d="M 195 152 L 195 352 C 238 378, 278 360, 308 305 L 288 152 Z"
                   fill={isHighlighted('region-inferior-post') ? '#10b981' : '#312e81'}
                   opacity={isHighlighted('region-inferior-post') ? 0.95 : 0.65}
                   stroke={isHighlighted('region-inferior-post') ? '#ffffff' : '#3730a3'}
                   strokeWidth={isHighlighted('region-inferior-post') ? 3.5 : 1.2}
                   className="transition-all duration-300"
                 />
-                <text x="245" y="222" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">Inferior Wall</text>
-                <text x="245" y="236" fill="#a7f3d0" fontSize="8" fontWeight="bold" textAnchor="middle">(II, III, aVF)</text>
+                <text x="248" y="230" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">Inferior Wall</text>
+                <text x="248" y="244" fill="#a7f3d0" fontSize="8" fontWeight="bold" textAnchor="middle">(II, III, aVF)</text>
 
-                {/* Coronary Sinus (Large venous channel in posterior AV groove) */}
+                {/* 8. Right Ventricle — thin sliver visible at patient's right base on posterior view */}
                 <path
-                  d="M 148 143 C 180 148, 220 150, 260 152"
+                  d="M 288 152 L 308 305 C 320 280, 322 240, 320 200 C 318 172, 308 155, 288 152 Z"
+                  fill="#641e2e"
+                  opacity="0.55"
+                  stroke="#9f1239"
+                  strokeWidth="1"
+                />
+                <text x="310" y="210" fill="#fbcfe8" fontSize="7" fontWeight="bold" textAnchor="middle">RV</text>
+
+                {/* 9. Coronary Sinus — runs in the posterior AV groove between LA (top) and LV (below) */}
+                {/* Correctly positioned: horizontal channel along the INFERIOR border of the left atrium */}
+                <path
+                  d="M 148 150 C 178 155, 218 156, 256 154"
                   fill="none"
                   stroke="url(#csTubularGrad)"
                   strokeWidth="6"
                   strokeLinecap="round"
                 />
-                <text x="195" y="140" fill="#93c5fd" fontSize="7" fontWeight="bold" textAnchor="middle">Coronary Sinus</text>
+                <text x="198" y="147" fill="#93c5fd" fontSize="7" fontWeight="bold" textAnchor="middle">Coronary Sinus (CS)</text>
 
-                {/* Posterior Interventricular Sulcus Adipose Pad */}
-                <path d="M 196 145 L 196 355" fill="none" stroke="url(#fatPadGrad)" strokeWidth="6" opacity="0.35" />
+                {/* 10. Posterior interventricular sulcus fat pad */}
+                <path d="M 195 152 L 195 360" fill="none" stroke="url(#fatPadGrad)" strokeWidth="6" opacity="0.35" />
 
-                {/* Posterior Descending Artery (PDA) coursing in posterior IV sulcus */}
+                {/* 11. Posterior Descending Artery (PDA) in posterior IV sulcus */}
                 <path
                   id="artery-rca-pda"
-                  d="M 196 142 L 196 355"
+                  d="M 195 148 L 195 360"
                   fill="none"
                   stroke={isHighlighted('artery-rca-pda') ? '#fbbf24' : '#ef4444'}
                   strokeWidth={isHighlighted('artery-rca-pda') ? 5.5 : 3.5}
                   strokeLinecap="round"
                   filter={isHighlighted('artery-rca-pda') ? 'url(#heartGlow)' : undefined}
                 />
-                <text x="202" y="275" fill="#fbbf24" fontSize="8" fontWeight="bold">PDA (RCA ~85% / LCx ~15%)</text>
+                <text x="202" y="280" fill="#fbbf24" fontSize="7.5" fontWeight="bold">PDA (RCA ~85% / LCx ~15%)</text>
 
-                {/* Posterolateral Branches (PLB) */}
+                {/* 12. RCA running in right AV groove (patient right = viewer right, superior to inferior along right border) */}
+                <path
+                  id="artery-rca"
+                  d="M 310 155 C 325 178, 322 225, 312 270 C 302 305, 284 330, 260 348"
+                  fill="none"
+                  stroke={isHighlighted('artery-rca') ? '#fbbf24' : '#ef4444'}
+                  strokeWidth={isHighlighted('artery-rca') ? 5.5 : 3}
+                  strokeLinecap="round"
+                  filter={isHighlighted('artery-rca') ? 'url(#heartGlow)' : undefined}
+                />
+                <text x="340" y="200" fill="#fbbf24" fontSize="7.5" fontWeight="bold" textAnchor="start">RCA</text>
+
+                {/* 13. Posterolateral Branches (PLB) from LCx — patient's left = viewer's left */}
                 <path
                   id="artery-lcx-post"
-                  d="M 146 145 C 132 185, 138 225, 154 265"
+                  d="M 140 152 C 125 188, 130 232, 148 272"
                   fill="none"
                   stroke={isHighlighted('artery-lcx-post') ? '#fbbf24' : '#ef4444'}
                   strokeWidth={isHighlighted('artery-lcx-post') ? 4.5 : 2.8}
                   strokeLinecap="round"
                   filter={isHighlighted('artery-lcx-post') ? 'url(#heartGlow)' : undefined}
                 />
-                <text x="122" y="172" fill="#fca5a5" fontSize="7.5" fontWeight="bold">PLB Branch</text>
+                <text x="90" y="185" fill={isHighlighted('artery-lcx-post') ? '#fbbf24' : '#fca5a5'} fontSize="7" fontWeight="bold">LCx PLB</text>
 
-                {/* Cardiac Apex Landmark */}
-                <circle cx="230" cy="372" r="4" fill="#ffffff" stroke="#e11d48" strokeWidth="1.5" />
-                <text x="230" y="390" fill={isBright ? "#334155" : "#cbd5e1"} fontSize="8" textAnchor="middle" fontWeight="bold">Cardiac Apex</text>
+                {/* 14. Cardiac Apex */}
+                <circle cx="234" cy="376" r="4" fill="#ffffff" stroke="#e11d48" strokeWidth="1.5" />
+                <text x="234" y="394" fill={isBright ? "#334155" : "#cbd5e1"} fontSize="8" textAnchor="middle" fontWeight="bold">Cardiac Apex</text>
+
+                {/* 15. Orientation compass */}
+                <text x="14" y="165" fill={isBright ? "#475569" : "#94a3b8"} fontSize="6.5" fontWeight="bold">Patient</text>
+                <text x="14" y="174" fill={isBright ? "#475569" : "#94a3b8"} fontSize="6.5" fontWeight="bold">Right →</text>
+                <text x="355" y="165" fill={isBright ? "#475569" : "#94a3b8"} fontSize="6.5" fontWeight="bold" textAnchor="end">← Patient</text>
+                <text x="355" y="174" fill={isBright ? "#475569" : "#94a3b8"} fontSize="6.5" fontWeight="bold" textAnchor="end">Left</text>
               </g>
             )}
           </svg>
@@ -490,8 +536,9 @@ export default function HeartTerritoryView({
                 key={key}
                 onClick={() => {
                   onSelectTerritory(key);
-                  if (key === 'posterior' || key === 'inferior') {
-                    if (key === 'posterior') setViewOrientation('posterior');
+                  // Auto-orient: Posterior STEMI → posterior view; all others → anterior
+                  if (key === 'posterior') {
+                    setViewOrientation('posterior');
                   } else {
                     setViewOrientation('anterior');
                   }
