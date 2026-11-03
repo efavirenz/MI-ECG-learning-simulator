@@ -70,7 +70,7 @@ export default function ECGWaveformMonitor({
     }
   }, [selectedTerritoryId]);
 
-  // Main synchronized rendering loop with rock-solid, jitter-free fixed pixel sampling
+  // Shared animation loop: all lead canvases use one clock, calibration scale, and sweep velocity.
   useEffect(() => {
     const render = (timestamp: number) => {
       if (!lastTimestampRef.current) {
@@ -229,14 +229,10 @@ export default function ECGWaveformMonitor({
           return getEcgVoltage(actualLead, t, territoryKey, 75);
         };
 
-        // Electrophysiologically Synchronized Sweep Duration:
-        // Standard and supplemental leads show exactly 3 complete cardiac cycles (2.40s at 75 bpm = 60 mm at 25 mm/s).
-        // Continuous Lead II rhythm strip shows exactly 12 complete cardiac cycles (9.60s = 4 x 2.40s = 240 mm at 25 mm/s).
-        // This harmonic 4:1 phase lock guarantees that standard leads wrap cleanly without mid-beat cutting,
-        // and all leads remain in 100% synchronous cardiac phase indefinitely without subpixel drift!
-        const durationSec = isRhythmStrip ? 9.60 : 2.40;
-        const sweepTime = timeRef.current % durationSec;
-        const sweepX = (sweepTime / durationSec) * w;
+        // All canvases sweep at the same physical paper speed: 25 mm/s.
+        // Using the shared pixel/mm scale makes cursor velocity identical even when canvas widths differ.
+        // Each canvas wraps at its own physical width, while the waveform time axis uses the same calibration.
+        const sweepX = (timeRef.current * 25 * smallBox) % w;
         const eraseWidth = Math.max(14, w * 0.04);
 
         // Fixed 1.0 CSS pixel increment ensures rock-solid, jitter-free waveform rendering
@@ -562,7 +558,7 @@ export default function ECGWaveformMonitor({
           }`}>
             <canvas
               ref={el => { canvasRefs.current['II_RHYTHM'] = el; }}
-              className="w-full h-44 sm:h-48 block rounded"
+              className="rhythm-strip-canvas w-full h-44 sm:h-48 block rounded"
             />
           </div>
         </div>
@@ -584,7 +580,7 @@ export default function ECGWaveformMonitor({
               </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            <div className="grid grid-cols-1 gap-3 supplemental-leads-grid">
               {supplementalLeads.map(leadName => {
                 const delta = territory.waveformDeltas[leadName];
                 const isPrimary = territory.primaryLeads.includes(leadName);

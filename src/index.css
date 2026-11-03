@@ -8,6 +8,24 @@
   }
 }
 
+/* Supplemental ECG leads follow the same orientation-specific column counts as the standard matrix.
+   Tablet detection uses both viewport axes so landscape phones remain single-column. */
+@media (min-width: 600px) and (min-height: 700px) and (max-width: 900px) and (orientation: portrait) {
+  .supplemental-leads-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rhythm-strip-canvas.rhythm-strip-canvas {
+    height: 220px;
+  }
+}
+
+@media (min-width: 900px) {
+  .supplemental-leads-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 /* Custom ECG grid styling */
 .ecg-grid-background {
   background-color: #0b1329;

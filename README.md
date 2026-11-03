@@ -124,6 +124,17 @@ npm run preview
 
 ## 📝 Update History & Changelog
 
+### [v5.7] [2026-11-03] — Responsive Supplemental Leads & Unified Sweep Speed
+- **Supplemental Leads Responsive Layout** (src/components/ECGWaveformMonitor.tsx, src/index.css):
+  - Uses one column on phone portrait and landscape, two columns on tablet portrait widths from 600–900 px, and four columns at 900 px and wider, following the standard lead matrix at the tested iPad and iPhone viewport sizes.
+  - Tablet-specific columns use both viewport dimensions so a wide phone in landscape does not incorrectly switch to two columns.
+- **Lead II Rhythm Strip Vertical Alignment**:
+  - Increased the rhythm-strip canvas height to 220 px on tablet portrait layouts, moving its baseline and waveform lower within the available vertical space while leaving other viewports unchanged.
+- **Unified ECG Sweep Velocity**:
+  - Replaced width-proportional sweep timing with a shared physical sweep rate of 25 mm/s using the common pixel-per-millimetre scale.
+  - Standard leads, supplemental leads, and continuous Lead II now move their sweep cursors at the same on-screen velocity despite different canvas widths.
+- **Version Bump**: Updated badges and footer to v5.7 across Navbar.tsx, App.tsx, AGENTS.md, and README.md.
+
 ### [v5.5] [2026-11-02] — Heart Diagram Anatomical Accuracy & Waveform Overlay Default Off
 - **Normal Baseline Overlay Default Off**: Changed `showNormalOverlay` default to `false` in `ECGWaveformMonitor.tsx` — normal dashed baseline hidden on initial load, reducing visual clutter.
 - **Posterior Heart View Complete Anatomical Rebuild** (`HeartTerritoryView.tsx`):
