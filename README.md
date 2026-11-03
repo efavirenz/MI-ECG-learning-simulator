@@ -1,6 +1,6 @@
 # Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator
 
-A clinically accurate, fully interactive educational web application designed for healthcare professionals (Registered Nurses, Paramedics / EMTs, Emergency and Critical Care staff, and Medical Trainees).
+A guideline-informed educational ECG simulator using synthetic teaching waveforms, designed for healthcare professionals (Registered Nurses, Paramedics / EMTs, Emergency and Critical Care staff, and Medical Trainees).
 
 The simulator bridges three core electrophysiological concepts:
 $$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrightarrow \text{ECG Lead Abnormalities}$$
@@ -27,7 +27,7 @@ $$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrig
   - Indicated for reciprocal ST depression and tall R waves in V1–V3.
   - Placement: Horizontal plane of V6 at left posterior axillary line (V7), midscapular line (V8), and paraspinal line (V9).
   - Diagnostic threshold: $\ge 0.5\text{ mm}$ ST elevation.
-- **Step-by-Step Acquisition Workflow**: Based on Queensland Ambulance Service (QAS) March 2026 guidelines. Includes cable reassignment table and mandatory manual re-labeling warnings.
+- **Step-by-Step Acquisition Workflow**: Based on Queensland Ambulance Service (QAS) June 2026 procedure. Includes cable reassignment table and mandatory manual re-labeling warnings.
 
 ### 3. Myocardial Infarction Anatomical Localization
 - **Interactive 2D Vector Heart**: Anterior (Sternocostal) and Posterior/Inferior (Diaphragmatic) coronary views.
@@ -69,6 +69,10 @@ $$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrig
 
 ---
 
+## Release Identifier Convention
+
+The visible simulator release (for example, v6) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
+
 ## 🛠️ Technology Stack
 
 - **Framework**: React 18 + TypeScript (Strict mode)
@@ -82,7 +86,7 @@ $$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrig
 ## 📦 Getting Started
 
 ### Prerequisites
-- Node.js (v18+ recommended)
+- Node.js (v20+ recommended)
 - npm or pnpm
 
 ### Installation
@@ -97,6 +101,17 @@ npm install
 # Start development server
 npm run dev
 ```
+
+### Automated Tests
+```bash
+# Run the Vitest suite once
+npm test
+
+# Run tests in watch mode during development
+npm run test:watch
+```
+
+The test suite checks UI interactions, keyboard access, timer cleanup, animation pause behavior, theme-storage fallbacks, synthetic waveform output and educational data structure integrity. These tests do not validate clinical accuracy or replace qualified ECG review.
 
 ### Production Build
 ```bash
@@ -117,12 +132,21 @@ npm run preview
    [European Heart Journal](https://academic.oup.com/eurheartj/article/44/38/3720/7243210)
 3. **Fifth Universal Definition of Myocardial Infarction (2026)**  
    [European Society of Cardiology Pocket Guidelines](https://www.escardio.org/guidelines/clinical-practice-guidelines/pocket-guidelines/universal-definition-of-myocardial-infarction/)
-4. **Queensland Ambulance Service Clinical Practice Procedures: 12-Lead ECG Acquisition and Interpretation (March 2026)**  
-   [Queensland Ambulance Service CPP](https://www.ambulance.qld.gov.au/__data/assets/pdf_file/0033/475791/CPP_12-lead-ECG-acquisition-and-interpretation.pdf)
+4. **Queensland Ambulance Service Clinical Practice Procedures: 12-Lead ECG Acquisition and Interpretation (June 2026)**
+   - [Queensland Ambulance Service CPP](https://www.ambulance.qld.gov.au/__data/assets/pdf_file/0033/475791/CPP_12-Lead-ECG-acquisition-and-interpretation.pdf)
 
 ---
 
 ## 📝 Update History & Changelog
+
+### [v6] [2026-11-03] — Software Reliability, Accessibility & Validation Infrastructure
+- **Accessibility**: improved keyboard operation for interactive anatomy and lead controls, dialog semantics, focus handling, Escape dismissal, accessible labels and live feedback; added reduced-motion behavior.
+- **Runtime reliability**: stopped the ECG canvas animation loop while paused, clarified independent canvas wrap timing while preserving 25 mm/s sweep velocity, synchronized heart orientation with the active MI territory, cancelled stale placement-practice timers, and made theme persistence resilient to invalid or unavailable localStorage.
+- **Clinical reference maintenance**: updated the Queensland Ambulance Service 12-lead ECG reference to its June 2026 procedure and current official PDF URL.
+- **Automated quality checks**: added a Vitest/React Testing Library suite and CI test-before-build step; pinned GitHub Actions to immutable commit SHAs and added scheduled Dependabot updates.
+- **Privacy and typography**: removed Google Fonts network requests and adopted system font stacks.
+- **Release identifiers**: updated the visible simulator release label to v6. The private npm package remains version 1.0.0.
+- **Clinical validation boundary**: this release does not claim independent clinical validation. Ten clinical findings remain pending qualified external review, and guideline licensing/distribution review remains deferred. The simulator continues to use synthetic educational waveforms and is not a diagnostic system.
 
 ### [v5.7] [2026-11-03] — Responsive Supplemental Leads & Unified Sweep Speed
 - **Supplemental Leads Responsive Layout** (src/components/ECGWaveformMonitor.tsx, src/index.css):
@@ -134,6 +158,11 @@ npm run preview
   - Replaced width-proportional sweep timing with a shared physical sweep rate of 25 mm/s using the common pixel-per-millimetre scale.
   - Standard leads, supplemental leads, and continuous Lead II now move their sweep cursors at the same on-screen velocity despite different canvas widths.
 - **Version Bump**: Updated badges and footer to v5.7 across Navbar.tsx, App.tsx, AGENTS.md, and README.md.
+
+### [v5.6] [2026-11-03] — Responsive Lead Layout & Practice Mode Interaction Guard
+- **Responsive Lead Layout** (`ECGWaveformMonitor.tsx`): adjusted tablet portrait lead ordering to a two-column layout while retaining the desktop four-column 3×4 arrangement.
+- **Practice Mode Interaction Guard** (`AnteriorTorso.tsx`): ignored duplicate electrode taps after a correct answer until the next practice target appears, preventing multiple score increments for one prompt.
+- **Release Metadata**: synchronized the visible simulator version label and footer to v5.6.
 
 ### [v5.5] [2026-11-02] — Heart Diagram Anatomical Accuracy & Waveform Overlay Default Off
 - **Normal Baseline Overlay Default Off**: Changed `showNormalOverlay` default to `false` in `ECGWaveformMonitor.tsx` — normal dashed baseline hidden on initial load, reducing visual clutter.
@@ -152,6 +181,8 @@ npm run preview
 - **Version Bump**: Updated badges and footer to `v5.6` across `Navbar.tsx`, `App.tsx`, `AGENTS.md`, and `README.md`.
 
 ### [v5.4] [2026-11-02] — Harmonic Multi-Lead Sweep Synchronization, Active Pulse Tracing & STEMI Mimics Precision
+
+> Historical note: the phase-synchronization behavior described in this v5.4 entry was later superseded by v5.7. The current implementation shares physical sweep velocity (25 mm/s) but each canvas wraps at its own width, so wrap periods are not phase-locked.
 - **Synchronized Harmonic Multi-Lead Animation Engine in Module 5 (`Waveform Simulator`)**:
   - In `src/components/ECGWaveformMonitor.tsx`, established a mathematically synchronized sweep duration framework across all standard leads, supplemental leads, and continuous Lead II rhythm strip.
   - Calibrated standard and supplemental lead boxes to exactly 3 complete cardiac cycles ($2.40\text{ s}$ at 75 bpm = $60\text{ mm}$ at $25\text{ mm/s}$ = 12 large boxes) and continuous Lead II rhythm strip to exactly 12 complete cardiac cycles ($9.60\text{ s}$ = $4 \times 2.40\text{ s}$ = $240\text{ mm}$ = 48 large boxes).
@@ -196,8 +227,8 @@ npm run preview
 ### [v5.1] [2026-11-01] — Multi-Lead Waveform Animation Calibration, Phase-Locking & Magnified Analysis Precision
 - **Synchronized Phase-Locking Across All 12 Leads & Lead II Rhythm Strip**:
   - In `src/components/ECGWaveformMonitor.tsx`, calibrated 12-lead and supplemental lead boxes strictly to an integer multiple of the cardiac cycle: $2.40\text{ s}$ duration ($60.0\text{ mm}$ width at $25\text{ mm/s} = 3$ complete beats at 75 bpm) and rhythm strip to $9.60\text{ s}$ duration ($240.0\text{ mm} = 12$ complete beats at 75 bpm = $4 \times 2.40\text{ s}$).
-  - Aligned Lead II rhythm strip calibration lead-in to exactly $20.0\text{ mm}$ ($0.80\text{ s} = 1$ cardiac cycle), establishing 100% synchronous phase-lock between Lead II in the 3x4 grid matrix and the continuous Lead II rhythm strip below it.
-  - Eliminated phase wrapping jumps: because durations are exact integer multiples of 0.80s, the sweep line loops seamlessly at the isoelectric electrical diastole baseline ($0.0\text{ mV}$) with zero visual glitching.
+  - Aligned Lead II rhythm strip calibration lead-in to exactly 20.0 mm (0.80 s = 1 cardiac cycle). This was the v5.1 phase-lock design; it was superseded by v5.7, which preserves common physical cursor velocity but wraps canvases independently because their widths differ.
+  - Historical v5.1 behavior: fixed canvas durations were integer multiples of 0.80s and were designed to wrap at the isoelectric baseline. This seam/phase claim no longer applies after v5.7 independent per-canvas wrapping; the current implementation preserves 25 mm/s physical speed, not synchronized wrap phase.
   - Aligned previous cycle trace color to match active injury morphology with 0.25 opacity (faint red for ST elevation, faint cyan for ST depression/reciprocal).
 - **Magnified Waveform Analysis Graphic Accuracy & Calibration Pulse Fix**:
   - In `src/components/LeadDetailModal.tsx`, eradicated the overlapping calibration pulse artifact where abnormal and normal waveform traces re-stroked the standard calibration mark in dashed or injury colors. Waveform path points now initiate cleanly at $X = 90$ ($t = 0$), preserving a single, crisp, standard 1.0 mV (0.20s) calibration pulse with isoelectric connector.

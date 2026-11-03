@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { STANDARD_ELECTRODES, SUPPLEMENTAL_ELECTRODES, Electrode } from '../data/electrodes';
 import { Eye, CheckCircle2, AlertTriangle, HelpCircle, RotateCcw, Info } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
@@ -22,6 +22,20 @@ export default function AnteriorTorso({
   const [targetPracticeElectrode, setTargetPracticeElectrode] = useState<Electrode | null>(null);
   const [practiceFeedback, setPracticeFeedback] = useState<{ isCorrect: boolean; message: string } | null>(null);
   const [score, setScore] = useState({ correct: 0, total: 0 });
+  const practiceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const practiceSessionRef = useRef(0);
+
+  const clearPracticeTimeout = () => {
+    if (practiceTimeoutRef.current !== null) {
+      clearTimeout(practiceTimeoutRef.current);
+      practiceTimeoutRef.current = null;
+    }
+  };
+
+  useEffect(() => () => {
+    practiceSessionRef.current += 1;
+    clearPracticeTimeout();
+  }, []);
 
   const activeElectrodeList = [
     ...STANDARD_ELECTRODES.filter(e => e.torsoView === 'anterior'),
@@ -39,6 +53,8 @@ export default function AnteriorTorso({
   };
 
   const startPractice = () => {
+    clearPracticeTimeout();
+    practiceSessionRef.current += 1;
     setPracticeMode(true);
     setScore({ correct: 0, total: 0 });
     setPracticeFeedback(null);
@@ -56,8 +72,13 @@ export default function AnteriorTorso({
           isCorrect: true,
           message: `Correct! ${e.name} (${e.code}) is placed at: ${e.anatomicalLocation}.`
         });
-        setTimeout(() => {
-          pickRandomTarget();
+        clearPracticeTimeout();
+        const sessionId = practiceSessionRef.current;
+        practiceTimeoutRef.current = setTimeout(() => {
+          practiceTimeoutRef.current = null;
+          if (practiceSessionRef.current === sessionId) {
+            pickRandomTarget();
+          }
         }, 1800);
       } else {
         setScore(prev => ({ ...prev, total: prev.total + 1 }));
@@ -123,7 +144,11 @@ export default function AnteriorTorso({
                   Score: {score.correct}/{score.total}
                 </span>
                 <button
-                  onClick={() => setPracticeMode(false)}
+                  onClick={() => {
+                    clearPracticeTimeout();
+                    practiceSessionRef.current += 1;
+                    setPracticeMode(false);
+                  }}
                   className="text-slate-400 hover:text-rose-500 flex items-center gap-1 text-xs ml-2 font-medium"
                 >
                   <RotateCcw className="w-3 h-3" /> Exit
@@ -152,7 +177,7 @@ export default function AnteriorTorso({
               Locate & Tap: <span className={`${theme.accentText} underline`}>{targetPracticeElectrode.name} ({targetPracticeElectrode.code})</span>
             </div>
             {practiceFeedback && (
-              <div className={`mt-2 text-xs font-semibold px-2.5 py-1.5 rounded-lg flex items-center justify-center gap-1.5 ${
+              <div role="status" aria-live="polite" className={`mt-2 text-xs font-semibold px-2.5 py-1.5 rounded-lg flex items-center justify-center gap-1.5 ${
                 practiceFeedback.isCorrect 
                   ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40' 
                   : 'bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-500/40'
@@ -168,7 +193,7 @@ export default function AnteriorTorso({
         <div className={`relative w-full max-w-[500px] aspect-[4/5] rounded-xl border p-2 flex items-center justify-center select-none overflow-hidden transition-colors ${
           isBright ? 'bg-slate-100 border-slate-300' : 'bg-slate-950/60 border-slate-800/80'
         }`}>
-          <svg viewBox="0 0 400 500" className="w-full h-full">
+          <svg viewBox="0 0 400 500" className="w-full h-full" role="group" aria-label="Interactive anterior torso electrode placement diagram">
             <defs>
               <linearGradient id="bodySkinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor={isBright ? "#cbd5e1" : "#334155"} />
@@ -482,8 +507,18 @@ export default function AnteriorTorso({
               return (
                 <g
                   key={elec.id}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`${practiceMode ? 'Practice target position' : 'Select'} ${elec.name} (${elec.code})`}
+                  aria-pressed={practiceMode ? undefined : isSelected}
                   onClick={() => handleElectrodeClick(elec)}
-                  className="cursor-pointer group"
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      handleElectrodeClick(elec);
+                    }
+                  }}
+                  className="cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
                 >
                   {/* Invisible Massive Touch/Click Target Zone (56x56 px hit target) */}
                   <circle

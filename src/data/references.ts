@@ -49,8 +49,8 @@ export const CLINICAL_REFERENCES: ReferenceItem[] = [
     id: 'qas-ecg-2026',
     title: 'Queensland Ambulance Service Clinical Practice Procedures: 12-Lead ECG Acquisition and Interpretation',
     organization: 'Queensland Ambulance Service (QAS)',
-    year: 'March 2026',
-    url: 'https://www.ambulance.qld.gov.au/__data/assets/pdf_file/0033/475791/CPP_12-lead-ECG-acquisition-and-interpretation.pdf',
+    year: 'June 2026',
+    url: 'https://www.ambulance.qld.gov.au/__data/assets/pdf_file/0033/475791/CPP_12-Lead-ECG-acquisition-and-interpretation.pdf',
     keyContributions: [
       'Step-by-step prehospital procedure for anatomical landmark palpation (Angle of Louis, midclavicular line, axillary lines).',
       'Standard protocol for repositioning electrodes to acquire supplemental right-sided leads (V4 cable to right 5th ICS MCL labeled V4R) and posterior leads (V4-V6 cables to V7-V9).',

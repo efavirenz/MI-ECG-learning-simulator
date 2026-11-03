@@ -31,6 +31,8 @@ export default function ECGWaveformMonitor({
   const [showSupplemental, setShowSupplemental] = useState(false);
   const [showNormalOverlay, setShowNormalOverlay] = useState(false);
   const [detailLead, setDetailLead] = useState<string | null>(null);
+  const [redrawRevision, setRedrawRevision] = useState(0);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   const territory = MI_TERRITORIES[selectedTerritoryId] || MI_TERRITORIES['normal'];
 
@@ -41,6 +43,19 @@ export default function ECGWaveformMonitor({
 
   // Canvas elements refs
   const canvasRefs = useRef<Record<string, HTMLCanvasElement | null>>({});
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updatePreference = () => setPrefersReducedMotion(mediaQuery.matches);
+    updatePreference();
+    mediaQuery.addEventListener('change', updatePreference);
+    return () => mediaQuery.removeEventListener('change', updatePreference);
+  }, []);
+
+  useEffect(() => {
+    if (prefersReducedMotion) setIsPlaying(false);
+  }, [prefersReducedMotion]);
 
   // Clinically sorted lead list:
   // Mobile: single column; tablet portrait: 2 columns; desktop / tablet landscape: standard 3x4 layout.
@@ -189,8 +204,8 @@ export default function ECGWaveformMonitor({
         ctx.stroke();
         ctx.setLineDash([]);
 
-        // Rhythm strip calibration pulse lead-in: exactly 20.0 mm (4 large boxes = 0.80s = 1 complete cardiac cycle)
-        // This guarantees that beats across the rhythm strip and 12-lead boxes are in 100% synchronous phase lock!
+        // Rhythm strip calibration pulse lead-in: exactly 20.0 mm (4 large boxes = 0.80s = 1 complete cardiac cycle).
+        // Each canvas uses its own width for wrapping; the shared clock preserves physical sweep velocity, not wrap phase.
         const stripLeadInMm = 20.0;
         const stripLeadInPx = isRhythmStrip ? (stripLeadInMm * smallBox) : 0;
 
@@ -231,7 +246,7 @@ export default function ECGWaveformMonitor({
 
         // All canvases sweep at the same physical paper speed: 25 mm/s.
         // Using the shared pixel/mm scale makes cursor velocity identical even when canvas widths differ.
-        // Each canvas wraps at its own physical width, while the waveform time axis uses the same calibration.
+        // Each canvas wraps at its own physical width; different widths therefore have different wrap periods.
         const sweepX = (timeRef.current * 25 * smallBox) % w;
         const eraseWidth = Math.max(14, w * 0.04);
 
@@ -349,19 +364,24 @@ export default function ECGWaveformMonitor({
         ctx.restore();
       });
 
-      animFrameRef.current = requestAnimationFrame(render);
+      if (isPlaying) {
+        animFrameRef.current = requestAnimationFrame(render);
+      } else {
+        animFrameRef.current = null;
+      }
     };
 
     animFrameRef.current = requestAnimationFrame(render);
 
     return () => {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+      if (animFrameRef.current !== null) cancelAnimationFrame(animFrameRef.current);
     };
-  }, [isPlaying, playbackSpeed, selectedTerritoryId, showNormalOverlay, paperMode, showSupplemental]);
+  }, [isPlaying, playbackSpeed, selectedTerritoryId, showNormalOverlay, paperMode, showSupplemental, redrawRevision]);
 
   const handleReset = () => {
     timeRef.current = 0;
     lastTimestampRef.current = null;
+    setRedrawRevision(revision => revision + 1);
   };
 
   const handleTogglePlay = () => {
@@ -480,10 +500,12 @@ export default function ECGWaveformMonitor({
             const isReciprocal = territory.reciprocalLeads.includes(leadName);
 
             return (
-              <div
+              <button
+                type="button"
                 key={leadName}
                 onClick={() => setDetailLead(leadName)}
-                className={`group relative rounded-lg border p-2 cursor-pointer transition shadow-sm hover:ring-2 hover:ring-cyan-500 overflow-hidden ${gridClass} ${
+                aria-label={`Inspect lead ${leadName} waveform and measurements`}
+                className={`w-full text-left group relative rounded-lg border p-2 cursor-pointer transition shadow-sm hover:ring-2 hover:ring-cyan-500 focus-visible:ring-2 focus-visible:ring-cyan-500 overflow-hidden ${gridClass} ${
                   paperMode === 'paper'
                     ? 'bg-white/90 border-rose-200/90 shadow-rose-100/50'
                     : 'bg-slate-950/80 border-slate-800/90'
@@ -527,8 +549,9 @@ export default function ECGWaveformMonitor({
                 <canvas
                   ref={el => { canvasRefs.current[leadName] = el; }}
                   className="w-full h-44 sm:h-48 block rounded"
+                  aria-hidden="true"
                 />
-              </div>
+              </button>
             );
           })}
         </div>
@@ -558,6 +581,8 @@ export default function ECGWaveformMonitor({
           }`}>
             <canvas
               ref={el => { canvasRefs.current['II_RHYTHM'] = el; }}
+              role="img"
+              aria-label="Lead II continuous rhythm strip, calibrated at 25 millimetres per second and 10 millimetres per millivolt"
               className="rhythm-strip-canvas w-full h-44 sm:h-48 block rounded"
             />
           </div>
@@ -586,10 +611,12 @@ export default function ECGWaveformMonitor({
                 const isPrimary = territory.primaryLeads.includes(leadName);
 
                 return (
-                  <div
+                  <button
+                    type="button"
                     key={leadName}
                     onClick={() => setDetailLead(leadName)}
-                    className={`group relative rounded-lg border p-2 cursor-pointer transition shadow-sm hover:ring-2 hover:ring-amber-500 overflow-hidden ${
+                    aria-label={`Inspect supplemental lead ${leadName} waveform and measurements`}
+                    className={`w-full text-left group relative rounded-lg border p-2 cursor-pointer transition shadow-sm hover:ring-2 hover:ring-amber-500 focus-visible:ring-2 focus-visible:ring-amber-500 overflow-hidden ${
                       paperMode === 'paper'
                         ? 'bg-amber-50/80 border-amber-200'
                         : 'bg-amber-950/20 border-amber-800/60'
@@ -613,8 +640,9 @@ export default function ECGWaveformMonitor({
                     <canvas
                       ref={el => { canvasRefs.current[leadName] = el; }}
                       className="w-full h-44 sm:h-48 block rounded"
+                      aria-hidden="true"
                     />
-                  </div>
+                  </button>
                 );
               })}
             </div>

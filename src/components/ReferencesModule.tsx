@@ -20,7 +20,7 @@ export default function ReferencesModule() {
             Clinical Diagnostic Criteria, STEMI Mimics & Guideline References
           </h2>
           <p className={`mt-1 max-w-2xl leading-relaxed ${theme.subtextColor}`}>
-            Standard diagnostic thresholds and procedural standards compiled directly from 2025 ACC/AHA, 2023 ESC, 2026 ESC Universal Definition, and Queensland Ambulance Service March 2026 guidelines.
+            Standard diagnostic thresholds and procedural standards compiled directly from 2025 ACC/AHA, 2023 ESC, 2026 ESC Universal Definition, and Queensland Ambulance Service June 2026 procedure.
           </p>
         </div>
 
@@ -28,6 +28,7 @@ export default function ReferencesModule() {
         <div className={`flex items-center gap-1.5 p-1.5 rounded-xl border transition-colors ${theme.cardSubBg} ${theme.cardBorder}`}>
           <button
             onClick={() => setActiveTab('criteria')}
+            aria-pressed={activeTab === 'criteria'}
             className={`px-3 py-1.5 rounded-lg font-semibold transition ${
               activeTab === 'criteria'
                 ? `${theme.accentBg} shadow`
@@ -38,6 +39,7 @@ export default function ReferencesModule() {
           </button>
           <button
             onClick={() => setActiveTab('mimics')}
+            aria-pressed={activeTab === 'mimics'}
             className={`px-3 py-1.5 rounded-lg font-semibold transition ${
               activeTab === 'mimics'
                 ? 'bg-rose-600 text-white shadow'
@@ -48,6 +50,7 @@ export default function ReferencesModule() {
           </button>
           <button
             onClick={() => setActiveTab('equivalents')}
+            aria-pressed={activeTab === 'equivalents'}
             className={`px-3 py-1.5 rounded-lg font-semibold transition ${
               activeTab === 'equivalents'
                 ? 'bg-amber-600 text-white shadow'
@@ -58,6 +61,7 @@ export default function ReferencesModule() {
           </button>
           <button
             onClick={() => setActiveTab('references')}
+            aria-pressed={activeTab === 'references'}
             className={`px-3 py-1.5 rounded-lg font-semibold transition ${
               activeTab === 'references'
                 ? 'bg-indigo-600 text-white shadow'

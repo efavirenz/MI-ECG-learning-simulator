@@ -13,13 +13,13 @@ export default function HeartTerritoryView({
   onSelectTerritory
 }: HeartTerritoryViewProps) {
   const { theme, isBright } = useTheme();
-  const [viewOrientation, setViewOrientation] = useState<'anterior' | 'posterior'>('anterior');
+  const [viewOrientation, setViewOrientation] = useState<'anterior' | 'posterior'>(
+    selectedTerritoryId === 'posterior' ? 'posterior' : 'anterior'
+  );
 
   // Automatically switch to posterior orientation when Posterior STEMI is selected
   useEffect(() => {
-    if (selectedTerritoryId === 'posterior') {
-      setViewOrientation('posterior');
-    }
+    setViewOrientation(selectedTerritoryId === 'posterior' ? 'posterior' : 'anterior');
   }, [selectedTerritoryId]);
 
   const currentTerritory: MITerritory = MI_TERRITORIES[selectedTerritoryId] || MI_TERRITORIES['normal'];
@@ -57,6 +57,7 @@ export default function HeartTerritoryView({
           <div className={`flex items-center gap-1.5 p-1 rounded-lg border ${theme.cardSubBg} ${theme.cardBorder}`}>
             <button
               onClick={() => setViewOrientation('anterior')}
+              aria-pressed={viewOrientation === 'anterior'}
               className={`px-3 py-1 rounded font-medium transition ${
                 viewOrientation === 'anterior'
                   ? `${theme.accentBg} shadow`
@@ -67,6 +68,7 @@ export default function HeartTerritoryView({
             </button>
             <button
               onClick={() => setViewOrientation('posterior')}
+              aria-pressed={viewOrientation === 'posterior'}
               className={`px-3 py-1 rounded font-medium transition ${
                 viewOrientation === 'posterior'
                   ? `${theme.accentBg} shadow`
@@ -534,6 +536,7 @@ export default function HeartTerritoryView({
             return (
               <button
                 key={key}
+                aria-pressed={isSelected}
                 onClick={() => {
                   onSelectTerritory(key);
                   // Auto-orient: Posterior STEMI → posterior view; all others → anterior
@@ -567,6 +570,7 @@ export default function HeartTerritoryView({
             return (
               <button
                 key={key}
+                aria-pressed={isSelected}
                 onClick={() => onSelectTerritory(key)}
                 className={`px-2.5 py-0.5 rounded-lg text-xs font-medium transition border ${
                   isSelected

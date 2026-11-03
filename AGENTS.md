@@ -1,6 +1,6 @@
-# AGENTS.md — Development & Clinical Guidelines for AI Agents (Release v5.7)
+# AGENTS.md — Development & Clinical Guidelines for AI Agents (Release v6)
 
-This document defines the architecture, project conventions, and clinical accuracy standards for AI agents contributing to the **Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator (v5.7)**.
+This document defines the architecture, project conventions, and clinical accuracy standards for AI agents contributing to the **Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator (v6)**.
 
 ---
 
@@ -11,17 +11,29 @@ This document defines the architecture, project conventions, and clinical accura
 - **Audience**: Registered Nurses, Paramedics/EMTs, Emergency and Critical Care staff, and Medical Trainees.
 - **Language**: English throughout all user-facing strings, labels, ECG annotations, and references.
 - **Patient Population**: Adult cardiology only.
+- **Release identifiers**: the visible simulator release label (v6 and future v6.x releases) is maintained separately from the private npm package metadata version (`1.0.0`); do not automatically synchronize them.
 
 ---
 
-## 2. Repository Architecture & File Map
+## 2. Development Validation Commands
+
+- `npm test`: run the Vitest + jsdom + React Testing Library suite.
+- `npm run test:watch`: run tests in watch mode during local development.
+- `npm run build`: run strict TypeScript compilation followed by the Vite production build.
+- Keep tests focused on software behavior and data integrity; do not encode unapproved clinical thresholds or treat tests as a substitute for clinical validation.
+
+## 3. Repository Architecture & File Map
 
 ```
 MI-ECG-learning-simulator/
-├── index.html                   # Entry HTML with Inter and JetBrains Mono fonts
-├── package.json                 # React 18, Vite 6, Tailwind CSS, Lucide React
+├── index.html                   # Entry HTML with system font fallback stacks
+├── package.json                 # React 18, Vite 6, Vitest test scripts, Tailwind CSS, Lucide React
 ├── tsconfig.json                # TypeScript strict (noUnusedLocals, noUnusedParameters)
 ├── vite.config.ts               # Vite configuration (port 3000)
+├── vitest.config.ts              # Vitest + jsdom + React Testing Library configuration
+├── .github/
+│   ├── dependabot.yml            # Monthly npm and GitHub Actions dependency updates
+│   └── workflows/deploy.yml      # Pinned GitHub Pages build/test/deploy workflow
 ├── tailwind.config.js           # ECG grid and medical slate theme tokens
 ├── prompt.md                    # Core project specifications
 ├── README.md                    # User and developer documentation
@@ -40,9 +52,14 @@ MI-ECG-learning-simulator/
     │   ├── clinicalCriteria.ts  # 2025 ACC/AHA & 2023 ESC criteria, mimics, ACS equivalents
     │   ├── clinicalCases.ts     # 5 clinical scenarios + 10-question knowledge quiz
     │   ├── references.ts        # Cited guideline references and clinical disclaimer
-    │   └── themes.ts            # 10 clinical UI themes (5 bright + 5 dark) and styling tokens
+    │   ├── themes.ts            # 10 clinical UI themes (5 bright + 5 dark) and styling tokens
+    │   └── clinicalDataIntegrity.test.ts # Structural regression tests for educational data
     ├── utils/
-    │   └── ecgGenerator.ts      # Mathematical Gaussian ECG synthesizer & landmark calculator
+    │   ├── ecgGenerator.ts      # Mathematical ECG synthesizer & landmark calculator
+    │   ├── themeStorage.ts      # Safe, validated local theme persistence
+    │   └── themeStorage.test.ts # Theme storage resilience tests
+    ├── test/
+    │   └── setup.ts             # Testing Library matchers and jsdom setup
     └── components/
         ├── Navbar.tsx                   # Top navigation with tabs and active MI pill
         ├── ECGBasicsModule.tsx          # 10 electrodes vs 12 leads, Angle of Louis, intervals
@@ -53,12 +70,13 @@ MI-ECG-learning-simulator/
         ├── ECGWaveformMonitor.tsx       # Live 3x4 + Lead II rhythm strip canvas simulator
         ├── LeadDetailModal.tsx          # Magnified single lead view with calipers & landmarks
         ├── ClinicalScenariosModule.tsx  # Interactive case scenarios & quiz mode
-        └── ReferencesModule.tsx         # Guideline tables, STEMI mimics, & disclaimer
+        ├── ReferencesModule.tsx         # Guideline tables, STEMI mimics, & disclaimer
+        └── *.test.tsx                    # Component interaction and accessibility regression tests
 ```
 
 ---
 
-## 3. Strict Project Rules for Agents
+## 4. Strict Project Rules for Agents
 
 ### Rule 1 — TypeScript & Strict Compilation
 - Strict mode is enabled (`noUnusedLocals: true`, `noUnusedParameters: true`).
@@ -71,7 +89,7 @@ MI-ECG-learning-simulator/
   - **2025 ACC/AHA/ACEP/NAEMSP/SCAI ACS Guidelines**
   - **2023 ESC Guidelines for the Management of ACS**
   - **2026 ESC Fifth Universal Definition of Myocardial Infarction**
-  - **Queensland Ambulance Service (QAS) March 2026 Clinical Practice Procedures**
+  - **Queensland Ambulance Service (QAS) June 2026 Clinical Practice Procedures**
 - **J-Point Baseline**: The ST segment deviation must always be referenced to the preceding **PR segment** (or TP segment in tachycardic rhythms).
 - **Contiguous Leads Rule**: STEMI diagnosis strictly requires $\ge 2$ anatomically contiguous leads.
 - **STEMI Thresholds**:
@@ -92,7 +110,7 @@ MI-ECG-learning-simulator/
 ### Rule 4 — Mandatory Clinical Safety Warnings
 - **Mason-Likar Torso Modification**: Always document that moving limb electrodes to the torso alters frontal axis and produces pseudo-Q waves; it is valid for telemetry but non-diagnostic for STEMI.
 - **Prehospital Cable Reassignment**: When standard cables (e.g. V4) are moved to the right chest or back (V4R or V7–V9), the machine software still prints the original lead name. Agents must preserve the explicit warning that the clinician **must hand-annotate the printout** to prevent diagnostic errors.
-- **Right Ventricular Infarction Hemodynamics**: When inferior/RV infarction is present, preserve the strict contraindication warning against nitrates, morphine, and diuretics due to fatal preload collapse.
+- **Right Ventricular Infarction Medication Wording**: Do not create, revise, or propagate RV-infarction medication instructions from this rule file. The existing application wording is pending qualified external clinical review (F-001); do not infer a blanket medication contraindication or change the educational copy until documented sign-off.
 
 ### Rule 5 — Functional Integrity & Separation of Concerns
 - Educational data and clinical parameters belong in `src/data/`, not hardcoded inside UI components.
@@ -107,7 +125,7 @@ MI-ECG-learning-simulator/
 
 ---
 
-## 4. Verification Workflow for Agents
+## 5. Verification Workflow for Agents
 
 Before completing any task, execute:
 ```bash
@@ -120,4 +138,8 @@ git status
 Ensure build exits with code 0 and no console warnings.
 
 ---
-*Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator • Release v5.7*
+*Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator • Release v6*
+
+**Clinical review gate:** The RV medication wording, STEMI evaluation, posterior MI criteria, Q-wave model, PR/J-point measurement baseline, pericarditis claims, right-sided thresholds, Wellens/aVL statistics, LVH/LBBB caveats and waveform parameter semantics are pending qualified external clinical review. Do not alter these clinical rules or teaching claims without documented approval.
+
+**Typography:** The application uses system font stacks and does not require Google Fonts at runtime.

@@ -72,6 +72,7 @@ export default function ClinicalScenariosModule({
         <div className={`flex items-center gap-1.5 p-1.5 rounded-xl border text-xs transition-colors ${theme.cardSubBg} ${theme.cardBorder}`}>
           <button
             onClick={() => setActiveTab('cases')}
+            aria-pressed={activeTab === 'cases'}
             className={`px-4 py-1.5 rounded-lg font-semibold transition ${
               activeTab === 'cases'
                 ? `${theme.accentBg} shadow`
@@ -82,6 +83,7 @@ export default function ClinicalScenariosModule({
           </button>
           <button
             onClick={() => setActiveTab('quiz')}
+            aria-pressed={activeTab === 'quiz'}
             className={`px-4 py-1.5 rounded-lg font-semibold transition ${
               activeTab === 'quiz'
                 ? 'bg-indigo-600 text-white shadow'
@@ -101,6 +103,7 @@ export default function ClinicalScenariosModule({
             {CLINICAL_CASES.map(c => (
               <button
                 key={c.id}
+                aria-pressed={selectedCaseId === c.id}
                 onClick={() => {
                   setSelectedCaseId(c.id);
                   if (onSelectTerritoryForCase) {
@@ -276,7 +279,7 @@ export default function ClinicalScenariosModule({
 
                       {/* Explanation Reveal */}
                       {hasAnswered && (
-                        <div className={`mt-2 p-3 rounded-lg border text-xs animate-fade-in ${
+                        <div role="status" aria-live="polite" className={`mt-2 p-3 rounded-lg border text-xs animate-fade-in ${
                           isCorrect
                             ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-900 dark:text-emerald-200'
                             : 'bg-rose-500/10 border-rose-500/40 text-rose-900 dark:text-rose-200'
@@ -379,7 +382,7 @@ export default function ClinicalScenariosModule({
 
                 {/* Immediate Explanation if answered */}
                 {quizAnswers[currentQuizIndex] !== undefined && (
-                  <div className={`p-3.5 rounded-xl border space-y-1.5 animate-fade-in ${
+                  <div role="status" aria-live="polite" className={`p-3.5 rounded-xl border space-y-1.5 animate-fade-in ${
                     isBright ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-slate-950 border-slate-800 text-slate-300'
                   }`}>
                     <div className="font-bold text-xs flex items-center gap-1.5">

@@ -62,7 +62,7 @@ export default function PosteriorTorso({
         <div className={`relative w-full max-w-[500px] aspect-[4/5] rounded-xl border p-2 flex items-center justify-center select-none overflow-hidden transition-colors ${
           isBright ? 'bg-slate-100 border-slate-300' : 'bg-slate-950/60 border-slate-800/80'
         }`}>
-          <svg viewBox="0 0 400 500" className="w-full h-full">
+          <svg viewBox="0 0 400 500" className="w-full h-full" role="group" aria-label="Interactive posterior torso electrode placement diagram">
             <defs>
               <linearGradient id="backSkinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor={isBright ? "#cbd5e1" : "#334155"} />
@@ -246,8 +246,18 @@ export default function PosteriorTorso({
               return (
                 <g
                   key={elec.id}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Select ${elec.name} (${elec.code})`}
+                  aria-pressed={isSelected}
                   onClick={() => onSelectElectrode(elec.id === selectedElectrodeId ? null : elec)}
-                  className="cursor-pointer group"
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      onSelectElectrode(elec.id === selectedElectrodeId ? null : elec);
+                    }
+                  }}
+                  className="cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
                 >
                   {/* Invisible Massive Touch/Click Target Zone */}
                   <circle
@@ -306,6 +316,7 @@ export default function PosteriorTorso({
             return (
               <button
                 key={e.id}
+                aria-pressed={isSelected}
                 onClick={() => onSelectElectrode(isSelected ? null : e)}
                 className={`px-3 py-1 rounded-lg font-mono font-bold text-xs transition border ${
                   isSelected

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Activity, ShieldCheck, HeartPulse, Menu, X, Check, Palette } from 'lucide-react';
 import { THEMES, getTheme } from '../data/themes';
 
@@ -29,6 +29,53 @@ export default function Navbar({
   onSelectTheme
 }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    closeButtonRef.current?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setIsMenuOpen(false);
+        return;
+      }
+      if (event.key !== 'Tab') return;
+
+      const focusable = drawerRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable?.length) {
+        event.preventDefault();
+        drawerRef.current?.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!drawerRef.current?.contains(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      previousFocus?.focus();
+    };
+  }, [isMenuOpen]);
 
   const currentTheme = getTheme(currentThemeId);
   const isBright = currentTheme.mode === 'bright';
@@ -64,8 +111,11 @@ export default function Navbar({
           <div className="flex items-center gap-3">
             {/* Hamburger Menu Toggle Button */}
             <button
+              ref={menuButtonRef}
               onClick={() => setIsMenuOpen(true)}
               aria-label="Open Navigation & Themes Menu"
+              aria-expanded={isMenuOpen}
+              aria-controls="navigation-theme-drawer"
               className={`p-2 rounded-xl border transition shadow-sm flex items-center justify-center ${
                 isBright
                   ? 'bg-white hover:bg-slate-100 text-slate-800 border-slate-300'
@@ -96,10 +146,10 @@ export default function Navbar({
             </div>
           </div>
 
-          {/* Top Right: Version Number (v5 in rounded rectangle) */}
+          {/* Top Right: Version Number (v6 in rounded rectangle) */}
           <div className="flex items-center gap-2">
             <span
-              title="Simulator Version 5.7"
+              title="Simulator Version 6"
               className={`px-2.5 py-1 rounded-lg border font-mono font-bold text-xs tracking-wider shadow-sm flex items-center gap-1.5 transition-colors ${
                 isBright
                   ? `${currentTheme.badgeBg} ${currentTheme.badgeBorder} ${currentTheme.badgeText}`
@@ -107,7 +157,7 @@ export default function Navbar({
               }`}
             >
               <span className={`w-1.5 h-1.5 rounded-full ${isBright ? 'bg-current' : 'bg-current'} animate-ping`} />
-              v5.7
+              v6
             </span>
           </div>
         </div>
@@ -119,6 +169,7 @@ export default function Navbar({
             return (
               <button
                 key={item.id}
+                aria-current={isActive ? 'page' : undefined}
                 onClick={() => handleTabClick(item.id)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition flex items-center gap-1.5 ${
                   isActive
@@ -187,19 +238,23 @@ export default function Navbar({
         <div
           onClick={() => setIsMenuOpen(false)}
           className="fixed inset-0 z-50 flex cursor-pointer"
-          role="dialog"
-          aria-modal="true"
+          role="presentation"
         >
           {/* Semi-transparent Backdrop (auto-closes on click or touch) */}
           <div
             onClick={() => setIsMenuOpen(false)}
-            onTouchEnd={() => setIsMenuOpen(false)}
             className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm transition-opacity cursor-pointer"
-            aria-label="Close menu by tapping outside"
+            aria-hidden="true"
           />
 
           {/* Slide-in Drawer Content - Full Screen Height & Optimized Distribution */}
           <div
+            ref={drawerRef}
+            id="navigation-theme-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="navigation-theme-drawer-title"
+            tabIndex={-1}
             onClick={(e) => e.stopPropagation()}
             className={`relative z-10 w-full max-w-sm sm:max-w-md h-screen max-h-screen shadow-2xl flex flex-col justify-between p-4 sm:p-5 border-r transition-colors overflow-y-auto cursor-default ${
               isBright
@@ -215,7 +270,7 @@ export default function Navbar({
                     <HeartPulse className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm tracking-tight">ECG Simulator Menu</h3>
+                    <h3 id="navigation-theme-drawer-title" className="font-bold text-sm tracking-tight">ECG Simulator Menu</h3>
                     <span className="text-[11px] text-slate-400 font-mono">Clinical Modules & Themes</span>
                   </div>
                 </div>
@@ -226,9 +281,10 @@ export default function Navbar({
                       ? `${currentTheme.badgeBg} ${currentTheme.badgeBorder} ${currentTheme.badgeText} border`
                       : `bg-slate-800 ${currentTheme.accentText} border border-slate-700`
                   }`}>
-                    v5.7
+                    v6
                   </span>
                   <button
+                    ref={closeButtonRef}
                     onClick={() => setIsMenuOpen(false)}
                     className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
                     aria-label="Close Menu"
@@ -249,6 +305,7 @@ export default function Navbar({
                     return (
                       <button
                         key={item.id}
+                        aria-current={isActive ? 'page' : undefined}
                         onClick={() => handleTabClick(item.id)}
                         className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center justify-between ${
                           isActive
@@ -361,7 +418,7 @@ export default function Navbar({
             {/* Drawer Footer */}
             <div className="pt-3 border-t border-slate-700/50 text-[11px] text-slate-400 flex items-center justify-between">
               <span>ACC/AHA 2025 • ESC 2023</span>
-              <span className={`font-mono font-bold ${currentTheme.accentText}`}>Release v5.7</span>
+              <span className={`font-mono font-bold ${currentTheme.accentText}`}>Release v6</span>
             </div>
           </div>
         </div>

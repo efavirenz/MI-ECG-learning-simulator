@@ -209,7 +209,7 @@ export default function SupplementalLeadsModule() {
               Standard Prehospital & Emergency Lead Acquisition Workflow
             </h3>
             <p className={`mt-1 ${theme.subtextColor}`}>
-              Follow this procedural protocol derived from Queensland Ambulance Service (QAS) March 2026 Clinical Practice Procedures and 2025 ACC/AHA guidelines.
+              Follow this procedural protocol derived from Queensland Ambulance Service (QAS) June 2026 Clinical Practice Procedures and 2025 ACC/AHA guidelines.
             </p>
           </div>
 

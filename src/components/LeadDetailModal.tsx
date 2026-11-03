@@ -33,6 +33,50 @@ export default function LeadDetailModal({
 
   const animRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    closeButtonRef.current?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+
+      const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable?.length) {
+        event.preventDefault();
+        dialogRef.current?.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!dialogRef.current?.contains(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      previousFocus?.focus();
+    };
+  }, []);
 
   const territory = MI_TERRITORIES[territoryId] || MI_TERRITORIES['normal'];
   const delta = territory.waveformDeltas[lead];
@@ -269,9 +313,15 @@ export default function LeadDetailModal({
   return (
     <div
       onClick={onClose}
+      role="presentation"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in"
     >
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="lead-detail-dialog-title"
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         className={`border rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] transition-colors ${
           isBright ? 'bg-white border-slate-200 text-slate-800' : 'bg-slate-900 border-slate-800 text-slate-100'
@@ -288,7 +338,7 @@ export default function LeadDetailModal({
               {lead}
             </span>
             <div>
-              <h2 className={`text-lg font-bold ${isBright ? 'text-slate-900' : 'text-white'} flex items-center gap-2`}>
+              <h2 id="lead-detail-dialog-title" className={`text-lg font-bold ${isBright ? 'text-slate-900' : 'text-white'} flex items-center gap-2`}>
                 Lead {lead} Magnified Waveform Analysis
               </h2>
               <span className={`text-xs ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
@@ -341,8 +391,10 @@ export default function LeadDetailModal({
             )}
 
             <button
+              ref={closeButtonRef}
               onClick={onClose}
               className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              aria-label="Close lead detail dialog"
               title="Close modal"
             >
               <X className="w-5 h-5" />
@@ -371,7 +423,18 @@ export default function LeadDetailModal({
             {/* SVG High-Res Waveform with 1:1 isometric square grid */}
             <svg
               viewBox="0 0 720 360"
-              className="w-full h-auto cursor-crosshair block touch-none"
+              role="group"
+              aria-label="Magnified ECG waveform. Focus this diagram and use the up and down arrow keys to move the caliper in 1 millimetre increments."
+              tabIndex={0}
+              className="w-full h-auto cursor-crosshair block touch-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-500"
+              onKeyDown={(event) => {
+                if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+                event.preventDefault();
+                const currentY = caliper?.y ?? 200;
+                const nextY = Math.max(0, Math.min(360, currentY + (event.key === 'ArrowUp' ? -10 : 10)));
+                const deviationMv = (200 - nextY) / 100;
+                setCaliper({ x: 360, y: nextY, mm: Number((deviationMv * 10).toFixed(1)), mv: deviationMv });
+              }}
               onPointerDown={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const clickX = e.clientX - rect.left;
@@ -593,11 +656,21 @@ export default function LeadDetailModal({
                 return (
                   <g
                     key={lm.code}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Select ${lm.code} waveform landmark`}
+                    aria-pressed={isActive}
                     onClick={(e) => {
                       e.stopPropagation();
                       setActiveLandmarkCode(lm.code);
                     }}
-                    className="cursor-pointer group"
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        setActiveLandmarkCode(lm.code);
+                      }
+                    }}
+                    className="cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
                   >
                     {isActive && (
                       <circle
@@ -713,6 +786,8 @@ export default function LeadDetailModal({
                 {caliper !== null ? 'Active Caliper Measurement:' : 'Programmed J-Point Deviation:'}
               </span>
               <span
+                aria-live="polite"
+                aria-label="Measured ST deviation"
                 className={`font-mono font-bold px-2 py-0.5 rounded text-xs ${
                   activeDev > 0
                     ? 'bg-rose-950 text-rose-300 border border-rose-800'

@@ -8,7 +8,8 @@ import ECGWaveformMonitor from './components/ECGWaveformMonitor';
 import ClinicalScenariosModule from './components/ClinicalScenariosModule';
 import ReferencesModule from './components/ReferencesModule';
 import { Electrode } from './data/electrodes';
-import { THEMES, DEFAULT_THEME_ID, getTheme } from './data/themes';
+import { THEMES, getTheme } from './data/themes';
+import { loadStoredThemeId, saveStoredThemeId } from './utils/themeStorage';
 import { ThemeProvider } from './context/ThemeContext';
 
 export default function App() {
@@ -17,9 +18,7 @@ export default function App() {
   const [selectedElectrode, setSelectedElectrode] = useState<Electrode | null>(null);
 
   // Theme state persisted in localStorage
-  const [currentThemeId, setCurrentThemeId] = useState<string>(() => {
-    return localStorage.getItem('ecg-simulator-theme') || DEFAULT_THEME_ID;
-  });
+  const [currentThemeId, setCurrentThemeId] = useState<string>(loadStoredThemeId);
 
   const currentTheme = getTheme(currentThemeId);
   const isBright = currentTheme.mode === 'bright';
@@ -35,7 +34,7 @@ export default function App() {
     const foundTheme = THEMES.find(t => t.id === themeId);
     if (!foundTheme) return;
     setCurrentThemeId(themeId);
-    localStorage.setItem('ecg-simulator-theme', themeId);
+    saveStoredThemeId(themeId);
     setPaperMode(foundTheme.paperMode);
   };
 
@@ -159,10 +158,10 @@ export default function App() {
         }`}>
           <div className="max-w-7xl mx-auto px-4 space-y-2">
             <p className={`font-semibold ${currentTheme.accentText}`}>
-              Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator • Release v5.7
+              Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator • Release v6
             </p>
             <p className={`text-[11px] max-w-xl mx-auto ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
-              Developed in accordance with the 2025 ACC/AHA ACS Guidelines, 2023 ESC ACS Guidelines, and Queensland Ambulance Service March 2026 Clinical Practice Procedures. Educational model only.
+              Developed in accordance with the 2025 ACC/AHA ACS Guidelines, 2023 ESC ACS Guidelines, and Queensland Ambulance Service June 2026 Clinical Practice Procedures. Educational model only.
             </p>
           </div>
         </footer>
