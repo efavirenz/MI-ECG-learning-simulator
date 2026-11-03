@@ -138,7 +138,7 @@ npm run preview
 - **Territory Data Corrections** (`miTerritories.ts`):
   - Added `posteriorHighlightSvgId: ['artery-lcx-post']` to Lateral STEMI territory.
   - Added `posteriorHighlightSvgId: ['region-inferior-post', 'artery-rca-pda']` to Right Ventricular Infarction territory.
-- **Version Bump**: Updated badges and footer to `v5.5` across `Navbar.tsx`, `App.tsx`, `AGENTS.md`, and `README.md`.
+- **Version Bump**: Updated badges and footer to `v5.6` across `Navbar.tsx`, `App.tsx`, `AGENTS.md`, and `README.md`.
 
 ### [v5.4] [2026-11-02] — Harmonic Multi-Lead Sweep Synchronization, Active Pulse Tracing & STEMI Mimics Precision
 - **Synchronized Harmonic Multi-Lead Animation Engine in Module 5 (`Waveform Simulator`)**:

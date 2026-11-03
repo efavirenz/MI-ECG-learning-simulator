@@ -47,6 +47,9 @@ export default function AnteriorTorso({
 
   const handleElectrodeClick = (e: Electrode) => {
     if (practiceMode && targetPracticeElectrode) {
+      // Ignore duplicate taps after a correct answer until the next target is selected.
+      if (practiceFeedback?.isCorrect) return;
+
       if (e.id === targetPracticeElectrode.id) {
         setScore(prev => ({ correct: prev.correct + 1, total: prev.total + 1 }));
         setPracticeFeedback({

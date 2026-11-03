@@ -43,22 +43,22 @@ export default function ECGWaveformMonitor({
   const canvasRefs = useRef<Record<string, HTMLCanvasElement | null>>({});
 
   // Clinically sorted lead list:
-  // On mobile (single column): displays limb leads first (I, II, III, aVR, aVL, aVF) then precordial (V1-V6)
-  // On desktop (md: 4 columns x 3 rows): placed via CSS grid into standard 3x4 layout:
-  // Col 1: I, II, III | Col 2: aVR, aVL, aVF | Col 3: V1, V2, V3 | Col 4: V4, V5, V6
+  // Mobile: single column; tablet portrait: 2 columns; desktop / tablet landscape: standard 3x4 layout.
+  // Tablet columns: limb leads in column 1, augmented leads in column 2, then precordial leads.
+  // Desktop columns: I/II/III | aVR/aVL/aVF | V1/V2/V3 | V4/V5/V6.
   const clinicalOrderedLeads: { name: string; gridClass: string }[] = [
-    { name: 'I', gridClass: 'md:col-start-1 md:row-start-1' },
-    { name: 'II', gridClass: 'md:col-start-1 md:row-start-2' },
-    { name: 'III', gridClass: 'md:col-start-1 md:row-start-3' },
-    { name: 'aVR', gridClass: 'md:col-start-2 md:row-start-1' },
-    { name: 'aVL', gridClass: 'md:col-start-2 md:row-start-2' },
-    { name: 'aVF', gridClass: 'md:col-start-2 md:row-start-3' },
-    { name: 'V1', gridClass: 'md:col-start-3 md:row-start-1' },
-    { name: 'V2', gridClass: 'md:col-start-3 md:row-start-2' },
-    { name: 'V3', gridClass: 'md:col-start-3 md:row-start-3' },
-    { name: 'V4', gridClass: 'md:col-start-4 md:row-start-1' },
-    { name: 'V5', gridClass: 'md:col-start-4 md:row-start-2' },
-    { name: 'V6', gridClass: 'md:col-start-4 md:row-start-3' },
+    { name: 'I', gridClass: 'md:col-start-1 md:row-start-1 lg:col-start-1 lg:row-start-1' },
+    { name: 'II', gridClass: 'md:col-start-1 md:row-start-2 lg:col-start-1 lg:row-start-2' },
+    { name: 'III', gridClass: 'md:col-start-1 md:row-start-3 lg:col-start-1 lg:row-start-3' },
+    { name: 'aVR', gridClass: 'md:col-start-2 md:row-start-1 lg:col-start-2 lg:row-start-1' },
+    { name: 'aVL', gridClass: 'md:col-start-2 md:row-start-2 lg:col-start-2 lg:row-start-2' },
+    { name: 'aVF', gridClass: 'md:col-start-2 md:row-start-3 lg:col-start-2 lg:row-start-3' },
+    { name: 'V1', gridClass: 'md:col-start-1 md:row-start-4 lg:col-start-3 lg:row-start-1' },
+    { name: 'V2', gridClass: 'md:col-start-1 md:row-start-5 lg:col-start-3 lg:row-start-2' },
+    { name: 'V3', gridClass: 'md:col-start-1 md:row-start-6 lg:col-start-3 lg:row-start-3' },
+    { name: 'V4', gridClass: 'md:col-start-2 md:row-start-4 lg:col-start-4 lg:row-start-1' },
+    { name: 'V5', gridClass: 'md:col-start-2 md:row-start-5 lg:col-start-4 lg:row-start-2' },
+    { name: 'V6', gridClass: 'md:col-start-2 md:row-start-6 lg:col-start-4 lg:row-start-3' },
   ];
 
   const supplementalLeads = ['V3R', 'V4R', 'V7', 'V8', 'V9'];
@@ -476,9 +476,8 @@ export default function ECGWaveformMonitor({
         }`}
       >
         {/* Clinically Sorted 3x4 Matrix:
-            On mobile (Safari iPhone): single column sorted limb leads (I, II, III, aVR, aVL, aVF) then precordial (V1-V6).
-            On desktop (md:): mapped into standard 3x4 layout columns via CSS grid classes */}
-        <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-3 gap-3">
+            Mobile: one column; tablet portrait: two columns; desktop / tablet landscape: standard 3x4 layout. */}
+        <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-6 lg:grid-cols-4 lg:grid-rows-3 gap-3">
           {clinicalOrderedLeads.map(({ name: leadName, gridClass }) => {
             const delta = territory.waveformDeltas[leadName];
             const isPrimary = territory.primaryLeads.includes(leadName);
