@@ -5,6 +5,18 @@ import ECGWaveformMonitor from './ECGWaveformMonitor';
 describe('ECG waveform animation lifecycle', () => {
   afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 
+  it('disables trace playback when reduced motion is preferred', () => {
+    vi.stubGlobal('requestAnimationFrame', vi.fn(() => 1));
+    vi.stubGlobal('cancelAnimationFrame', vi.fn());
+    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({
+      matches: true,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn()
+    }));
+    render(<ECGWaveformMonitor selectedTerritoryId="normal" paperMode="dark" onTogglePaperMode={vi.fn()} />);
+    expect(screen.getByRole('button', { name: 'Play Trace' })).toBeDisabled();
+  });
+
   it('stops requesting frames after the final paused redraw', () => {
     const pending = new Map<number, FrameRequestCallback>();
     let nextId = 1;

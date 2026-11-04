@@ -8,7 +8,7 @@ export interface BaseLeadConfig {
   tAmp: number;
 }
 
-// Canonical physiological morphology for standard & supplemental leads (HR 75 bpm = 800 ms cycle)
+// Baseline synthetic morphology for standard and supplemental leads (reference cycle: 75 bpm = 800 ms).
 export const BASE_LEADS: Record<string, BaseLeadConfig> = {
   'I':   { pAmp: 0.10, qAmp: -0.05, rAmp: 0.85, sAmp: -0.12, tAmp: 0.25 },
   'II':  { pAmp: 0.15, qAmp: -0.05, rAmp: 1.25, sAmp: -0.22, tAmp: 0.35 },
@@ -29,11 +29,18 @@ export const BASE_LEADS: Record<string, BaseLeadConfig> = {
   'V9':  { pAmp: 0.07, qAmp: -0.05, rAmp: 0.60, sAmp: -0.10, tAmp: 0.20 }
 };
 
+/** Synthetic PR-segment displacement used by the pericarditis teaching waveform. */
+export function getPrSegmentDisplacementMv(lead: string, territoryId: string): number {
+  if (territoryId !== 'pericarditis') return 0;
+  if (['I', 'II', 'III', 'aVL', 'aVF', 'V2', 'V3', 'V4', 'V5', 'V6'].includes(lead)) return -0.06;
+  if (lead === 'aVR') return 0.06;
+  return 0;
+}
+
 /**
- * Computes exact, clinically calibrated, mathematically continuous ECG voltage (in mV).
- * Standard calibration: 10 mm/mV (1 mm = 0.1 mV).
- * Paper speed: 25 mm/s (0.04s = 1 mm small box; 0.20s = 5 mm large box).
- * Normal baseline is isoelectric at 0.0 mV referenced to PR segment.
+ * Computes synthetic educational ECG voltage (in mV).
+ * Display convention: 10 mm/mV and 25 mm/s; these are model coordinates, not physical monitor calibration.
+ * The baseline is 0.0 mV except where a territory explicitly models PR-segment displacement.
  */
 export function getEcgVoltage(
   lead: string,
@@ -56,7 +63,7 @@ export function getEcgVoltage(
 
   // Key physiological timing markers normalized to 0.8s cycle (75 bpm):
   const tPStart = 0.08;
-  const tPEnd = 0.22;
+  const tPEnd = 0.19;
   const tQRSStart = 0.28;
   const tQ = 0.305;
   const tR = 0.335;
@@ -71,24 +78,20 @@ export function getEcgVoltage(
     return 0.0;
   }
 
-  // 2. P Wave (0.080 -> 0.220): Atrial Depolarization
+  // 2. P Wave (0.080 -> 0.190): Atrial Depolarization
   if (tau >= tPStart && tau < tPEnd) {
     const u = (tau - tPStart) / (tPEnd - tPStart);
     // Smooth raised sine lobe: starts at 0 with 0 slope, peaks smoothly, ends at 0 with 0 slope
     return base.pAmp * Math.sin(Math.PI * u) * Math.sin(Math.PI * u);
   }
 
-  // 3. PR Segment (0.220 -> 0.280): AV node conduction delay
+  // 3. PR Segment (0.190 -> 0.280): AV node conduction delay
   if (tau >= tPEnd && tau < tQRSStart) {
     // In acute pericarditis: subepicardial atrial injury causes PR depression in inferolateral leads, PR elevation in aVR
-    if (territoryId === 'pericarditis') {
+    const prDisplacementMv = getPrSegmentDisplacementMv(lead, territoryId);
+    if (prDisplacementMv !== 0) {
       const u = (tau - tPEnd) / (tQRSStart - tPEnd);
-      const prEnvelope = Math.sin(Math.PI * u);
-      if (['II', 'III', 'aVF', 'V5', 'V6'].includes(lead)) {
-        return -0.06 * prEnvelope;
-      } else if (lead === 'aVR') {
-        return +0.06 * prEnvelope;
-      }
+      return prDisplacementMv * Math.sin(Math.PI * u);
     }
     return 0.0;
   }
@@ -111,7 +114,7 @@ export function getEcgVoltage(
 
     if (isQS) {
       // Schematic QS morphology for teaching; it does not prove transmural necrosis or tissue viability.
-      const qsNadir = Math.min(qAmp, -0.55);
+      const qsNadir = delta?.qWaveMm !== undefined ? qAmp : Math.min(qAmp, -0.55);
       const tQSNadir = 0.335;
       if (tau < tQSNadir) {
         const u = (tau - tQRSStart) / (tQSNadir - tQRSStart);
@@ -254,8 +257,8 @@ export function getCycleLandmarks(lead: string, territoryId: string = 'normal', 
   const delta = territory.waveformDeltas[lead];
   const base = BASE_LEADS[lead] || BASE_LEADS['II'];
 
-  const pTime = 0.150 * scale;
-  const prSegmentTime = 0.250 * scale;
+  const pTime = 0.135 * scale;
+  const prSegmentTime = 0.235 * scale;
   const qTime = 0.305 * scale;
   const rTime = 0.335 * scale;
   const sTime = 0.360 * scale;
@@ -281,12 +284,10 @@ export function getCycleLandmarks(lead: string, territoryId: string = 'normal', 
       code: 'PR Seg',
       timeSec: prSegmentTime,
       voltageMv: getEcgVoltage(lead, prSegmentTime, territoryId, bpm),
-      description: territoryId === 'pericarditis'
-        ? (['II', 'III', 'aVF', 'V5', 'V6'].includes(lead)
-            ? 'PR-segment depression is a supportive ECG feature described in acute pericarditis; interpret with the full clinical assessment.'
-            : lead === 'aVR'
-            ? 'PR segment elevation: reciprocal sign in aVR strongly indicative of acute pericarditis.'
-            : 'Conduction delay through AV node, bundle of His, and bundle branches. The standard isoelectric baseline for J-point reference.')
+      description: getPrSegmentDisplacementMv(lead, territoryId) < 0
+        ? 'PR-segment depression is a supportive ECG feature described in acute pericarditis; interpret with the full clinical assessment.'
+        : getPrSegmentDisplacementMv(lead, territoryId) > 0
+        ? 'PR-segment elevation in aVR can be a reciprocal supportive feature; interpret with the full clinical assessment.'
         : 'Conduction delay through AV node, bundle of His, and bundle branches. The standard isoelectric baseline for J-point reference.'
     }
   ];
@@ -310,7 +311,7 @@ export function getCycleLandmarks(lead: string, territoryId: string = 'normal', 
       timeSec: effectiveQTime,
       voltageMv: effectiveQVoltage,
       description: delta?.qWaveMm
-        ? `Pathological Q Wave (depth ≥ ${delta.qWaveMm} mm, duration ≥ 0.04s) representing transmural electrical necrosis.`
+        ? `Programmed Q-wave morphology (nominal model depth ${delta.qWaveMm} mm). This synthetic waveform does not encode a validated pathological Q-wave duration criterion.`
         : !hasQ
         ? 'Normal absence of Q wave (rS morphology typical of right precordial leads V1-V2). QRS onset begins directly from baseline.'
         : 'Initial negative deflection of ventricular depolarization (physiologic septal depolarization left-to-right).'
@@ -340,7 +341,7 @@ export function getCycleLandmarks(lead: string, territoryId: string = 'normal', 
     code: 'J-Pt',
     timeSec: jPointTime,
     voltageMv: getEcgVoltage(lead, jPointTime, territoryId, bpm),
-    description: 'Junction point between QRS complex and ST segment. The exact anatomical point at which guideline ST elevation or depression is measured relative to PR segment baseline.'
+    description: 'Junction between the QRS complex and ST segment. Clinical ST measurement requires the selected guideline source and an approved reference-segment method.'
   });
 
   landmarks.push({
@@ -349,7 +350,7 @@ export function getCycleLandmarks(lead: string, territoryId: string = 'normal', 
     timeSec: stSegmentTime,
     voltageMv: getEcgVoltage(lead, stSegmentTime, territoryId, bpm),
     description: delta?.stElevationMm
-      ? `Acute ST deviation (${delta.stElevationMm > 0 ? '+' : ''}${delta.stElevationMm} mm) indicating transmural current of injury / ischemia.`
+      ? `Programmed ST deviation (${delta.stElevationMm > 0 ? '+' : ''}${delta.stElevationMm} mm) in this synthetic teaching waveform; this value is not an isolated-lead diagnostic finding.`
       : 'Plateau phase (phase 2) of ventricular action potential. Isoelectric in normal myocardium.'
   });
 
@@ -362,8 +363,12 @@ export function getCycleLandmarks(lead: string, territoryId: string = 'normal', 
       ? 'Normally inverted T wave in lead aVR reflecting repolarization away from right arm electrode.'
       : delta?.tInverted
       ? 'Symmetric T-wave inversion reflecting ischemic repolarization delay.'
-      : delta?.tWaveAmplitudeMm && delta.tWaveAmplitudeMm >= 6
-      ? 'Hyperacute tall T wave: earliest recognizable ECG sign of acute coronary occlusion.'
+      : territoryId === 'posterior' && delta?.tallRWave
+      ? 'Prominent upright T-wave morphology in an anterior reciprocal lead; interpret with the accompanying ST and QRS pattern.'
+      : territoryId === 'early_repolarization' && delta?.tWaveAmplitudeMm !== undefined
+      ? 'Prominent upright T wave can accompany benign early repolarization; it is not an acute coronary occlusion marker by itself.'
+      : delta?.tWaveAmplitudeMm !== undefined && delta.tWaveAmplitudeMm >= 6
+      ? 'Prominent T-wave amplitude in this synthetic acute-infarct scenario; assess for hyperacute morphology in the complete ECG and clinical context.'
       : 'Rapid ventricular repolarization (phase 3). Normal upright morphology concordant with main QRS vector.'
   });
 

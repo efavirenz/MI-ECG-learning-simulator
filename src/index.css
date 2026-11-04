@@ -14,10 +14,6 @@
   .supplemental-leads-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .rhythm-strip-canvas.rhythm-strip-canvas {
-    height: 220px;
-  }
 }
 
 @media (min-width: 900px) {

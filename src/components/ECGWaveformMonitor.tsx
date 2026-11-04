@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { MI_TERRITORIES } from '../data/miTerritories';
 import { getEcgVoltage } from '../utils/ecgGenerator';
+import { getEcgBaselineY, getEcgRecordingEndX, getEcgSweepX, getUnifiedEcgSmallBox, getWaveformVisualState, RHYTHM_STRIP_LEAD_IN_MM } from '../utils/ecgDisplay';
 import LeadDetailModal from './LeadDetailModal';
 import { useTheme } from '../context/ThemeContext';
 import {
@@ -106,19 +107,13 @@ export default function ECGWaveformMonitor({
         ...(showSupplemental ? supplementalLeads : [])
       ];
 
-      // Unified clinical calibration:
-      // Measure standard lead card width (Lead I or Lead II) to determine the unified millimeter scale.
-      // Standard 12-lead ECG calibration: 25 mm/s paper speed, 10 mm/mV gain.
-      // All leads (12-lead matrix, rhythm strip, supplemental leads) MUST share this identical millimeter scale
-      // so waveforms are never disproportionately shrunken or distorted across devices.
+      // Derive one shared model pixel/mm scale from a standard lead card.
+      // All standard, rhythm and supplemental leads share this gain and model paper speed.
       const stdCanvas = canvasRefs.current['I'] || canvasRefs.current['II'];
       const stdRect = stdCanvas?.getBoundingClientRect();
       const stdWidth = stdRect && stdRect.width > 0 ? stdRect.width : 0;
-      // In desktop 3x4 matrix (4 cols), standard lead width is ~240-300px -> ~4.2-5.0 px/mm.
-      // On mobile (1 col), standard lead width is ~340-390px -> ~5.0-5.8 px/mm.
-      // On tablet (4 cols), standard lead width is ~160-180px -> clamp to minimum 4.6 px/mm so waveforms are never compressed.
       const baseSmallBox = stdWidth > 0 ? (stdWidth / 60.0) : 4.8;
-      const unifiedSmallBox = Math.max(4.6, Math.min(5.6, baseSmallBox));
+      const unifiedSmallBox = Math.min(5.6, baseSmallBox);
 
       leadsToDraw.forEach(leadKey => {
         const canvas = canvasRefs.current[leadKey];
@@ -148,19 +143,13 @@ export default function ECGWaveformMonitor({
 
         // Standard 25 mm/s paper speed & 10 mm/mV voltage calibration
         // All leads share the unified scale so grid boxes and voltage gain are square and identical across leads
-        const smallBox = unifiedSmallBox;
+        // Preserve one common gain for every lead while ensuring at least 1.6 mV
+        // of vertical headroom on both sides of the isoelectric baseline.
+        // The previous lower-headroom-only placement clipped tall posterior R waves.
+        const smallBox = getUnifiedEcgSmallBox(unifiedSmallBox, h);
         const largeBox = smallBox * 5;
         const voltScale = smallBox * 10; // 1.0 mV = 10 mm = 10 small boxes
-
-        // Calibrated Anti-Clipping Baseline:
-        // Ensure at least 1.6 mV headroom below baseline for deep S waves (V1-V2: -1.45 mV)
-        // and at least 1.8 mV headroom above baseline for tall R waves (Lead II, V4, V5: +1.45 mV) + STEMI elevation.
-        const minHeadroomDown = 1.60 * voltScale;
-        let baselineRow = Math.max(1, Math.round((h * (isRhythmStrip ? 0.54 : 0.52)) / largeBox));
-        while (h - (baselineRow * largeBox) < minHeadroomDown && baselineRow > 1) {
-          baselineRow--;
-        }
-        const centerY = baselineRow * largeBox;
+        const centerY = getEcgBaselineY(h, smallBox);
 
         // 1. Draw Calibrated ECG Grid directly on canvas
         ctx.fillStyle = paperMode === 'paper' ? '#fff9f5' : '#0a0f1d';
@@ -204,10 +193,11 @@ export default function ECGWaveformMonitor({
         ctx.stroke();
         ctx.setLineDash([]);
 
-        // Rhythm strip calibration pulse lead-in: exactly 20.0 mm (4 large boxes = 0.80s = 1 complete cardiac cycle).
-        // Each canvas uses its own width for wrapping; the shared clock preserves physical sweep velocity, not wrap phase.
-        const stripLeadInMm = 20.0;
+        // The 20 mm lead-in contains the 1 mV / 0.20 s calibration pulse and connector.
+        // The sweep starts after the lead-in; the recording area ends on a whole 0.8 s cycle at 75 bpm.
+        const stripLeadInMm = RHYTHM_STRIP_LEAD_IN_MM;
         const stripLeadInPx = isRhythmStrip ? (stripLeadInMm * smallBox) : 0;
+        const recordingEndX = getEcgRecordingEndX(w, smallBox, isRhythmStrip ? stripLeadInMm : 0);
 
         const pulseX = smallBox * 2.5;
         const pulseW = largeBox;
@@ -231,6 +221,7 @@ export default function ECGWaveformMonitor({
 
         // Trace voltage sampler calibrated to exact 25 mm/s paper speed
         const getTraceVoltage = (x: number, territoryKey: string) => {
+          if (x > recordingEndX) return 0.0;
           if (isRhythmStrip && x < stripLeadInPx) {
             // Actively trace the 1.0 mV calibration pulse during lead-in
             if (x >= pulseX && x <= pulseX + pulseW) {
@@ -244,10 +235,10 @@ export default function ECGWaveformMonitor({
           return getEcgVoltage(actualLead, t, territoryKey, 75);
         };
 
-        // All canvases sweep at the same physical paper speed: 25 mm/s.
-        // Using the shared pixel/mm scale makes cursor velocity identical even when canvas widths differ.
-        // Each canvas wraps at its own physical width; different widths therefore have different wrap periods.
-        const sweepX = (timeRef.current * 25 * smallBox) % w;
+        // All canvases sweep at the same model paper speed: 25 mm/s.
+        // The shared pixel/mm model scale makes cursor velocity identical across canvas widths.
+        // The visible recording ends on a whole cardiac cycle; any residual width remains isoelectric.
+        const sweepX = getEcgSweepX(timeRef.current, smallBox, w, isRhythmStrip ? stripLeadInMm : 0);
         const eraseWidth = Math.max(14, w * 0.04);
 
         // Fixed 1.0 CSS pixel increment ensures rock-solid, jitter-free waveform rendering
@@ -271,16 +262,20 @@ export default function ECGWaveformMonitor({
           ctx.setLineDash([]);
         }
 
-        // Determine active waveform trace color
-        let activeColor = paperMode === 'paper' ? '#0f172a' : '#38bdf8';
-        let oldColor = paperMode === 'paper' ? 'rgba(15, 23, 42, 0.25)' : 'rgba(56, 189, 248, 0.25)';
-        if (delta?.stElevationMm && delta.stElevationMm > 0) {
-          activeColor = paperMode === 'paper' ? '#dc2626' : '#f87171'; // Red for ST elevation
-          oldColor = paperMode === 'paper' ? 'rgba(220, 38, 38, 0.25)' : 'rgba(248, 113, 113, 0.25)';
-        } else if ((delta?.stElevationMm && delta.stElevationMm < 0) || territory.reciprocalLeads.includes(actualLead)) {
-          activeColor = paperMode === 'paper' ? '#0284c7' : '#38bdf8'; // Cyan for ST depression / reciprocal
-          oldColor = paperMode === 'paper' ? 'rgba(2, 132, 199, 0.25)' : 'rgba(56, 189, 248, 0.25)';
-        }
+        // Distinguish ischemic elevation from ST-elevation mimics in both themes.
+        const visualState = getWaveformVisualState(
+          selectedTerritoryId,
+          delta?.stElevationMm,
+          territory.primaryLeads.includes(actualLead),
+          territory.reciprocalLeads.includes(actualLead)
+        );
+        const colorByState = {
+          'ischemic-elevation': paperMode === 'paper' ? ['#dc2626', 'rgba(220, 38, 38, 0.25)'] : ['#f87171', 'rgba(248, 113, 113, 0.25)'],
+          'mimic-elevation': paperMode === 'paper' ? ['#b45309', 'rgba(180, 83, 9, 0.25)'] : ['#fbbf24', 'rgba(251, 191, 36, 0.25)'],
+          'reciprocal-depression': paperMode === 'paper' ? ['#0284c7', 'rgba(2, 132, 199, 0.25)'] : ['#38bdf8', 'rgba(56, 189, 248, 0.25)'],
+          baseline: paperMode === 'paper' ? ['#0f172a', 'rgba(15, 23, 42, 0.25)'] : ['#38bdf8', 'rgba(56, 189, 248, 0.25)']
+        } as const;
+        const [activeColor, oldColor] = colorByState[visualState];
 
         // 3. Draw Previous Cycle Trace (Beyond erase gap ahead of sweep beam)
         if (sweepX + eraseWidth < w) {
@@ -397,6 +392,8 @@ export default function ECGWaveformMonitor({
           {/* Play / Pause - Theme Accent Highlight */}
           <button
             onClick={handleTogglePlay}
+            disabled={prefersReducedMotion}
+            title={prefersReducedMotion ? 'Playback disabled by reduced-motion preference' : 'Toggle ECG trace playback'}
             className={`px-3.5 py-1.5 ${theme.accentBg} ${theme.accentHoverBg} rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shadow`}
           >
             {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
@@ -520,7 +517,7 @@ export default function ECGWaveformMonitor({
                       {leadName}
                     </span>
                     {isPrimary && (
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-600 text-white animate-pulse">
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-600 text-white ${prefersReducedMotion ? '' : 'animate-pulse'}`}>
                         PRIMARY
                       </span>
                     )}
@@ -548,7 +545,7 @@ export default function ECGWaveformMonitor({
                 {/* Animated Lead Canvas */}
                 <canvas
                   ref={el => { canvasRefs.current[leadName] = el; }}
-                  className="w-full h-44 sm:h-48 block rounded"
+                  className="w-full h-48 sm:h-52 block rounded"
                   aria-hidden="true"
                 />
               </button>
@@ -561,7 +558,7 @@ export default function ECGWaveformMonitor({
           <div className="flex items-center justify-between mb-1.5 px-2">
             <span className="font-mono font-bold text-xs uppercase tracking-wider flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-slate-900 text-white border border-slate-700">
-                Lead II (Continuous Rhythm Strip • 25 mm/s • 10 mm/mV)
+                Lead II (Continuous Rhythm Strip • 25 mm/s model • 10 mm/mV model)
               </span>
               <span className="text-[11px] font-normal opacity-75 hidden sm:inline">
                 Evaluates baseline rhythm, P waves, PR interval, and underlying rate
@@ -582,8 +579,8 @@ export default function ECGWaveformMonitor({
             <canvas
               ref={el => { canvasRefs.current['II_RHYTHM'] = el; }}
               role="img"
-              aria-label="Lead II continuous rhythm strip, calibrated at 25 millimetres per second and 10 millimetres per millivolt"
-              className="rhythm-strip-canvas w-full h-44 sm:h-48 block rounded"
+              aria-label="Lead II continuous rhythm strip using 25 millimetres per second and 10 millimetres per millivolt model coordinates"
+              className="rhythm-strip-canvas w-full h-48 sm:h-52 block rounded"
             />
           </div>
         </div>
@@ -639,7 +636,7 @@ export default function ECGWaveformMonitor({
 
                     <canvas
                       ref={el => { canvasRefs.current[leadName] = el; }}
-                      className="w-full h-44 sm:h-48 block rounded"
+                      className="w-full h-48 sm:h-52 block rounded"
                       aria-hidden="true"
                     />
                   </button>

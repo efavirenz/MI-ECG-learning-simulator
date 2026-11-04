@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useState } from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import LeadDetailModal from './LeadDetailModal';
 
 function ModalHarness() {
@@ -44,6 +44,31 @@ describe('lead detail dialog accessibility', () => {
     const waveform = screen.getByRole('group', { name: /Magnified isolated-lead ECG waveform/ });
     waveform.focus();
     fireEvent.keyDown(waveform, { key: 'ArrowUp' });
-    expect(screen.getByLabelText('Measured ST deviation')).toHaveTextContent('+1.0 mm (0.10 mV)');
+    expect(screen.getByLabelText('Measured voltage relative to model reference')).toHaveTextContent('+1.0 mm (0.10 mV)');
+  });
+
+  it('respects the reduced-motion preference by disabling the live waveform sweep', () => {
+    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({
+      matches: true,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn()
+    }));
+    render(
+      <LeadDetailModal lead="II" territoryId="normal" paperMode="dark" onClose={() => undefined} />
+    );
+    expect(screen.getByRole('button', { name: 'Live Sweep' })).toBeDisabled();
+    vi.unstubAllGlobals();
+  });
+
+  it('disables caliper feedback for pericarditis until a validated reference method is approved', () => {
+    render(
+      <LeadDetailModal lead="II" territoryId="pericarditis" paperMode="dark" onClose={() => undefined} />
+    );
+    const waveform = screen.getByRole('group', { name: /Magnified isolated-lead ECG waveform/ });
+    waveform.focus();
+    fireEvent.keyDown(waveform, { key: 'ArrowUp' });
+    expect(screen.getByText(/Measurement feedback is disabled for this territory/)).toBeInTheDocument();
+    expect(screen.queryByText(/Active Voltage Measurement/)).not.toBeInTheDocument();
+    expect(screen.getByText(/TP reference \(0.00 mV\)/)).toBeInTheDocument();
   });
 });

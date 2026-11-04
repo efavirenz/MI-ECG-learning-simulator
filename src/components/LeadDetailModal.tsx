@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { MI_TERRITORIES } from '../data/miTerritories';
-import { getCycleLandmarks, getEcgVoltage } from '../utils/ecgGenerator';
+import { getCycleLandmarks, getEcgVoltage, getPrSegmentDisplacementMv } from '../utils/ecgGenerator';
+import { getWaveformVisualState } from '../utils/ecgDisplay';
 import { X, ZoomIn, Info, CheckCircle2, Sliders, AlertTriangle, Play, Pause, RotateCcw } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
@@ -30,11 +31,29 @@ export default function LeadDetailModal({
   const [caliper, setCaliper] = useState<CaliperMeasurement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [sweepTime, setSweepTime] = useState(0);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   const animRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updatePreference = () => setPrefersReducedMotion(mediaQuery.matches);
+    updatePreference();
+    mediaQuery.addEventListener('change', updatePreference);
+    return () => mediaQuery.removeEventListener('change', updatePreference);
+  }, []);
+
+  useEffect(() => {
+    if (prefersReducedMotion) setIsPlaying(false);
+  }, [prefersReducedMotion]);
+
+  useEffect(() => {
+    setCaliper(null);
+  }, [lead, territoryId]);
 
   useEffect(() => {
     const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -83,7 +102,7 @@ export default function LeadDetailModal({
   const landmarks = getCycleLandmarks(lead, territoryId, 75);
   const activeLandmark = landmarks.find(l => l.code === activeLandmarkCode) || landmarks[0];
 
-  const prDisplacementMv = territoryId === 'pericarditis' && ['II', 'III', 'aVF', 'V5', 'V6'].includes(lead) ? -0.06 : territoryId === 'pericarditis' && lead === 'aVR' ? 0.06 : 0;
+  const prDisplacementMv = getPrSegmentDisplacementMv(lead, territoryId);
   const caliperReferenceY = 200 - prDisplacementMv * 100;
   const measurementEnabled = territoryId !== 'pericarditis';
 
@@ -208,12 +227,14 @@ export default function LeadDetailModal({
   const isPrimary = territory.primaryLeads.includes(lead);
   const isReciprocal = territory.reciprocalLeads.includes(lead);
 
-  const activeColor =
-    (delta?.stElevationMm && delta.stElevationMm > 0) || (isPrimary && territoryId !== 'normal')
-      ? (paperMode === 'paper' ? '#dc2626' : '#f87171')
-      : (delta?.stElevationMm && delta.stElevationMm < 0) || (isReciprocal && territoryId !== 'normal')
-      ? (paperMode === 'paper' ? '#0284c7' : '#38bdf8')
-      : (paperMode === 'paper' ? '#0f172a' : '#38bdf8');
+  const visualState = getWaveformVisualState(territoryId, delta?.stElevationMm, isPrimary, isReciprocal);
+  const activeColor = visualState === 'ischemic-elevation'
+    ? (paperMode === 'paper' ? '#dc2626' : '#f87171')
+    : visualState === 'mimic-elevation'
+    ? (paperMode === 'paper' ? '#b45309' : '#fbbf24')
+    : visualState === 'reciprocal-depression'
+    ? (paperMode === 'paper' ? '#0284c7' : '#38bdf8')
+    : (paperMode === 'paper' ? '#0f172a' : '#38bdf8');
 
   const unsweptColor = paperMode === 'paper' ? '#94a3b8' : '#64748b';
 
@@ -270,7 +291,7 @@ export default function LeadDetailModal({
                 Lead {lead} Magnified Waveform Analysis
               </h2>
               <span className={`text-xs ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
-                Pattern: <strong className={theme.accentText}>{territory.name}</strong> • Calibrated 25 mm/s • 10 mm/mV (1:1 Square Grid)
+                Pattern: <strong className={theme.accentText}>{territory.name}</strong> • Model scale: 25 mm/s • 10 mm/mV (square grid; screen size is not physically calibrated)
               </span>
             </div>
           </div>
@@ -279,6 +300,8 @@ export default function LeadDetailModal({
             {/* Live Animation Toggle Button */}
             <button
               onClick={() => setIsPlaying(!isPlaying)}
+              disabled={prefersReducedMotion}
+              title={prefersReducedMotion ? 'Live sweep disabled by reduced-motion preference' : 'Toggle live sweep'}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition flex items-center gap-1.5 ${
                 isPlaying
                   ? `${theme.accentBg} ${theme.accentHoverBg} shadow`
@@ -341,10 +364,10 @@ export default function LeadDetailModal({
             {/* Calibration Legend */}
             <div className="absolute top-2 left-4 z-10 flex items-center gap-4 text-[11px] font-mono pointer-events-none">
               <span className={paperMode === 'paper' ? 'text-rose-900 font-bold' : 'text-slate-300'}>
-                Paper Speed: 25 mm/s (1 small box = 0.04s)
+                Model paper speed: 25 mm/s (1 small box = 0.04s)
               </span>
               <span className={paperMode === 'paper' ? 'text-rose-900 font-bold' : 'text-slate-300'}>
-                Voltage: 10 mm/mV (1 small box = 0.1 mV / 1 mm)
+                Model gain: 10 mm/mV (1 small box = 0.1 mV / 1 model mm)
               </span>
             </div>
 
@@ -352,9 +375,9 @@ export default function LeadDetailModal({
             <svg
               viewBox="0 0 720 360"
               role="group"
-              aria-label="Magnified isolated-lead ECG waveform measurement aid. Focus this diagram and use the up and down arrow keys to move the caliper in 1 millimetre increments. This view cannot diagnose STEMI."
+              aria-label={measurementEnabled ? 'Magnified isolated-lead ECG waveform measurement aid. Focus this diagram and use the up and down arrow keys to move the caliper in 1 millimetre increments. This view cannot diagnose STEMI.' : 'Magnified isolated-lead ECG waveform. Caliper measurement is disabled for pericarditis pending an approved reference-segment method.'}
               tabIndex={0}
-              className="w-full h-auto cursor-crosshair block touch-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-500"
+              className={`w-full h-auto ${measurementEnabled ? 'cursor-crosshair' : 'cursor-default'} block touch-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-500`}
               onKeyDown={(event) => {
                 if (!measurementEnabled || (event.key !== 'ArrowUp' && event.key !== 'ArrowDown')) return;
                 event.preventDefault();
@@ -455,8 +478,14 @@ export default function LeadDetailModal({
                 fontWeight="700"
                 opacity="0.9"
               >
-                0.0 mV Model Reference
+                {prDisplacementMv < 0 ? `PR model reference (${prDisplacementMv.toFixed(2)} mV)` : prDisplacementMv > 0 ? `PR model reference (+${prDisplacementMv.toFixed(2)} mV)` : '0.0 mV Model Reference'}
               </text>
+              {territoryId === 'pericarditis' && (
+                <g>
+                  <line x1="10" y1="200" x2="710" y2="200" stroke={paperMode === 'paper' ? '#64748b' : '#94a3b8'} strokeWidth="1" strokeDasharray="2,4" opacity="0.8" />
+                  <text x="705" y="230" textAnchor="end" fill={paperMode === 'paper' ? '#475569' : '#cbd5e1'} fontSize="8.5" fontWeight="700">TP reference (0.00 mV)</text>
+                </g>
+              )}
               <text
                 x="705"
                 y="215"
@@ -466,7 +495,7 @@ export default function LeadDetailModal({
                 fontWeight="700"
                 opacity="0.9"
               >
-                Model Reference (0 mV)
+                {prDisplacementMv === 0 ? 'Model Reference (0 mV)' : 'PR-segment model reference'}
               </text>
 
               {/* Standard Calibration Pulse (10 mm = 1.0 mV high = 100px, 0.20s = 5 mm wide = 50px) */}
@@ -572,7 +601,7 @@ export default function LeadDetailModal({
                     fill="none"
                     stroke={paperMode === 'paper' ? 'rgba(234, 88, 12, 0.4)' : 'rgba(34, 211, 238, 0.6)'}
                     strokeWidth="1.8"
-                    className="animate-pulse"
+                    className={prefersReducedMotion ? '' : 'animate-pulse'}
                   />
                 </g>
               )}
@@ -610,7 +639,7 @@ export default function LeadDetailModal({
                         fill="none"
                         stroke="#fbbf24"
                         strokeWidth="2"
-                        className="animate-pulse"
+                        className={prefersReducedMotion ? '' : 'animate-pulse'}
                       />
                     )}
                     <circle
@@ -713,11 +742,11 @@ export default function LeadDetailModal({
           }`}>
             <div className="flex flex-wrap items-center gap-2">
               <span className={`font-semibold ${isBright ? 'text-slate-800' : 'text-slate-300'}`}>
-                {caliper !== null ? 'Active Caliper Measurement:' : 'Programmed J-Point Deviation:'}
+                {caliper !== null ? 'Active Voltage Measurement:' : 'Programmed J-Point Level (TP reference):'}
               </span>
               <span
                 aria-live="polite"
-                aria-label="Measured ST deviation"
+                aria-label="Measured voltage relative to model reference"
                 className={`font-mono font-bold px-2 py-0.5 rounded text-xs ${
                   activeDev > 0
                     ? 'bg-rose-950 text-rose-300 border border-rose-800'
@@ -808,11 +837,11 @@ export default function LeadDetailModal({
               <p className={isBright ? 'text-slate-700' : 'text-slate-300'}>
                 {territory.primaryLeads.includes(lead) ? (
                   <span className="text-rose-600 dark:text-rose-400 font-bold flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> PRIMARY contiguous injury lead (ST elevation).
+                    <CheckCircle2 className="w-3.5 h-3.5" /> {territoryId === 'pericarditis' || territoryId === 'early_repolarization' ? 'PRIMARY ST-elevation mimic lead.' : 'PRIMARY territory lead (programmed ST elevation).'}
                   </span>
                 ) : territory.reciprocalLeads.includes(lead) ? (
                   <span className="text-cyan-600 dark:text-cyan-400 font-bold flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> RECIPROCAL mirror injury lead (ST depression / reciprocal changes).
+                    <CheckCircle2 className="w-3.5 h-3.5" /> RECIPROCAL change lead (ST depression / reciprocal changes).
                   </span>
                 ) : (
                   <span className={isBright ? 'text-slate-500' : 'text-slate-400'}>
@@ -822,7 +851,7 @@ export default function LeadDetailModal({
               </p>
               {delta?.stElevationMm !== undefined && delta.stElevationMm !== 0 && (
                 <div className={`mt-1 font-medium ${isBright ? 'text-slate-900' : 'text-slate-200'}`}>
-                  Target ST Deviation: <strong className={isBright ? 'text-slate-900' : 'text-white'}>{delta.stElevationMm > 0 ? '+' : ''}{delta.stElevationMm} mm ({(delta.stElevationMm * 0.1).toFixed(2)} mV)</strong> ({delta.stSlope || (delta.stElevationMm > 0 ? 'convex' : 'horizontal')}).
+                  Programmed J-Point Level (TP reference): <strong className={isBright ? 'text-slate-900' : 'text-white'}>{delta.stElevationMm > 0 ? '+' : ''}{delta.stElevationMm} mm ({(delta.stElevationMm * 0.1).toFixed(2)} mV)</strong> ({delta.stSlope || (delta.stElevationMm > 0 ? 'convex' : 'horizontal')}).
                 </div>
               )}
             </div>
@@ -834,7 +863,7 @@ export default function LeadDetailModal({
                 Caliper & J-Point Measurement Guide:
               </span>
               <p className={`leading-snug ${isBright ? 'text-slate-700' : 'text-slate-300'}`}>
-                Click the ECG grid to measure voltage relative to the synthetic model's 0 mV reference. In pericarditis, the model displays PR-segment displacement; this reference is not a validated clinical PR/TP baseline method.
+                {measurementEnabled ? 'Click the ECG grid to measure voltage relative to the synthetic model reference. This is a teaching measurement, not a clinical ST measurement.' : 'Measurement is disabled for pericarditis. The graphic distinguishes the displaced PR-segment model reference from the isoelectric TP reference; this is not a validated clinical measurement method.'}
               </p>
               <div className={`text-[11px] pt-1 ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
                 Clinical J-point measurement requires an approved reference-segment method. This synthetic teaching caliper does not implement a validated PR/TP fallback and must not be used for clinical interpretation.

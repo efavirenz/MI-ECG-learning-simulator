@@ -39,7 +39,7 @@ $$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrig
   - Extensive Anterior / Tombstone (V1–V6, I, aVL, proximal LAD / Left Main)
   - Lateral (I, aVL, V5, V6, LCx or diagonal LAD)
   - High Lateral (I, aVL, 1st diagonal LAD or OM1, reciprocal II, III, aVF)
-  - Inferior (II, III, aVF, RCA ~85% or LCx ~15%, reciprocal I, aVL)
+  - Inferior (II, III, aVF; RCA or LCx depending on coronary dominance; reciprocal I and aVL)
   - Posterior (V7–V9, reciprocal horizontal ST depression & tall R in V1–V3)
   - Right Ventricular (V3R, V4R, proximal RCA)
 - **Clinical Clarification**: Explains coronary dominance and highlights lead findings as typical and supportive rather than an absolute isolated geometry.
@@ -47,11 +47,12 @@ $$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrig
 ### 4. Calibrated ECG Waveform Simulator
 - **Standard Clinical Layout**: $3 \times 4$ layout (I, II, III; aVR, aVL, aVF; V1, V2, V3; V4, V5, V6) plus a continuous Lead II rhythm strip.
 - **Supplemental Leads Toggle**: View V3R, V4R, V7, V8, V9.
-- **Clinical Grid Standards**: Calibrated to $25\text{ mm/s}$ paper speed and $10\text{ mm/mV}$ voltage calibration with $1.0\text{ mV}$ calibration pulse.
+- **ECG Grid Model**: Uses 25 mm/s and 10 mm/mV model coordinates with a 1.0 mV calibration pulse. The browser display is not physically calibrated to millimetres; treat these as internal teaching coordinates.
+- **Waveform Scenarios**: Synthetic morphology for all 17 standard/supplemental leads across 12 configured baseline, infarct-territory and STEMI-mimic scenarios. Regression checks cover waveform continuity, programmed J-point levels, display headroom and landmark consistency. These checks do not constitute independent clinical validation.
 - **Animation Controls**: Real-time continuous sweep beam, play/pause, speed controls ($0.5\times$, $1.0\times$, $2.0\times$), reset.
 - **Dual Display Modes**: Modern Dark Clinical Monitor vs Pink ECG Paper.
 - **Normal Overlay Comparison**: Displays normal baseline morphology as a dashed line behind the active pathological waveform.
-- **Magnified Single-Lead Analysis Modal**: Click any lead to inspect P, PR segment, Q, R, S, J point, ST segment, T wave, and measure synthetic waveform deviation. This is a teaching aid only; it cannot diagnose or exclude STEMI. Pericarditis PR/TP baseline measurement remains subject to clinical approval.
+- **Magnified Single-Lead Analysis Modal**: Click any lead to inspect P, PR segment, Q, R, S, J point, ST segment and T wave. Landmark values are generated from the same waveform model as the live monitor. The caliper measures a selected sample relative to the model reference, not necessarily ST deviation; pericarditis caliper feedback is disabled while its clinical reference method remains unapproved. This view cannot diagnose or exclude STEMI.
 
 ### 5. Clinical Criteria, STEMI Mimics & Equivalents
 - **Guideline Diagnostic Thresholds**: 2025 ACC/AHA and 2023 ESC criteria by age and sex (including V2–V3 specific cutoffs).
@@ -71,7 +72,7 @@ $$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrig
 
 ## Release Identifier Convention
 
-The visible simulator release (for example, v6.1) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
+The visible simulator release (for example, v6.2) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
 
 ## 🛠️ Technology Stack
 
@@ -138,6 +139,17 @@ npm run preview
 ---
 
 ## 📝 Update History & Changelog
+
+### [v6.2] [2026-11-04] — ECG Waveform Model & Magnified Analysis Corrections
+- **Waveform timing**: corrected the synthetic P-wave duration to 110 ms and aligned the PR-segment landmark with the modeled interval.
+- **Mimic visualization**: distinguished pericarditis and benign early repolarization from ischemic ST elevation with a separate trace state in both live and magnified views.
+- **Scenario coverage**: regression checks exercise all 17 leads across all 12 configured baseline, infarct-territory and STEMI-mimic scenarios.
+- **Sweep phase continuity**: standard, rhythm and supplemental traces now wrap only after a whole number of 0.8 s reference cycles; any residual canvas width remains isoelectric. The Lead II strip starts after its 20 mm calibration lead-in and uses the available canvas width for complete cycles.
+- **Canvas clipping**: centered the shared isoelectric baseline and constrained the common gain to preserve vertical headroom for tall positive and deep negative complexes across the lead set.
+- **Pericarditis graphics**: extended modeled PR displacement across the diffuse lead set, retained reciprocal aVR displacement, and explicitly distinguished the TP reference from the displaced PR reference in the magnified view.
+- **Landmark and measurement labels**: removed unsupported pathological-Q duration claims and clarified that arbitrary caliper samples measure voltage relative to the model reference, not necessarily ST deviation.
+- **Regression coverage**: expanded data-integrity tests across every configured lead and territory for J-point targets, periodicity, voltage bounds, P-wave timing and pericarditis PR displacement.
+- **Clinical boundary**: these are synthetic educational waveforms. The new regression tests verify implementation consistency, not independent clinical validation of every disease pattern or patient ECG.
 
 ### [v6.1] [2026-11-04] — Clinical Review Corrective Actions & Diagnostic Safety
 - **Isolated-lead interpretation safety**: removed per-lead diagnostic pass/fail verdicts; the magnified lead view now identifies itself as a measurement aid only.

@@ -1,6 +1,6 @@
-# AGENTS.md — Development & Clinical Guidelines for AI Agents (Release v6.1)
+# AGENTS.md — Development & Clinical Guidelines for AI Agents (Release v6.2)
 
-This document defines the architecture, project conventions, and clinical accuracy standards for AI agents contributing to the **Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator (v6.1)**.
+This document defines the architecture, project conventions, and clinical accuracy standards for AI agents contributing to the **Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator (v6.2)**.
 
 ---
 
@@ -11,7 +11,7 @@ This document defines the architecture, project conventions, and clinical accura
 - **Audience**: Registered Nurses, Paramedics/EMTs, Emergency and Critical Care staff, and Medical Trainees.
 - **Language**: English throughout all user-facing strings, labels, ECG annotations, and references.
 - **Patient Population**: Adult cardiology only.
-- **Release identifiers**: the visible simulator release label (v6.1 and future v6.x releases) is maintained separately from the private npm package metadata version (`1.0.0`); do not automatically synchronize them.
+- **Release identifiers**: the visible simulator release label (v6.2 and future v6.x releases) is maintained separately from the private npm package metadata version (`1.0.0`); do not automatically synchronize them.
 
 ---
 
@@ -55,7 +55,8 @@ MI-ECG-learning-simulator/
     │   ├── themes.ts            # 10 clinical UI themes (5 bright + 5 dark) and styling tokens
     │   └── clinicalDataIntegrity.test.ts # Structural regression tests for educational data
     ├── utils/
-    │   ├── ecgGenerator.ts      # Mathematical ECG synthesizer & landmark calculator
+    │   ├── ecgGenerator.ts      # Synthetic ECG voltage model & landmark calculator
+    │   ├── ecgDisplay.ts        # Shared canvas gain, baseline, sweep and waveform visual-state helpers
     │   ├── themeStorage.ts      # Safe, validated local theme persistence
     │   └── themeStorage.test.ts # Theme storage resilience tests
     ├── test/
@@ -104,8 +105,10 @@ MI-ECG-learning-simulator/
 ### Rule 3 — Electrophysiological Calibration Standards
 - **Paper Speed**: Standard is $25\text{ mm/s}$ ($1\text{ mm small box} = 0.04\text{ s} = 40\text{ ms}$; $5\text{ mm large box} = 0.20\text{ s} = 200\text{ ms}$).
 - **Voltage Calibration**: Standard is $10\text{ mm/mV}$ ($1\text{ mm small box} = 0.1\text{ mV}$; $10\text{ mm} = 1.0\text{ mV}$).
-- All canvas and SVG waveform renderings must align with these grid measurements.
-- **Anti-Clipping & Margin Standards**: Waveform monitors must provide sufficient vertical headroom for tall R waves (Lead II, V4, V5 up to $1.45\text{ mV}$ + STEMI ST elevation) and deep S waves (V1, V2 down to $-1.45\text{ mV}$). Lead II continuous rhythm strips must have proportional canvas height and width-adjusted duration so waveforms never exceed canvas boundaries.
+- Canvas and SVG coordinates must preserve the same model time/voltage ratios and square grid boxes; browser CSS pixels are not a physical millimetre calibration.
+- **Synthetic timing contract**: the reference cycle is 0.8 s at 75 bpm; the current model uses a 110 ms P wave, 200 ms PR interval, 105 ms QRS complex and a T wave ending at 680 ms. These are schematic model parameters, not a substitute for patient-derived ECG validation or a clinical normal-range claim.
+- **Anti-Clipping & Margin Standards**: Standard, rhythm and supplemental canvases must share one gain and preserve at least 1.6 mV headroom on both sides of the baseline. The Lead II rhythm-strip sweep begins after its calibration pulse and connector, not at the canvas origin. Every canvas trace must end and wrap on a whole reference cycle to avoid phase discontinuity at the edge.
+- **Trace colour semantics**: ischemic ST elevation, ST-elevation mimics (pericarditis/early repolarization), reciprocal depression and baseline morphology must remain visually distinguishable.
 
 ### Rule 4 — Mandatory Clinical Safety Warnings
 - **Mason-Likar Torso Modification**: Always document that moving limb electrodes to the torso alters frontal axis and produces pseudo-Q waves; it is valid for telemetry but non-diagnostic for STEMI.
@@ -138,7 +141,7 @@ git status
 Ensure build exits with code 0 and no console warnings.
 
 ---
-*Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator • Release v6.1*
+*Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator • Release v6.2*
 
 **Clinical review gate:** High-severity findings remain release blockers until a qualified clinical/model owner approves the source-specific medication wording, multi-lead criteria, posterior MI framework, Q-wave criterion/model semantics, and PR/J-point reference policy. Numeric V3R/V4R claims, Wellens/aVL statistics, and De Winter source details remain omitted until primary-source provenance and reviewer approval are recorded. LVH/LBBB is displayed as an interpretation limitation only; no modified threshold is implemented.
 
