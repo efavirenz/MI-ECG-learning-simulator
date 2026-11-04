@@ -69,8 +69,8 @@ export default function SupplementalLeadsModule() {
           {/* Clinical Rationale Alert Cards (Dark text on light background in bright mode) */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
             <div className={`p-4 rounded-xl border space-y-1.5 ${
-              isBright 
-                ? 'bg-cyan-50 border-cyan-200 text-slate-800' 
+              isBright
+                ? 'bg-cyan-50 border-cyan-200 text-slate-800'
                 : 'bg-cyan-950/40 border-cyan-500/40 text-slate-200'
             }`}>
               <span className={`font-bold uppercase tracking-wide block text-[11px] ${
@@ -87,8 +87,8 @@ export default function SupplementalLeadsModule() {
             </div>
 
             <div className={`p-4 rounded-xl border space-y-1.5 ${
-              isBright 
-                ? 'bg-red-50 border-red-200 text-slate-800' 
+              isBright
+                ? 'bg-red-50 border-red-200 text-slate-800'
                 : 'bg-rose-950/40 border-rose-500/40 text-slate-200'
             }`}>
               <span className={`font-bold uppercase tracking-wide block text-[11px] flex items-center gap-1 ${
@@ -100,13 +100,13 @@ export default function SupplementalLeadsModule() {
                 Avoid nitroglycerin in suspected RV infarction; do not apply a blanket prohibition to all medication classes.
               </p>
               <p className={`text-[11px] ${isBright ? 'text-slate-700' : 'text-slate-300'}`}>
-                The teaching should distinguish drug classes. Morphine is not universally contraindicated and, if considered for pain resistant to other maximally tolerated anti-ischaemic medication, requires the cited guideline context and monitoring. Diuretic use depends on haemodynamic and volume status. Follow the approved local protocol; qualified clinical wording is pending review.
+                Morphine is not universally contraindicated and, if considered for pain resistant to other maximally tolerated anti-ischaemic medication, requires the cited guideline context and monitoring. Diuretic use depends on haemodynamic and volume status.
               </p>
             </div>
 
             <div className={`p-4 rounded-xl border space-y-1.5 ${
-              isBright 
-                ? 'bg-emerald-50 border-emerald-200 text-slate-800' 
+              isBright
+                ? 'bg-emerald-50 border-emerald-200 text-slate-800'
                 : 'bg-emerald-950/40 border-emerald-500/40 text-slate-200'
             }`}>
               <span className={`font-bold uppercase tracking-wide block text-[11px] ${
@@ -115,10 +115,10 @@ export default function SupplementalLeadsModule() {
                 Interpretation Guardrail:
               </span>
               <p className="font-semibold leading-relaxed">
-                Assess the right-sided tracing with the full clinical and ECG context; no numeric threshold is presented here pending primary-source review.
+                Assess the right-sided tracing with the full clinical and ECG context.
               </p>
               <p className={`text-[11px] ${isBright ? 'text-slate-600' : 'text-slate-400'}`}>
-                Acquire supplemental right-sided leads promptly when RV involvement is suspected. Numeric sensitivity and fading-time claims are omitted pending primary-source review.
+                Acquire supplemental right-sided leads promptly when RV involvement is suspected.
               </p>
             </div>
           </div>
@@ -138,8 +138,8 @@ export default function SupplementalLeadsModule() {
           {/* Clinical Rationale Alert Cards (Dark text on light background in bright mode) */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
             <div className={`p-4 rounded-xl border space-y-1.5 ${
-              isBright 
-                ? 'bg-amber-50 border-amber-200 text-slate-800' 
+              isBright
+                ? 'bg-amber-50 border-amber-200 text-slate-800'
                 : 'bg-amber-950/40 border-amber-500/40 text-slate-200'
             }`}>
               <span className={`font-bold uppercase tracking-wide block text-[11px] ${
@@ -156,8 +156,8 @@ export default function SupplementalLeadsModule() {
             </div>
 
             <div className={`p-4 rounded-xl border space-y-1.5 ${
-              isBright 
-                ? 'bg-indigo-50 border-indigo-200 text-slate-800' 
+              isBright
+                ? 'bg-indigo-50 border-indigo-200 text-slate-800'
                 : 'bg-indigo-950/40 border-indigo-500/40 text-slate-200'
             }`}>
               <span className={`font-bold uppercase tracking-wide block text-[11px] ${
@@ -174,8 +174,8 @@ export default function SupplementalLeadsModule() {
             </div>
 
             <div className={`p-4 rounded-xl border space-y-1.5 ${
-              isBright 
-                ? 'bg-emerald-50 border-emerald-200 text-slate-800' 
+              isBright
+                ? 'bg-emerald-50 border-emerald-200 text-slate-800'
                 : 'bg-emerald-950/40 border-emerald-500/40 text-slate-200'
             }`}>
               <span className={`font-bold uppercase tracking-wide block text-[11px] ${
