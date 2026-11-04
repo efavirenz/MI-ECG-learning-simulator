@@ -83,6 +83,10 @@ export default function LeadDetailModal({
   const landmarks = getCycleLandmarks(lead, territoryId, 75);
   const activeLandmark = landmarks.find(l => l.code === activeLandmarkCode) || landmarks[0];
 
+  const prDisplacementMv = territoryId === 'pericarditis' && ['II', 'III', 'aVF', 'V5', 'V6'].includes(lead) ? -0.06 : territoryId === 'pericarditis' && lead === 'aVR' ? 0.06 : 0;
+  const caliperReferenceY = 200 - prDisplacementMv * 100;
+  const measurementEnabled = territoryId !== 'pericarditis';
+
   // Calibrated Clinical Coordinate System:
   // ViewBox: 0 0 720 360
   // Standard calibration: 10 mm/mV -> 1 mm = 0.1 mV = 10 px; 10 mm = 1.0 mV = 100 px.
@@ -213,86 +217,10 @@ export default function LeadDetailModal({
 
   const unsweptColor = paperMode === 'paper' ? '#94a3b8' : '#64748b';
 
-  // Clinical guideline criteria evaluator for this lead
-  const getClinicalThresholdEvaluation = (deviationMm: number) => {
-    // 1. STEMI Mimic: Acute Pericarditis
-    if (territoryId === 'pericarditis') {
-      if (lead === 'aVR') {
-        if (deviationMm <= -0.5) {
-          return { meets: true, text: 'Meets Acute Pericarditis criteria (reciprocal ST depression and PR elevation in aVR; hallmark of subepicardial atrial injury).' };
-        }
-        return { meets: true, text: 'Reciprocal lead aVR in Acute Pericarditis: typically displays PR elevation and ST depression.' };
-      }
-      if (deviationMm >= 0.5) {
-        return { meets: true, text: 'Meets Acute Pericarditis criteria (widespread concave "saddleback" ST elevation with PR depression; distinguishes from localized convex STEMI).' };
-      }
-      return { meets: false, text: 'ST segment deviation below pericarditis threshold in this lead.' };
-    }
-
-    // 2. STEMI Mimic: Benign Early Repolarization (BER)
-    if (territoryId === 'early_repolarization') {
-      if (deviationMm >= 0.5) {
-        return { meets: true, text: 'Benign Early Repolarization (normal variant): concave ST elevation with characteristic J-point notching / fishhook slur and absence of reciprocal ST depression.' };
-      }
-      return { meets: false, text: 'Within physiological baseline limits for Benign Early Repolarization.' };
-    }
-
-    // 3. Normal Baseline
-    if (territoryId === 'normal') {
-      if (Math.abs(deviationMm) < 0.5) {
-        return { meets: true, text: 'Normal isoelectric baseline (< 0.5 mm physiological deviation relative to PR segment baseline).' };
-      }
-      return { meets: false, text: `Measured ${deviationMm > 0 ? '+' : ''}${deviationMm} mm deviation from normal isoelectric PR baseline.` };
-    }
-
-    // 4. Precordial leads V2 - V3
-    if (lead === 'V2' || lead === 'V3') {
-      if (deviationMm >= 2.5) {
-        return { meets: true, text: 'Meets STEMI criteria for Men < 40 (≥ 2.5 mm), Men ≥ 40 (≥ 2.0 mm), and Women (≥ 1.5 mm).' };
-      } else if (deviationMm >= 2.0) {
-        return { meets: true, text: 'Meets STEMI criteria for Men ≥ 40 (≥ 2.0 mm) and Women (≥ 1.5 mm).' };
-      } else if (deviationMm >= 1.5) {
-        return { meets: true, text: 'Meets STEMI criteria for Women of all ages (≥ 1.5 mm).' };
-      } else if (deviationMm <= -0.5) {
-        return { meets: true, text: 'Meets Posterior STEMI reciprocal criteria (≥ 0.5 mm ST depression in V1–V3; verify in V7–V9!).' };
-      } else {
-        return { meets: false, text: 'Below precordial V2-V3 STEMI cutoffs (≥1.5 mm Women, ≥2.0 mm Men ≥40, ≥2.5 mm Men <40).' };
-      }
-    } else if (lead === 'V1') {
-      if (deviationMm >= 1.0) {
-        return { meets: true, text: 'Meets Septal / RV STEMI criteria (≥ 1.0 mm ST elevation in V1).' };
-      } else if (deviationMm <= -0.5) {
-        return { meets: true, text: 'Meets Posterior STEMI reciprocal criteria (≥ 0.5 mm ST depression in V1; verify in V7–V9!).' };
-      }
-      return { meets: false, text: 'Within normal limits (< 1.0 mm ST deviation in V1).' };
-    } else if (['V3R', 'V4R'].includes(lead)) {
-      if (deviationMm >= 0.5) {
-        return { meets: true, text: 'Meets Right-Sided STEMI criteria (≥ 0.5 mm ST elevation; ≥ 1.0 mm in men < 30).' };
-      }
-      return { meets: false, text: 'Below right-sided lead cutoff (≥ 0.5 mm).' };
-    } else if (['V7', 'V8', 'V9'].includes(lead)) {
-      if (deviationMm >= 0.5) {
-        return { meets: true, text: 'Meets Posterior STEMI criteria (≥ 0.5 mm ST elevation in supplemental V7–V9).' };
-      }
-      return { meets: false, text: 'Below posterior supplemental cutoff (≥ 0.5 mm).' };
-    } else if (lead === 'aVR') {
-      if (deviationMm >= 1.0) {
-        return { meets: true, text: 'Meets Left Main / Proximal LAD occlusion criteria (ST elevation in aVR ≥ 1.0 mm with multi-lead ST depression).' };
-      }
-      return { meets: false, text: 'Within normal baseline limits in lead aVR.' };
-    } else {
-      if (deviationMm >= 1.0) {
-        return { meets: true, text: 'Meets standard STEMI criteria (≥ 1.0 mm ST elevation in ≥ 2 contiguous leads).' };
-      } else if (deviationMm <= -1.0) {
-        return { meets: true, text: 'Significant reciprocal ST depression (≥ 1.0 mm mirror image injury).' };
-      }
-      return { meets: false, text: 'Within normal limits (< 1.0 mm standard threshold).' };
-    }
-  };
-
-  const currentDev = delta?.stElevationMm || 0;
+  // This magnified view is an isolated-lead measurement aid, not a diagnostic rule engine.
+  // No single lead can establish or exclude STEMI or an ACS equivalent.
+  const currentDev = delta?.stElevationMm ?? 0;
   const activeDev = caliper !== null ? caliper.mm : currentDev;
-  const evalResult = getClinicalThresholdEvaluation(activeDev);
 
   // SVG grid lines definition (perfect 10px squares minor; 50px squares major)
   const minorYLines: number[] = [];
@@ -424,36 +352,38 @@ export default function LeadDetailModal({
             <svg
               viewBox="0 0 720 360"
               role="group"
-              aria-label="Magnified ECG waveform. Focus this diagram and use the up and down arrow keys to move the caliper in 1 millimetre increments."
+              aria-label="Magnified isolated-lead ECG waveform measurement aid. Focus this diagram and use the up and down arrow keys to move the caliper in 1 millimetre increments. This view cannot diagnose STEMI."
               tabIndex={0}
               className="w-full h-auto cursor-crosshair block touch-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-500"
               onKeyDown={(event) => {
-                if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+                if (!measurementEnabled || (event.key !== 'ArrowUp' && event.key !== 'ArrowDown')) return;
                 event.preventDefault();
-                const currentY = caliper?.y ?? 200;
+                const currentY = caliper?.y ?? caliperReferenceY;
                 const nextY = Math.max(0, Math.min(360, currentY + (event.key === 'ArrowUp' ? -10 : 10)));
-                const deviationMv = (200 - nextY) / 100;
+                const deviationMv = (caliperReferenceY - nextY) / 100;
                 setCaliper({ x: 360, y: nextY, mm: Number((deviationMv * 10).toFixed(1)), mv: deviationMv });
               }}
               onPointerDown={(e) => {
+                if (!measurementEnabled) return;
                 const rect = e.currentTarget.getBoundingClientRect();
                 const clickX = e.clientX - rect.left;
                 const clickY = e.clientY - rect.top;
                 const svgX = (clickX / rect.width) * 720;
                 const svgY = (clickY / rect.height) * 360;
                 // Baseline 0 mV is at Y = 200. 1 mV = 100px => 0.1 mV (1 mm) = 10px
-                const devMv = (200 - svgY) / 100;
+                const devMv = (caliperReferenceY - svgY) / 100;
                 const devMm = parseFloat((devMv * 10).toFixed(1));
                 setCaliper({ x: svgX, y: svgY, mm: devMm, mv: devMv });
               }}
               onClick={(e) => {
+                if (!measurementEnabled) return;
                 const rect = e.currentTarget.getBoundingClientRect();
                 const clickX = e.clientX - rect.left;
                 const clickY = e.clientY - rect.top;
                 const svgX = (clickX / rect.width) * 720;
                 const svgY = (clickY / rect.height) * 360;
                 // Baseline 0 mV is at Y = 200. 1 mV = 100px => 0.1 mV (1 mm) = 10px
-                const devMv = (200 - svgY) / 100;
+                const devMv = (caliperReferenceY - svgY) / 100;
                 const devMm = parseFloat((devMv * 10).toFixed(1));
                 setCaliper({ x: svgX, y: svgY, mm: devMm, mv: devMv });
               }}
@@ -506,12 +436,12 @@ export default function LeadDetailModal({
                 />
               ))}
 
-              {/* Isoelectric PR/TP Baseline Line (0.0 mV) */}
+              {/* Synthetic reference line; pericarditis PR displacement is shown explicitly. */}
               <line
                 x1="10"
-                y1="200"
+                y1={caliperReferenceY}
                 x2="710"
-                y2="200"
+                y2={caliperReferenceY}
                 stroke={paperMode === 'paper' ? '#be123c' : '#38bdf8'}
                 strokeWidth="1.2"
                 strokeDasharray="4,3"
@@ -525,7 +455,7 @@ export default function LeadDetailModal({
                 fontWeight="700"
                 opacity="0.9"
               >
-                0.0 mV Baseline
+                0.0 mV Model Reference
               </text>
               <text
                 x="705"
@@ -536,7 +466,7 @@ export default function LeadDetailModal({
                 fontWeight="700"
                 opacity="0.9"
               >
-                PR Segment Isoelectric Reference (0 mV)
+                Model Reference (0 mV)
               </text>
 
               {/* Standard Calibration Pulse (10 mm = 1.0 mV high = 100px, 0.20s = 5 mm wide = 50px) */}
@@ -722,10 +652,10 @@ export default function LeadDetailModal({
                     strokeWidth="1.5"
                     strokeDasharray="3,3"
                   />
-                  {/* Vertical measurement bracket from baseline Y=200 to clicked Y at caliper.x */}
+                  {/* Vertical measurement bracket from the model's zero-mV reference to the clicked sample. */}
                   <line
                     x1={caliper.x}
-                    y1="200"
+                    y1={caliperReferenceY}
                     x2={caliper.x}
                     y2={caliper.y}
                     stroke="#10b981"
@@ -734,9 +664,9 @@ export default function LeadDetailModal({
                   {/* Top and bottom bracket ticks */}
                   <line
                     x1={caliper.x - 6}
-                    y1="200"
+                    y1={caliperReferenceY}
                     x2={caliper.x + 6}
-                    y2="200"
+                    y2={caliperReferenceY}
                     stroke="#10b981"
                     strokeWidth="2"
                   />
@@ -749,7 +679,7 @@ export default function LeadDetailModal({
                     strokeWidth="2"
                   />
                   {/* Caliper Floating Measurement Pill */}
-                  <g transform={`translate(${Math.min(caliper.x + 10, 540)}, ${Math.min(200, caliper.y) + Math.abs(caliper.y - 200) / 2 - 12})`}>
+                  <g transform={`translate(${Math.min(caliper.x + 10, 540)}, ${Math.min(caliperReferenceY, caliper.y) + Math.abs(caliper.y - caliperReferenceY) / 2 - 12})`}>
                     <rect
                       x="0"
                       y="0"
@@ -814,15 +744,10 @@ export default function LeadDetailModal({
             </div>
 
             <div className={`flex items-center gap-2 text-[11px] ${isBright ? 'text-slate-700' : 'text-slate-300'}`}>
-              {evalResult.meets ? (
-                <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> {evalResult.text}
-                </span>
-              ) : (
-                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                  <AlertTriangle className="w-3.5 h-3.5 text-amber-500" /> {evalResult.text}
-                </span>
-              )}
+              <span className="text-amber-700 dark:text-amber-300 font-semibold flex items-center gap-1">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+                Isolated-lead measurement only — this view cannot diagnose or exclude STEMI. Interpret the complete ECG, contiguous lead groups, clinical context, and applicable demographic criteria. {measurementEnabled ? '' : 'Measurement feedback is disabled for this territory pending approval of a valid PR/TP reference method.'}
+              </span>
             </div>
           </div>
 
@@ -909,10 +834,10 @@ export default function LeadDetailModal({
                 Caliper & J-Point Measurement Guide:
               </span>
               <p className={`leading-snug ${isBright ? 'text-slate-700' : 'text-slate-300'}`}>
-                Click anywhere on the ECG grid above to place the electronic caliper and measure elevation/depression relative to the isoelectric PR segment baseline.
+                Click the ECG grid to measure voltage relative to the synthetic model's 0 mV reference. In pericarditis, the model displays PR-segment displacement; this reference is not a validated clinical PR/TP baseline method.
               </p>
               <div className={`text-[11px] pt-1 ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
-                Per 2025 ACC/AHA & 2023 ESC guidelines, STEMI criteria strictly require measurement at the <strong className="text-amber-600 dark:text-amber-300">J point</strong> relative to the preceding <strong className="text-cyan-600 dark:text-cyan-300">PR segment</strong>.
+                Clinical J-point measurement requires an approved reference-segment method. This synthetic teaching caliper does not implement a validated PR/TP fallback and must not be used for clinical interpretation.
               </div>
             </div>
           </div>

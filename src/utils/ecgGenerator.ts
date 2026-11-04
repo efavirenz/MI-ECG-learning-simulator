@@ -2,38 +2,31 @@ import { MI_TERRITORIES } from '../data/miTerritories';
 
 export interface BaseLeadConfig {
   pAmp: number;      // mV
-  pWidth: number;    // seconds
-  pPos: number;      // fraction of cycle
   qAmp: number;
-  qWidth: number;
   rAmp: number;
-  rWidth: number;
   sAmp: number;
-  sWidth: number;
   tAmp: number;
-  tWidth: number;
-  tPos: number;
 }
 
 // Canonical physiological morphology for standard & supplemental leads (HR 75 bpm = 800 ms cycle)
 export const BASE_LEADS: Record<string, BaseLeadConfig> = {
-  'I':   { pAmp: 0.10, pWidth: 0.035, pPos: 0.16, qAmp: -0.05, qWidth: 0.012, rAmp: 0.85, rWidth: 0.018, sAmp: -0.12, sWidth: 0.015, tAmp: 0.25, tWidth: 0.045, tPos: 0.57 },
-  'II':  { pAmp: 0.15, pWidth: 0.035, pPos: 0.16, qAmp: -0.05, qWidth: 0.012, rAmp: 1.25, rWidth: 0.020, sAmp: -0.22, sWidth: 0.016, tAmp: 0.35, tWidth: 0.050, tPos: 0.57 },
-  'III': { pAmp: 0.07, pWidth: 0.035, pPos: 0.16, qAmp: -0.06, qWidth: 0.012, rAmp: 0.55, rWidth: 0.018, sAmp: -0.25, sWidth: 0.016, tAmp: 0.15, tWidth: 0.045, tPos: 0.57 },
-  'aVR': { pAmp: -0.12, pWidth: 0.035, pPos: 0.16, qAmp: 0.0,   qWidth: 0.012, rAmp: 0.12, rWidth: 0.015, sAmp: -1.05, sWidth: 0.022, tAmp: -0.25, tWidth: 0.045, tPos: 0.57 },
-  'aVL': { pAmp: 0.06, pWidth: 0.035, pPos: 0.16, qAmp: -0.05, qWidth: 0.012, rAmp: 0.55, rWidth: 0.018, sAmp: -0.12, sWidth: 0.015, tAmp: 0.20, tWidth: 0.045, tPos: 0.57 },
-  'aVF': { pAmp: 0.11, pWidth: 0.035, pPos: 0.16, qAmp: -0.06, qWidth: 0.012, rAmp: 0.90, rWidth: 0.019, sAmp: -0.18, sWidth: 0.016, tAmp: 0.25, tWidth: 0.048, tPos: 0.57 },
-  'V1':  { pAmp: 0.08, pWidth: 0.032, pPos: 0.16, qAmp: 0.0,   qWidth: 0.010, rAmp: 0.25, rWidth: 0.015, sAmp: -1.25, sWidth: 0.022, tAmp: 0.16, tWidth: 0.045, tPos: 0.57 },
-  'V2':  { pAmp: 0.10, pWidth: 0.035, pPos: 0.16, qAmp: 0.0,   qWidth: 0.010, rAmp: 0.45, rWidth: 0.016, sAmp: -1.45, sWidth: 0.024, tAmp: 0.38, tWidth: 0.050, tPos: 0.57 },
-  'V3':  { pAmp: 0.11, pWidth: 0.035, pPos: 0.16, qAmp: -0.04, qWidth: 0.012, rAmp: 0.85, rWidth: 0.018, sAmp: -0.85, sWidth: 0.020, tAmp: 0.45, tWidth: 0.050, tPos: 0.57 },
-  'V4':  { pAmp: 0.12, pWidth: 0.035, pPos: 0.16, qAmp: -0.06, qWidth: 0.012, rAmp: 1.35, rWidth: 0.020, sAmp: -0.35, sWidth: 0.016, tAmp: 0.40, tWidth: 0.048, tPos: 0.57 },
-  'V5':  { pAmp: 0.11, pWidth: 0.035, pPos: 0.16, qAmp: -0.08, qWidth: 0.012, rAmp: 1.45, rWidth: 0.020, sAmp: -0.15, sWidth: 0.015, tAmp: 0.35, tWidth: 0.048, tPos: 0.57 },
-  'V6':  { pAmp: 0.10, pWidth: 0.035, pPos: 0.16, qAmp: -0.08, qWidth: 0.012, rAmp: 1.15, rWidth: 0.019, sAmp: -0.10, sWidth: 0.015, tAmp: 0.30, tWidth: 0.045, tPos: 0.57 },
-  'V3R': { pAmp: 0.08, pWidth: 0.032, pPos: 0.16, qAmp: 0.0,   qWidth: 0.010, rAmp: 0.22, rWidth: 0.015, sAmp: -0.95, sWidth: 0.020, tAmp: 0.12, tWidth: 0.042, tPos: 0.57 },
-  'V4R': { pAmp: 0.08, pWidth: 0.032, pPos: 0.16, qAmp: 0.0,   qWidth: 0.010, rAmp: 0.24, rWidth: 0.015, sAmp: -0.85, sWidth: 0.020, tAmp: 0.12, tWidth: 0.042, tPos: 0.57 },
-  'V7':  { pAmp: 0.09, pWidth: 0.035, pPos: 0.16, qAmp: -0.06, qWidth: 0.012, rAmp: 0.85, rWidth: 0.018, sAmp: -0.10, sWidth: 0.015, tAmp: 0.25, tWidth: 0.045, tPos: 0.57 },
-  'V8':  { pAmp: 0.08, pWidth: 0.035, pPos: 0.16, qAmp: -0.05, qWidth: 0.012, rAmp: 0.70, rWidth: 0.018, sAmp: -0.10, sWidth: 0.015, tAmp: 0.22, tWidth: 0.045, tPos: 0.57 },
-  'V9':  { pAmp: 0.07, pWidth: 0.035, pPos: 0.16, qAmp: -0.05, qWidth: 0.012, rAmp: 0.60, rWidth: 0.018, sAmp: -0.10, sWidth: 0.015, tAmp: 0.20, tWidth: 0.045, tPos: 0.57 }
+  'I':   { pAmp: 0.10, qAmp: -0.05, rAmp: 0.85, sAmp: -0.12, tAmp: 0.25 },
+  'II':  { pAmp: 0.15, qAmp: -0.05, rAmp: 1.25, sAmp: -0.22, tAmp: 0.35 },
+  'III': { pAmp: 0.07, qAmp: -0.06, rAmp: 0.55, sAmp: -0.25, tAmp: 0.15 },
+  'aVR': { pAmp: -0.12, qAmp: 0.0,   rAmp: 0.12, sAmp: -1.05, tAmp: -0.25 },
+  'aVL': { pAmp: 0.06, qAmp: -0.05, rAmp: 0.55, sAmp: -0.12, tAmp: 0.20 },
+  'aVF': { pAmp: 0.11, qAmp: -0.06, rAmp: 0.90, sAmp: -0.18, tAmp: 0.25 },
+  'V1':  { pAmp: 0.08, qAmp: 0.0,   rAmp: 0.25, sAmp: -1.25, tAmp: 0.16 },
+  'V2':  { pAmp: 0.10, qAmp: 0.0,   rAmp: 0.45, sAmp: -1.45, tAmp: 0.38 },
+  'V3':  { pAmp: 0.11, qAmp: -0.04, rAmp: 0.85, sAmp: -0.85, tAmp: 0.45 },
+  'V4':  { pAmp: 0.12, qAmp: -0.06, rAmp: 1.35, sAmp: -0.35, tAmp: 0.40 },
+  'V5':  { pAmp: 0.11, qAmp: -0.08, rAmp: 1.45, sAmp: -0.15, tAmp: 0.35 },
+  'V6':  { pAmp: 0.10, qAmp: -0.08, rAmp: 1.15, sAmp: -0.10, tAmp: 0.30 },
+  'V3R': { pAmp: 0.08, qAmp: 0.0,   rAmp: 0.22, sAmp: -0.95, tAmp: 0.12 },
+  'V4R': { pAmp: 0.08, qAmp: 0.0,   rAmp: 0.24, sAmp: -0.85, tAmp: 0.12 },
+  'V7':  { pAmp: 0.09, qAmp: -0.06, rAmp: 0.85, sAmp: -0.10, tAmp: 0.25 },
+  'V8':  { pAmp: 0.08, qAmp: -0.05, rAmp: 0.70, sAmp: -0.10, tAmp: 0.22 },
+  'V9':  { pAmp: 0.07, qAmp: -0.05, rAmp: 0.60, sAmp: -0.10, tAmp: 0.20 }
 };
 
 /**
@@ -102,7 +95,7 @@ export function getEcgVoltage(
 
   // 4. QRS Complex (0.280 -> 0.385): Ventricular Depolarization
   if (tau >= tQRSStart && tau <= tJ) {
-    let qAmp = delta?.qWaveMm ? -(delta.qWaveMm * 0.1) : base.qAmp;
+    let qAmp = delta?.qWaveMm !== undefined ? -(delta.qWaveMm * 0.1) : base.qAmp;
     let rAmp = base.rAmp;
     let sAmp = base.sAmp;
 
@@ -117,7 +110,7 @@ export function getEcgVoltage(
                  (delta?.qWaveMm !== undefined && delta.qWaveMm >= 4 && base.rAmp < 0.5);
 
     if (isQS) {
-      // Deep monophasic QS complex representing full-thickness transmural necrosis
+      // Schematic QS morphology for teaching; it does not prove transmural necrosis or tissue viability.
       const qsNadir = Math.min(qAmp, -0.55);
       const tQSNadir = 0.335;
       if (tau < tQSNadir) {
@@ -290,7 +283,7 @@ export function getCycleLandmarks(lead: string, territoryId: string = 'normal', 
       voltageMv: getEcgVoltage(lead, prSegmentTime, territoryId, bpm),
       description: territoryId === 'pericarditis'
         ? (['II', 'III', 'aVF', 'V5', 'V6'].includes(lead)
-            ? 'PR segment depression: pathognomonic sign of acute pericarditis due to subepicardial atrial current of injury.'
+            ? 'PR-segment depression is a supportive ECG feature described in acute pericarditis; interpret with the full clinical assessment.'
             : lead === 'aVR'
             ? 'PR segment elevation: reciprocal sign in aVR strongly indicative of acute pericarditis.'
             : 'Conduction delay through AV node, bundle of His, and bundle branches. The standard isoelectric baseline for J-point reference.')
@@ -304,10 +297,10 @@ export function getCycleLandmarks(lead: string, territoryId: string = 'normal', 
       code: 'QS',
       timeSec: 0.335 * scale,
       voltageMv: getEcgVoltage(lead, 0.335 * scale, territoryId, bpm),
-      description: `Pathological QS complex (depth ≥ ${delta?.qWaveMm || 4} mm, duration ≥ 0.04s): total loss of viable myocardium and electrical transmural necrosis.`
+      description: `QS morphology in this synthetic teaching waveform (nominal programmed depth ${delta?.qWaveMm ?? 'not specified'} mm). A Q/QS pattern alone does not establish transmural necrosis or total loss of viable myocardium; interpret in the full clinical context.`
     });
   } else {
-    const hasQ = (delta?.qWaveMm ? -(delta.qWaveMm * 0.1) : base.qAmp) < -0.015;
+    const hasQ = (delta?.qWaveMm !== undefined ? -(delta.qWaveMm * 0.1) : base.qAmp) < -0.015;
     const effectiveQTime = hasQ ? qTime : (0.280 * scale);
     const effectiveQVoltage = hasQ ? getEcgVoltage(lead, qTime, territoryId, bpm) : 0.0;
 
@@ -329,7 +322,7 @@ export function getCycleLandmarks(lead: string, territoryId: string = 'normal', 
       timeSec: rTime,
       voltageMv: getEcgVoltage(lead, rTime, territoryId, bpm),
       description: delta?.tallRWave
-        ? 'Abnormally tall, broad reciprocal R wave (R/S > 1.0) diagnostic of acute posterior wall STEMI.'
+        ? 'Abnormally tall, broad R-wave morphology can be a reciprocal clue to posterior wall injury; interpret with contiguous leads and the clinical context.'
         : 'Primary positive ventricular depolarization vector (bulk of left and right ventricular free walls).'
     });
 

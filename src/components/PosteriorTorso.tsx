@@ -388,10 +388,10 @@ export default function PosteriorTorso({
 
             <div>
               <span className="font-semibold text-rose-600 dark:text-rose-400 uppercase tracking-wide text-[11px] block mb-0.5">
-                Diagnostic Threshold:
+                Interpretation Guardrail:
               </span>
               <p className={`leading-relaxed ${theme.subtextColor}`}>
-                ST-segment elevation <strong className={theme.headingColor}>≥ 0.5 mm (0.05 mV)</strong> in any posterior lead (V7, V8, or V9) confirms true acute posterior STEMI.
+                Interpret posterior ST-segment findings as a source-specific lead-group pattern. No individual posterior lead or unapproved universal threshold confirms STEMI in this teaching view.
               </p>
             </div>
 

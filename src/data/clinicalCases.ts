@@ -61,8 +61,8 @@ export const CLINICAL_CASES: ClinicalCase[] = [
           'Apical MI caused by diagonal branch occlusion'
         ],
         correctIndex: 1,
-        explanation: 'Contiguous ST elevation in leads II, III, and aVF defines an inferior myocardial infarction. In ~85-90% of individuals, the posterior descending artery (PDA) arises from the RCA (right-dominant system).',
-        pearl: 'ST elevation in III > II combined with reciprocal ST depression in lead I strongly predicts RCA occlusion over LCx.'
+        explanation: 'Contiguous ST elevation in leads II, III, and aVF defines an inferior myocardial infarction. Coronary dominance varies between individuals; the culprit vessel should be considered in the context of the full coronary anatomy.',
+        pearl: 'ST elevation in III greater than II, with reciprocal changes, can support an RCA-versus-LCx localization hypothesis; consider coronary dominance and the complete clinical context.'
       },
       {
         id: 'c1-q2',
@@ -74,8 +74,8 @@ export const CLINICAL_CASES: ClinicalCase[] = [
           'It indicates secondary digitalis toxicity'
         ],
         correctIndex: 2,
-        explanation: 'Reciprocal ST-segment depression in lead aVL is present in >95% of acute inferior STEMIs. Lead aVL looks directly down upon the inferior wall from the opposite perspective (+30° looking at -60°). Reciprocal depression in aVL is one of the most sensitive and specific markers confirming acute inferior coronary occlusion.',
-        pearl: 'Even 0.5 mm ST depression in aVL in the context of borderline inferior ST elevation strongly confirms acute transmural injury.'
+        explanation: 'Reciprocal ST-segment depression in aVL can be a useful reciprocal clue in the context of inferior injury. Avoid treating this finding alone as confirmation; interpret the full set of contiguous leads and clinical presentation. The percentage and performance statistics are omitted pending primary-study verification.',
+        pearl: 'Reciprocal ST depression in aVL may support an inferior injury pattern; it is not an independent confirmation criterion.'
       },
       {
         id: 'c1-q3',
@@ -87,8 +87,8 @@ export const CLINICAL_CASES: ClinicalCase[] = [
           'High chest lead recording (2nd intercostal space)'
         ],
         correctIndex: 0,
-        explanation: 'In every patient with acute inferior STEMI, recording right-sided precordial leads (V3R, V4R) is strongly recommended. Up to 30-50% of inferior STEMIs have right ventricular involvement, which dramatically alters hemodynamic stability and management.',
-        pearl: 'ST elevation ≥ 0.5 mm in lead V4R confirms acute RV infarction.'
+        explanation: 'When inferior injury is present, consider right-sided precordial leads (V3R, V4R) to assess for possible RV involvement. The reported prevalence estimate is omitted pending primary-study verification.',
+        pearl: 'Right-sided ST changes support assessment for RV involvement in the context of inferior injury; interpret the complete ECG and clinical picture.'
       },
       {
         id: 'c1-q4',
@@ -105,24 +105,24 @@ export const CLINICAL_CASES: ClinicalCase[] = [
       },
       {
         id: 'c1-q5',
-        question: 'If lead V4R demonstrates 1.5 mm ST elevation, what critical management precaution must be observed?',
+        question: 'If right-sided leads show changes in a patient with inferior injury, what medication-teaching precaution is appropriate?',
         options: [
           'Administer high-dose sublingual nitroglycerin and intravenous loop diuretics',
-          'Withhold nitrates, morphine, and diuretics; prepare for aggressive IV fluid volume loading if hypotensive',
+          'Avoid nitroglycerin in suspected RV infarction; assess morphine and diuretics individually in the clinical and local-protocol context',
           'Immediately administer high-dose beta-blockers to lower heart rate',
           'Perform immediate electrical cardioversion'
         ],
         correctIndex: 1,
-        explanation: 'The infarcted right ventricle loses contractile power and acts as a passive conduit. Maintenance of left ventricular cardiac output is entirely dependent on adequate right-sided filling pressure (preload). Nitrates and diuretics decrease venous return, precipitating profound, life-threatening hypotension and cardiovascular collapse.',
-        pearl: 'First-line therapy for hypotension in RV infarction is rapid isotonic IV crystalloid boluses (500–1000 mL) to optimize preload.'
+        explanation: 'The infarcted right ventricle may be preload-sensitive. Nitroglycerin should be avoided in suspected RV infarction. Morphine is not universally contraindicated and requires the cited guideline context if considered for refractory pain; diuretic use depends on haemodynamic and volume status. Follow the applicable local protocol.',
+        pearl: 'For hypotension with suspected RV involvement, manage haemodynamics according to the applicable emergency and local protocols; fluid therapy must be guided by clinical assessment.'
       }
     ],
     managementTakeaways: [
-      'Inferior STEMI involves leads II, III, aVF (RCA in ~90%).',
-      'Reciprocal ST depression in aVL is nearly 100% specific for acute inferior infarction.',
-      'Routinely acquire right-sided leads (V3R, V4R) in all inferior STEMI patients.',
-      'V4R ST elevation ≥ 0.5 mm = Right Ventricular Infarction.',
-      'AVOID nitrates and diuretics in RV infarction; fluid load to maintain RV preload.'
+      'Inferior injury is assessed in anatomically contiguous leads II, III, and aVF.',
+      'Interpret reciprocal changes in aVL with the complete ECG and clinical context; unsupported performance statistics are omitted.',
+      'Acquire right-sided leads when RV involvement is suspected in the context of inferior injury.',
+      'Right-sided ST changes support assessment but must not be treated as an isolated-lead diagnostic verdict.',
+      'Avoid nitroglycerin in suspected RV infarction; assess morphine and diuretic use individually under the applicable clinical and local-protocol context.'
     ]
   },
 
@@ -151,13 +151,13 @@ export const CLINICAL_CASES: ClinicalCase[] = [
         question: 'What is the most likely clinical interpretation of horizontal ST depression and tall R waves in leads V1–V3 in a patient with acute ischemic chest pain?',
         options: [
           'Benign non-specific ST changes requiring no further workup',
-          'Reciprocal mirror-image changes of an acute transmural posterior wall STEMI',
+          'Reciprocal ECG clues that raise suspicion for posterior wall injury and warrant a complete contextual assessment',
           'Digitalis effect causing "sagging" ST depression',
           'Normal female repolarization pattern'
         ],
         correctIndex: 1,
-        explanation: 'Standard leads V1–V3 face the anterior surface of the heart. The posterior LV wall is situated opposite to them. Transmural injury of the posterior wall creates an electrical vector directed away from anterior leads, resulting in reciprocal horizontal ST depression, tall broad R waves (mirror of Q waves), and tall upright T waves (mirror of inverted T waves).',
-        pearl: 'The "Flip Test": Turn the ECG trace upside down and view it against the light. Leads V1–V3 will appear as classic ST-elevation myocardial infarction with Q waves!'
+        explanation: 'Standard leads V1–V3 face the anterior surface of the heart. The posterior LV wall is situated opposite to them. Posterior injury may create reciprocal horizontal ST depression, tall broad R waves (mirror of Q waves), and tall upright T waves (mirror of inverted T waves). Treat these as contextual clues and interpret them alongside the complete ECG and clinical presentation.',
+        pearl: 'The flip-test can be a visual teaching aid for reciprocal morphology; it does not replace supplemental-lead assessment or clinical interpretation.'
       },
       {
         id: 'c2-q2',
@@ -169,7 +169,7 @@ export const CLINICAL_CASES: ClinicalCase[] = [
           'Fontaine leads for arrhythmogenic dysplasia'
         ],
         correctIndex: 1,
-        explanation: 'Posterior leads V7, V8, and V9 are positioned directly over the posterior left ventricular myocardium on the patient\'s back. They directly capture the true transmural injury current.',
+        explanation: 'Posterior leads V7, V8, and V9 are positioned directly over the posterior left ventricular myocardium on the patient\'s back. They provide a direct view of the posterior surface electrical activity and should be interpreted with the complete ECG and clinical context.',
         pearl: 'Recording posterior leads prevents catastrophic delay in activating the cardiac catheterization lab for an occluded coronary artery.'
       },
       {
@@ -187,23 +187,23 @@ export const CLINICAL_CASES: ClinicalCase[] = [
       },
       {
         id: 'c2-q4',
-        question: 'What ST-segment elevation threshold in posterior leads V7–V9 is diagnostic of acute posterior STEMI according to ESC and ACC/AHA guidelines?',
+        question: 'How should ST-segment findings in posterior leads V7–V9 be interpreted when posterior infarction is suspected?',
         options: [
-          '≥ 2.0 mm (0.20 mV)',
-          '≥ 1.0 mm (0.10 mV)',
-          '≥ 0.5 mm (0.05 mV) in at least two contiguous leads',
-          '≥ 3.0 mm (0.30 mV)'
+          'A single lead at or above 0.5 mm independently confirms infarction',
+          'Only the standard 1.0 mm limb-lead threshold can be applied',
+          'Use a source-specific posterior lead combination and threshold with the full ECG and clinical context',
+          'Posterior lead values are not interpretable'
         ],
         correctIndex: 2,
-        explanation: 'Because the posterior thoracic wall has thicker musculature and greater distance from the heart, electrical voltages recorded on the back are attenuated. Current 2023 ESC and 2025 ACC/AHA guidelines define ST elevation ≥ 0.5 mm (0.05 mV) in V7–V9 as sufficient criteria for STEMI.',
-        pearl: 'A common catastrophic error is applying the 1 mm or 2 mm standard precordial threshold to posterior leads and mistakenly ruling out STEMI.'
+        explanation: 'The source dossier identifies distinct descriptions in QAS June 2026 and Fifth UDMI 2026, and separate ACC/AHA 2025 guidance about acquiring posterior leads when LCx occlusion is suspected. Keep the lead combination, threshold and certainty level attributed to the selected source; do not merge them into one universal numeric rule.',
+        pearl: 'Do not transfer a threshold from another lead group or source; use the selected posterior-lead framework and its source-specific certainty wording.'
       }
     ],
     managementTakeaways: [
-      'ST depression in V1–V3 with tall R waves and upright T waves is Posterior STEMI until proven otherwise.',
-      'Standard 12-lead ECG is often "blind" to posterior infarction, missing up to 10% of occluded vessels.',
+      'ST depression in V1–V3 with tall R waves and upright T waves can be a reciprocal clue to posterior involvement and should prompt contextual assessment.',
+      'A standard 12-lead ECG may not fully display posterior injury; supplemental posterior leads can add information when posterior involvement is suspected.',
       'Place V7 (posterior axillary), V8 (midscapular), V9 (paraspinal) on horizontal line with V6.',
-      'ST elevation ≥ 0.5 mm in V7–V9 confirms acute posterior STEMI requiring emergency catheterization/reperfusion.',
+      'Posterior-lead findings should be interpreted as a source-defined lead group with the complete ECG and clinical context; do not use a single-lead confirmation rule.',
       'Culprit artery is usually Left Circumflex (LCx) or dominant RCA posterolateral branch.'
     ]
   },
@@ -245,12 +245,12 @@ export const CLINICAL_CASES: ClinicalCase[] = [
         question: 'What is the clinical significance of QS complexes (loss of anterior r waves) developing in leads V1–V3?',
         options: [
           'Indicates benign respiratory variation in thoracic resistance',
-          'Represents transmural infarction and loss of viable anterior septal myocardium',
+          'Represents a possible anterior septal infarction pattern; a QS complex alone does not establish transmural necrosis or loss of viable myocardium',
           'Proves the patient has had a prior myocardial infarction 10 years ago',
           'Shows hyperkalemia'
         ],
         correctIndex: 1,
-        explanation: 'Normal septal depolarization creates an initial small r wave in V1–V2. Transmural necrosis in the septum and anterior wall abolishes this initial positive electrical vector, causing an unopposed negative vector directed toward the posterior LV wall, producing a QS complex or pathological Q wave.',
+        explanation: 'Normal septal depolarization creates an initial small r wave in V1–V2. A QS complex or pathological Q-wave morphology may occur in infarction, but the pattern alone does not prove transmural necrosis or total loss of viable myocardium; interpretation requires the broader ECG and clinical context.',
         pearl: 'Development of Q waves during acute presentation does not mean the infarction is old or irreversible; acute reperfusion can still salvage significant penumbral myocardium.'
       },
       {
@@ -368,19 +368,19 @@ export const CLINICAL_CASES: ClinicalCase[] = [
         question: 'What is the immediate primary resuscitation measure for this profound hypotension?',
         options: [
           'Administer IV furosemide (Lasix) 40 mg',
-          'Immediate rapid intravenous isotonic crystalloid fluid bolus (e.g. 500–1000 mL normal saline)',
+          'Assess haemodynamic status and manage according to the applicable emergency and local protocol',
           'Administer additional sublingual nitrates to relieve ongoing coronary ischemia',
           'Administer intravenous high-dose beta-blockers'
         ],
         correctIndex: 1,
-        explanation: 'Aggressive volume expansion with IV normal saline boluses is the cornerstone of initial resuscitation in RV infarction to restore right-sided filling pressure and left ventricular preload.',
-        pearl: 'Diuretics and nitrates are STRICTLY CONTRAINDICATED. If hypotension persists after 1-2 liters of fluid, inotropes (dobutamine/norepinephrine) and emergent PCI are required.'
+        explanation: 'Haemodynamic management in suspected RV infarction must be individualized to the clinical assessment and applicable emergency/local protocol.',
+        pearl: 'Avoid nitroglycerin in suspected RV infarction. Morphine is not universally contraindicated; any use requires the cited guideline context and monitoring. Diuretic use depends on haemodynamic and volume status. Treat hypotension according to the applicable emergency and local protocols.'
       }
     ],
     managementTakeaways: [
       'Inferior STEMI with ST elevation in III > II strongly hints at RV involvement.',
-      'Lead V4R ST elevation ≥ 0.5 mm confirms RV infarction.',
-      'Nitrates, morphine, and diuretics can cause fatal hypotension in RV infarction.',
+      'Right-sided ST changes should be interpreted in the context of the complete ECG and clinical picture.',
+      'Avoid nitroglycerin in suspected RV infarction; assess morphine and diuretic use individually according to haemodynamic status and local protocol.',
       'Rapid IV fluid boluses restore cardiac output by restoring preload.',
       'Emergent revascularization of proximal RCA saves RV function.'
     ]

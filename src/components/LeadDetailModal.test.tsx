@@ -30,6 +30,7 @@ describe('lead detail dialog accessibility', () => {
     const dialog = screen.getByRole('dialog', { name: 'Lead II Magnified Waveform Analysis' });
     expect(dialog).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Close lead detail dialog' })).toHaveFocus();
+    expect(screen.getByText(/Isolated-lead measurement only — this view cannot diagnose or exclude STEMI/)).toBeInTheDocument();
 
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -40,7 +41,7 @@ describe('lead detail dialog accessibility', () => {
     render(
       <LeadDetailModal lead="II" territoryId="normal" paperMode="dark" onClose={() => undefined} />
     );
-    const waveform = screen.getByRole('group', { name: /Magnified ECG waveform/ });
+    const waveform = screen.getByRole('group', { name: /Magnified isolated-lead ECG waveform/ });
     waveform.focus();
     fireEvent.keyDown(waveform, { key: 'ArrowUp' });
     expect(screen.getByLabelText('Measured ST deviation')).toHaveTextContent('+1.0 mm (0.10 mV)');

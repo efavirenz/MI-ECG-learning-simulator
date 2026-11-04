@@ -97,10 +97,10 @@ export default function SupplementalLeadsModule() {
                 <AlertTriangle className="w-3.5 h-3.5" /> Hemodynamic Danger:
               </span>
               <p className={`font-bold leading-relaxed ${isBright ? 'text-red-950' : 'text-white'}`}>
-                DO NOT administer Nitrates, Morphine, or Diuretics!
+                Avoid nitroglycerin in suspected RV infarction; do not apply a blanket prohibition to all medication classes.
               </p>
               <p className={`text-[11px] ${isBright ? 'text-slate-700' : 'text-slate-300'}`}>
-                The infarcted RV is a stiff conduit; cardiac output depends strictly on high venous preload. Nitrates drop preload causing catastrophic shock.
+                The teaching should distinguish drug classes. Morphine is not universally contraindicated and, if considered for pain resistant to other maximally tolerated anti-ischaemic medication, requires the cited guideline context and monitoring. Diuretic use depends on haemodynamic and volume status. Follow the approved local protocol; qualified clinical wording is pending review.
               </p>
             </div>
 
@@ -112,13 +112,13 @@ export default function SupplementalLeadsModule() {
               <span className={`font-bold uppercase tracking-wide block text-[11px] ${
                 isBright ? 'text-emerald-800' : 'text-emerald-300'
               }`}>
-                Diagnostic Threshold:
+                Interpretation Guardrail:
               </span>
               <p className="font-semibold leading-relaxed">
-                ST elevation ≥ 0.5 mm in lead V4R (≥ 1.0 mm in men &lt; 30 years old).
+                Assess the right-sided tracing with the full clinical and ECG context; no numeric threshold is presented here pending primary-source review.
               </p>
               <p className={`text-[11px] ${isBright ? 'text-slate-600' : 'text-slate-400'}`}>
-                Lead V4R has ~100% sensitivity when recorded early (fades within 10 hours).
+                Acquire supplemental right-sided leads promptly when RV involvement is suspected. Numeric sensitivity and fading-time claims are omitted pending primary-source review.
               </p>
             </div>
           </div>
@@ -169,7 +169,7 @@ export default function SupplementalLeadsModule() {
                 Standard V1–V3 are the reciprocal view of the posterior wall!
               </p>
               <p className={`text-[11px] ${isBright ? 'text-slate-600' : 'text-slate-300'}`}>
-                Posterior transmural injury vectors away from the front chest, showing horizontal ST depression and tall R waves in V1–V3.
+                Posterior wall injury may create reciprocal horizontal ST depression and tall R waves in V1–V3; interpret these as contextual clues rather than a standalone diagnosis.
               </p>
             </div>
 
@@ -181,13 +181,13 @@ export default function SupplementalLeadsModule() {
               <span className={`font-bold uppercase tracking-wide block text-[11px] ${
                 isBright ? 'text-emerald-800' : 'text-emerald-300'
               }`}>
-                Diagnostic Threshold:
+                Interpretation Guardrail:
               </span>
               <p className="font-semibold leading-relaxed">
-                ST elevation ≥ 0.5 mm in leads V7, V8, or V9.
+                Interpret posterior-lead findings as a lead-group pattern using an explicitly selected source framework; do not treat one lead in isolation as confirmation.
               </p>
               <p className={`text-[11px] ${isBright ? 'text-slate-600' : 'text-slate-400'}`}>
-                Voltage is attenuated by thick back musculature; 0.5 mm is fully diagnostic of posterior STEMI.
+                Posterior leads are acquired when LCx occlusion is suspected, particularly with isolated anterior ST depression. The source-specific lead combination and certainty level must be retained; no universal single-lead confirmation statement is made here.
               </p>
             </div>
           </div>

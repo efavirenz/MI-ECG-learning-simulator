@@ -250,9 +250,9 @@ export const SUPPLEMENTAL_ELECTRODES: Electrode[] = [
     anatomicalLocation: '5th intercostal space in right midclavicular line (mirror of V4)',
     landmarks: ['Midpoint of right clavicle', 'Right 5th intercostal space', 'Right midclavicular line'],
     instructions: 'Identify right midclavicular line at the 5th intercostal space (exact right-side mirror of V4).',
-    clinicalPurpose: 'Highest sensitivity and specificity for right ventricular infarction (ST elevation >= 0.5 mm or >= 1.0 mm in males < 30). Critical before administering nitrates or morphine due to severe preload dependence!',
+    clinicalPurpose: 'Supplemental assessment of right ventricular ischemia/infarction in suspected inferior STEMI. Acquire promptly when RV involvement is suspected; interpret the tracing with the full ECG and clinical context.',
     commonMistakes: [
-      'Delaying recording: ST elevation in V4R can be transient and resolve within 2-10 hours',
+      'Delaying supplemental right-sided acquisition when RV involvement is suspected',
       'Forgetting that standard 10-lead ECG machine cable V4 is repurposed and MUST be hand-written as "V4R"'
     ],
     torsoView: 'anterior',
@@ -267,7 +267,7 @@ export const SUPPLEMENTAL_ELECTRODES: Electrode[] = [
     anatomicalLocation: 'Left posterior axillary line (PAL), horizontal plane of V6',
     landmarks: ['Posterior axillary fold', 'Horizontal plane extending around back at V6 level'],
     instructions: 'Position patient slightly turned onto right side. Place electrode at left posterior axillary line on same horizontal level as V6.',
-    clinicalPurpose: 'Directly records posterior wall of left ventricle. Detects isolated or inferoposterior STEMI (ST elevation >= 0.5 mm).',
+    clinicalPurpose: 'Directly records the posterior wall of the left ventricle. Acquire when posterior involvement is suspected and interpret together with the contiguous posterior lead group and clinical context.',
     commonMistakes: [
       'Placing at incorrect vertical level instead of horizontal with V6',
       'Ignoring reciprocal ST depression in V1-V3 on standard ECG'

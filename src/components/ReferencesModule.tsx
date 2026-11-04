@@ -137,6 +137,10 @@ export default function ReferencesModule() {
                   The standard electrical reference baseline is the <strong className={theme.headingColor}>PR segment</strong> immediately preceding the QRS complex. The J point is where the QRS ends and ST segment begins. In severe sinus tachycardia where P waves merge, the TP segment may be used.
                 </p>
               </div>
+              <div className={`mt-4 p-3 rounded-lg border space-y-1 ${isBright ? 'bg-amber-50 border-amber-200 text-slate-800' : 'bg-amber-950/30 border-amber-800 text-slate-200'}`}>
+                <strong className="text-amber-700 dark:text-amber-300">LVH / LBBB interpretation caveat</strong>
+                <p className="leading-relaxed">The conventional thresholds above are described in the cited sources in the absence of LVH and/or LBBB. These conditions can alter baseline ST segments and complicate interpretation. No modified threshold is implemented in this simulator; where this context is present or unknown, interpret the table as a limitation and assess the complete ECG and clinical context.</p>
+              </div>
             </div>
           </div>
         </div>

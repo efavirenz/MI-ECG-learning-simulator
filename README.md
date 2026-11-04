@@ -20,13 +20,13 @@ $$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrig
 
 ### 2. Supplemental ECG Leads (Right-Sided & Posterior)
 - **Right-Sided ECG (V3R, V4R)**:
-  - Indicated in inferior STEMI (30–50% co-involvement) and unexplained hypotension.
-  - V4R (5th ICS right MCL) threshold: $\ge 0.5\text{ mm}$ ($\ge 1.0\text{ mm}$ in males < 30).
-  - Hemodynamic collapse risk: Withhold nitrates, morphine, and diuretics; treat with rapid IV fluid volume boluses.
+  - Acquire when RV involvement is suspected, including in the context of inferior injury or unexplained hypotension.
+  - Interpret right-sided changes with the complete ECG and clinical context. Numeric threshold/performance claims are omitted pending primary-source verification.
+  - Medication teaching distinguishes nitroglycerin from morphine and diuretics; follow the applicable local protocol and reviewer-approved wording.
 - **Posterior ECG (V7, V8, V9)**:
-  - Indicated for reciprocal ST depression and tall R waves in V1–V3.
+  - Consider acquisition with isolated anterior ST depression or other suspicion of LCx/posterior involvement.
   - Placement: Horizontal plane of V6 at left posterior axillary line (V7), midscapular line (V8), and paraspinal line (V9).
-  - Diagnostic threshold: $\ge 0.5\text{ mm}$ ST elevation.
+  - Interpret as a source-specific lead group; do not use one-lead confirmation or a universal numeric threshold pending reviewer selection.
 - **Step-by-Step Acquisition Workflow**: Based on Queensland Ambulance Service (QAS) June 2026 procedure. Includes cable reassignment table and mandatory manual re-labeling warnings.
 
 ### 3. Myocardial Infarction Anatomical Localization
@@ -51,7 +51,7 @@ $$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrig
 - **Animation Controls**: Real-time continuous sweep beam, play/pause, speed controls ($0.5\times$, $1.0\times$, $2.0\times$), reset.
 - **Dual Display Modes**: Modern Dark Clinical Monitor vs Pink ECG Paper.
 - **Normal Overlay Comparison**: Displays normal baseline morphology as a dashed line behind the active pathological waveform.
-- **Magnified Single-Lead Analysis Modal**: Click any lead to inspect P, PR segment, Q, R, S, J point, ST segment, T wave, and use the interactive caliper to measure ST deviation in mm.
+- **Magnified Single-Lead Analysis Modal**: Click any lead to inspect P, PR segment, Q, R, S, J point, ST segment, T wave, and measure synthetic waveform deviation. This is a teaching aid only; it cannot diagnose or exclude STEMI. Pericarditis PR/TP baseline measurement remains subject to clinical approval.
 
 ### 5. Clinical Criteria, STEMI Mimics & Equivalents
 - **Guideline Diagnostic Thresholds**: 2025 ACC/AHA and 2023 ESC criteria by age and sex (including V2–V3 specific cutoffs).
@@ -71,7 +71,7 @@ $$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrig
 
 ## Release Identifier Convention
 
-The visible simulator release (for example, v6) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
+The visible simulator release (for example, v6.1) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
 
 ## 🛠️ Technology Stack
 
@@ -138,6 +138,16 @@ npm run preview
 ---
 
 ## 📝 Update History & Changelog
+
+### [v6.1] [2026-11-04] — Clinical Review Corrective Actions & Diagnostic Safety
+- **Isolated-lead interpretation safety**: removed per-lead diagnostic pass/fail verdicts; the magnified lead view now identifies itself as a measurement aid only.
+- **Measurement guardrails**: caliper geometry follows the synthetic pericarditis PR displacement, while pericarditis measurement feedback remains disabled pending an approved clinical reference-segment policy.
+- **Supplemental lead teaching**: removed unsupported right-sided/posterior numeric and performance claims from the active teaching panels; added source-specific posterior interpretation guardrails.
+- **RV medication education**: distinguished nitroglycerin precautions from morphine and diuretic considerations; final wording remains subject to local clinical sign-off.
+- **Q-wave and pericarditis language**: removed unsupported assertions that Q/QS morphology proves transmural necrosis or total loss of viable myocardium; calibrated PR-depression wording.
+- **Criteria context**: added LVH/LBBB limitations; no modified threshold is implemented.
+- **Generator contract**: removed unused timing, Q-wave-duration and poor-R-progression parameters from active model contracts; explicit zero Q-wave amplitude is preserved.
+- **Review gate**: primary-source confirmation and named clinical/model-owner approval remain outstanding for source-specific criteria, model semantics and high-severity findings.
 
 ### [v6] [2026-11-03] — Software Reliability, Accessibility & Validation Infrastructure
 - **Accessibility**: improved keyboard operation for interactive anatomy and lead controls, dialog semantics, focus handling, Escape dismissal, accessible labels and live feedback; added reduced-motion behavior.

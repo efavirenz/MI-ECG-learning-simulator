@@ -30,9 +30,9 @@ export interface MITerritory {
     tWaveAmplitudeMm?: number;
     tInverted?: boolean;
     qWaveMm?: number;
-    qWaveDurationMs?: number;
+
     tallRWave?: boolean;
-    poorRProgression?: boolean;
+
     rAmplitudeMultiplier?: number;
   }>;
 }
@@ -71,7 +71,7 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
     expectedECG: {
       stSegment: 'Convex or straight ST elevation in V1–V2 (often >= 2.0 mm in men >=40, >= 2.5 mm in men <40, >= 1.5 mm in women).',
       tWave: 'Hyperacute peaked T waves early; evolves to symmetric T-wave inversion.',
-      qWave: 'Loss of normal septal r wave in V1–V2 (QS complex formation), indicating transmural septal necrosis.',
+      qWave: 'Loss or reduction of the normal septal r wave in V1–V2 may produce QS morphology. This waveform pattern alone does not establish transmural necrosis or tissue viability.',
       reciprocal: 'Usually no prominent reciprocal depression unless accompanied by inferior changes.'
     },
     clinicalPearls: [
@@ -82,8 +82,8 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
       anteriorHighlightSvgId: ['region-septum', 'artery-lad']
     },
     waveformDeltas: {
-      'V1': { stElevationMm: 2.8, stSlope: 'convex', qWaveMm: 4, qWaveDurationMs: 40, rAmplitudeMultiplier: 0.2 },
-      'V2': { stElevationMm: 3.2, stSlope: 'convex', qWaveMm: 5, qWaveDurationMs: 40, rAmplitudeMultiplier: 0.3 }
+      'V1': { stElevationMm: 2.8, stSlope: 'convex', qWaveMm: 4, rAmplitudeMultiplier: 0.2 },
+      'V2': { stElevationMm: 3.2, stSlope: 'convex', qWaveMm: 5, rAmplitudeMultiplier: 0.3 }
     }
   },
 
@@ -109,8 +109,8 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
       anteriorHighlightSvgId: ['region-anterior', 'artery-lad']
     },
     waveformDeltas: {
-      'V3': { stElevationMm: 4.5, stSlope: 'convex', tWaveAmplitudeMm: 6, qWaveMm: 4, qWaveDurationMs: 45, rAmplitudeMultiplier: 0.3 },
-      'V4': { stElevationMm: 4.0, stSlope: 'convex', tWaveAmplitudeMm: 5, qWaveMm: 3, qWaveDurationMs: 40, rAmplitudeMultiplier: 0.4 },
+      'V3': { stElevationMm: 4.5, stSlope: 'convex', tWaveAmplitudeMm: 6, qWaveMm: 4, rAmplitudeMultiplier: 0.3 },
+      'V4': { stElevationMm: 4.0, stSlope: 'convex', tWaveAmplitudeMm: 5, qWaveMm: 3, rAmplitudeMultiplier: 0.4 },
       'II': { stElevationMm: -1.2, stSlope: 'horizontal', tInverted: true },
       'III': { stElevationMm: -1.8, stSlope: 'horizontal', tInverted: true },
       'aVF': { stElevationMm: -1.5, stSlope: 'horizontal', tInverted: true }
@@ -139,10 +139,10 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
       anteriorHighlightSvgId: ['region-septum', 'region-anterior', 'artery-lad']
     },
     waveformDeltas: {
-      'V1': { stElevationMm: 2.6, stSlope: 'convex', qWaveMm: 5, qWaveDurationMs: 45, rAmplitudeMultiplier: 0.1 },
-      'V2': { stElevationMm: 4.0, stSlope: 'convex', qWaveMm: 6, qWaveDurationMs: 45, rAmplitudeMultiplier: 0.2 },
-      'V3': { stElevationMm: 4.5, stSlope: 'convex', qWaveMm: 5, qWaveDurationMs: 40, rAmplitudeMultiplier: 0.3 },
-      'V4': { stElevationMm: 3.5, stSlope: 'convex', qWaveMm: 3, qWaveDurationMs: 40, rAmplitudeMultiplier: 0.4 },
+      'V1': { stElevationMm: 2.6, stSlope: 'convex', qWaveMm: 5, rAmplitudeMultiplier: 0.1 },
+      'V2': { stElevationMm: 4.0, stSlope: 'convex', qWaveMm: 6, rAmplitudeMultiplier: 0.2 },
+      'V3': { stElevationMm: 4.5, stSlope: 'convex', qWaveMm: 5, rAmplitudeMultiplier: 0.3 },
+      'V4': { stElevationMm: 3.5, stSlope: 'convex', qWaveMm: 3, rAmplitudeMultiplier: 0.4 },
       'II': { stElevationMm: -1.0, stSlope: 'horizontal' },
       'III': { stElevationMm: -1.5, stSlope: 'horizontal' },
       'aVF': { stElevationMm: -1.2, stSlope: 'horizontal' }
@@ -173,12 +173,12 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
     waveformDeltas: {
       'I': { stElevationMm: 2.5, stSlope: 'convex', tWaveAmplitudeMm: 3 },
       'aVL': { stElevationMm: 3.0, stSlope: 'convex', tWaveAmplitudeMm: 3 },
-      'V1': { stElevationMm: 3.0, stSlope: 'convex', qWaveMm: 4, qWaveDurationMs: 45, rAmplitudeMultiplier: 0.1 },
-      'V2': { stElevationMm: 5.5, stSlope: 'convex', qWaveMm: 6, qWaveDurationMs: 45, rAmplitudeMultiplier: 0.1 },
-      'V3': { stElevationMm: 6.0, stSlope: 'convex', qWaveMm: 5, qWaveDurationMs: 45, rAmplitudeMultiplier: 0.2 },
-      'V4': { stElevationMm: 5.0, stSlope: 'convex', qWaveMm: 4, qWaveDurationMs: 40, rAmplitudeMultiplier: 0.3 },
-      'V5': { stElevationMm: 3.5, stSlope: 'convex', qWaveMm: 3, qWaveDurationMs: 40, rAmplitudeMultiplier: 0.5 },
-      'V6': { stElevationMm: 2.5, stSlope: 'convex', qWaveMm: 2, qWaveDurationMs: 35, rAmplitudeMultiplier: 0.6 },
+      'V1': { stElevationMm: 3.0, stSlope: 'convex', qWaveMm: 4, rAmplitudeMultiplier: 0.1 },
+      'V2': { stElevationMm: 5.5, stSlope: 'convex', qWaveMm: 6, rAmplitudeMultiplier: 0.1 },
+      'V3': { stElevationMm: 6.0, stSlope: 'convex', qWaveMm: 5, rAmplitudeMultiplier: 0.2 },
+      'V4': { stElevationMm: 5.0, stSlope: 'convex', qWaveMm: 4, rAmplitudeMultiplier: 0.3 },
+      'V5': { stElevationMm: 3.5, stSlope: 'convex', qWaveMm: 3, rAmplitudeMultiplier: 0.5 },
+      'V6': { stElevationMm: 2.5, stSlope: 'convex', qWaveMm: 2, rAmplitudeMultiplier: 0.6 },
       'II': { stElevationMm: -2.0, stSlope: 'downsloping', tInverted: true },
       'III': { stElevationMm: -2.8, stSlope: 'downsloping', tInverted: true },
       'aVF': { stElevationMm: -2.2, stSlope: 'downsloping', tInverted: true }
@@ -254,18 +254,18 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
     shortDescription: 'Infarction of the diaphragmatic (inferior) wall of the left ventricle.',
     primaryLeads: ['II', 'III', 'aVF'],
     reciprocalLeads: ['I', 'aVL'],
-    culpritArtery: 'Right Coronary Artery (RCA) (~85-90% dominant) or Left Circumflex (LCx) (~10-15%)',
+    culpritArtery: 'Right Coronary Artery (RCA) or Left Circumflex (LCx), depending on coronary dominance',
     coronaryAnatomyNotes: 'Supplied by the Posterior Descending Artery (PDA). When RCA dominant: ST elevation III > II and ST depression in lead I. When LCx dominant: ST elevation II >= III and ST elevation or isoelectric in I.',
     expectedECG: {
       stSegment: 'Convex ST elevation >= 1.0 mm in at least two contiguous leads: II, III, aVF.',
       tWave: 'Tall peaked T waves early, followed by deep T-wave inversion in II, III, aVF.',
       qWave: 'Pathological Q waves in III and aVF (width >= 0.04s).',
-      reciprocal: 'Profound reciprocal ST depression and T inversion in lead aVL (99% sensitivity for inferior STEMI) and lead I.'
+      reciprocal: 'Reciprocal ST depression and T-wave changes may be seen in lead aVL and lead I. Performance statistics are omitted pending primary-study verification.'
     },
     supplementalLeadsRecommended: {
       leads: ['V3R', 'V4R'],
       reason: 'Mandatory evaluation for co-existing Right Ventricular (RV) Infarction, present in up to 30-50% of inferior STEMIs.',
-      clinicalPearl: 'Check V4R immediately! Patients with RV involvement are highly preload-dependent: nitrates, morphine, and diuretics may precipitate catastrophic hypotension.'
+      clinicalPearl: 'Acquire right-sided leads promptly when RV involvement is suspected. Avoid nitroglycerin in suspected RV infarction; assess morphine and diuretics individually under the applicable local protocol.'
     },
     clinicalPearls: [
       'Sinus bradycardia and 1st, 2nd (Mobitz I / Wenckebach), or 3rd degree AV block are common due to RCA supply to SA node (~60%) and AV node (~90%). Usually transient/nodal with junctional escape.',
@@ -276,9 +276,9 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
       posteriorHighlightSvgId: ['region-inferior-post', 'artery-rca-pda']
     },
     waveformDeltas: {
-      'II': { stElevationMm: 2.8, stSlope: 'convex', qWaveMm: 2, qWaveDurationMs: 40 },
-      'III': { stElevationMm: 4.2, stSlope: 'convex', qWaveMm: 4, qWaveDurationMs: 45 },
-      'aVF': { stElevationMm: 3.5, stSlope: 'convex', qWaveMm: 3, qWaveDurationMs: 40 },
+      'II': { stElevationMm: 2.8, stSlope: 'convex', qWaveMm: 2, },
+      'III': { stElevationMm: 4.2, stSlope: 'convex', qWaveMm: 4, },
+      'aVF': { stElevationMm: 3.5, stSlope: 'convex', qWaveMm: 3, },
       'I': { stElevationMm: -1.6, stSlope: 'horizontal', tInverted: true },
       'aVL': { stElevationMm: -2.5, stSlope: 'horizontal', tInverted: true }
     }
@@ -293,7 +293,7 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
     culpritArtery: 'Left Circumflex (LCx) or Right Coronary Artery (RCA — Posterolateral branches)',
     coronaryAnatomyNotes: 'Supplied by distal branches of LCx or dominant RCA. Because standard 12-lead electrodes face anteriorly, standard leads record the electrical event from the opposite side ("through the heart").',
     expectedECG: {
-      stSegment: 'Standard leads V1–V3 show horizontal ST-segment depression (mirror image of ST elevation). Supplemental leads V7–V9 show ST elevation >= 0.5 mm.',
+      stSegment: 'Standard leads V1–V3 may show horizontal ST-segment depression (mirror-image clue). Obtain posterior leads when LCx occlusion is suspected, particularly with isolated anterior ST depression; use a source-specific lead combination and threshold rather than a single-lead rule.',
       tWave: 'Standard leads V1–V3 show tall, upright, prominent T waves (mirror image of T inversion).',
       qWave: 'Standard leads V1–V3 show abnormally tall, broad R waves (R/S ratio > 1 in V2; mirror image of pathological Q waves!).',
       reciprocal: 'Standard V1–V3 are the reciprocal view of the posterior wall!'
@@ -301,7 +301,7 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
     supplementalLeadsRecommended: {
       leads: ['V7', 'V8', 'V9'],
       reason: 'Standard 12-lead ECG is often nondiagnostic or misinterpreted as "anterior subendocardial ischemia", delaying primary reperfusion.',
-      clinicalPearl: 'Place V7 (left posterior axillary line), V8 (midscapular line), V9 (paraspinal line) horizontally level with V6. ST elevation >= 0.5 mm diagnostic of STEMI.'
+      clinicalPearl: 'Place V7 (left posterior axillary line), V8 (midscapular line), V9 (paraspinal line) horizontally level with V6. Interpret the lead group using the selected source framework; a single lead is not independently confirmatory.'
     },
     clinicalPearls: [
       'The "flip-test": Turning the ECG upside down and holding it to the light turns V1–V3 ST depression into classic ST elevation and tall R waves into deep Q waves.',
@@ -329,7 +329,7 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
     culpritArtery: 'Proximal Right Coronary Artery (RCA) — Proximal to acute marginal branches',
     coronaryAnatomyNotes: 'RCA supplies the right ventricular free wall via acute marginal branches before continuing to the posterior interventricular groove.',
     expectedECG: {
-      stSegment: 'ST-segment elevation >= 0.5 mm in lead V4R (>= 1.0 mm in men < 30 years). Usually co-exists with inferior ST elevation (II, III, aVF) with ST elevation III > II.',
+      stSegment: 'Right-sided ST-segment changes can support assessment for RV involvement in the context of inferior injury; numeric thresholds remain omitted pending primary-source review.',
       tWave: 'Upright, hyperacute T wave in right precordial leads V3R and V4R.',
       qWave: 'Q waves in III and aVF; QS patterns can emerge in V3R/V4R.',
       reciprocal: 'ST depression in I and aVL; standard V1 may show subtle ST elevation while V2 is isoelectric or depressed.'
@@ -337,11 +337,11 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
     supplementalLeadsRecommended: {
       leads: ['V3R', 'V4R'],
       reason: 'Standard 12-lead ECG is blind to right ventricular free wall electrical activity.',
-      clinicalPearl: 'V4R has ~100% sensitivity for RV infarction when acquired within first 2 hours of symptom onset (transient signal that fades quickly).'
+      clinicalPearl: 'Acquire right-sided leads promptly when RV involvement is suspected. Numeric sensitivity and fading-time claims require primary-source verification.'
     },
     clinicalPearls: [
       'HEMODYNAMIC DISASTER WARNING: The infarcted RV behaves as a stiff, passive conduit. LV filling depends strictly on high right-sided preload (elevated JVP).',
-      'CONTRAINDICATED: Nitroglycerin, Morphine, Diuretics (drop preload -> precipitous collapse/shock).',
+      'Medication teaching must distinguish drug classes. Avoid nitroglycerin in suspected RV infarction; morphine is not universally contraindicated and diuretic use depends on haemodynamic and volume status. Final wording requires qualified local-protocol review.',
       'TREATMENT: Aggressive IV fluid resuscitation (normal saline bolus), inotropes if needed, emergent PCI.'
     ],
     heartRegionCoords: {

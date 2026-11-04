@@ -1,6 +1,6 @@
-# AGENTS.md — Development & Clinical Guidelines for AI Agents (Release v6)
+# AGENTS.md — Development & Clinical Guidelines for AI Agents (Release v6.1)
 
-This document defines the architecture, project conventions, and clinical accuracy standards for AI agents contributing to the **Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator (v6)**.
+This document defines the architecture, project conventions, and clinical accuracy standards for AI agents contributing to the **Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator (v6.1)**.
 
 ---
 
@@ -11,7 +11,7 @@ This document defines the architecture, project conventions, and clinical accura
 - **Audience**: Registered Nurses, Paramedics/EMTs, Emergency and Critical Care staff, and Medical Trainees.
 - **Language**: English throughout all user-facing strings, labels, ECG annotations, and references.
 - **Patient Population**: Adult cardiology only.
-- **Release identifiers**: the visible simulator release label (v6 and future v6.x releases) is maintained separately from the private npm package metadata version (`1.0.0`); do not automatically synchronize them.
+- **Release identifiers**: the visible simulator release label (v6.1 and future v6.x releases) is maintained separately from the private npm package metadata version (`1.0.0`); do not automatically synchronize them.
 
 ---
 
@@ -90,7 +90,7 @@ MI-ECG-learning-simulator/
   - **2023 ESC Guidelines for the Management of ACS**
   - **2026 ESC Fifth Universal Definition of Myocardial Infarction**
   - **Queensland Ambulance Service (QAS) June 2026 Clinical Practice Procedures**
-- **J-Point Baseline**: The ST segment deviation must always be referenced to the preceding **PR segment** (or TP segment in tachycardic rhythms).
+- **J-Point Baseline**: The clinical reference-segment method must be explicit and approved. Use the preceding **PR segment** or a source-defined TP fallback where applicable; do not treat the synthetic modal reference as a validated clinical measurement baseline.
 - **Contiguous Leads Rule**: STEMI diagnosis strictly requires $\ge 2$ anatomically contiguous leads.
 - **STEMI Thresholds**:
   - Leads V2–V3:
@@ -98,8 +98,8 @@ MI-ECG-learning-simulator/
     - Men $\ge 40$ years: $\ge 2.0\text{ mm}$ ($0.20\text{ mV}$)
     - Women (all ages): $\ge 1.5\text{ mm}$ ($0.15\text{ mV}$)
   - All other standard leads: $\ge 1.0\text{ mm}$ ($0.10\text{ mV}$)
-  - Supplemental right-sided (V3R, V4R): $\ge 0.5\text{ mm}$ ($\ge 1.0\text{ mm}$ in men $< 30$)
-  - Supplemental posterior (V7, V8, V9): $\ge 0.5\text{ mm}$
+  - Supplemental right-sided (V3R, V4R): qualitative acquisition guidance only until numeric threshold and subgroup claims are supported by approved primary sources.
+  - Supplemental posterior (V7, V8, V9): use a reviewer-selected, source-specific lead combination and threshold; do not apply a single-lead rule or merge separate source statements.
 
 ### Rule 3 — Electrophysiological Calibration Standards
 - **Paper Speed**: Standard is $25\text{ mm/s}$ ($1\text{ mm small box} = 0.04\text{ s} = 40\text{ ms}$; $5\text{ mm large box} = 0.20\text{ s} = 200\text{ ms}$).
@@ -110,7 +110,7 @@ MI-ECG-learning-simulator/
 ### Rule 4 — Mandatory Clinical Safety Warnings
 - **Mason-Likar Torso Modification**: Always document that moving limb electrodes to the torso alters frontal axis and produces pseudo-Q waves; it is valid for telemetry but non-diagnostic for STEMI.
 - **Prehospital Cable Reassignment**: When standard cables (e.g. V4) are moved to the right chest or back (V4R or V7–V9), the machine software still prints the original lead name. Agents must preserve the explicit warning that the clinician **must hand-annotate the printout** to prevent diagnostic errors.
-- **Right Ventricular Infarction Medication Wording**: Do not create, revise, or propagate RV-infarction medication instructions from this rule file. The existing application wording is pending qualified external clinical review (F-001); do not infer a blanket medication contraindication or change the educational copy until documented sign-off.
+- **Right Ventricular Infarction Medication Wording**: Keep medication classes distinct. Do not describe morphine or diuretics as universally contraindicated. Nitroglycerin wording must reflect the cited suspected-RV-infarction precaution. Any remaining morphine/diuretic teaching must be clinically signed off and aligned with the applicable local protocol.
 
 ### Rule 5 — Functional Integrity & Separation of Concerns
 - Educational data and clinical parameters belong in `src/data/`, not hardcoded inside UI components.
@@ -138,8 +138,8 @@ git status
 Ensure build exits with code 0 and no console warnings.
 
 ---
-*Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator • Release v6*
+*Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator • Release v6.1*
 
-**Clinical review gate:** The RV medication wording, STEMI evaluation, posterior MI criteria, Q-wave model, PR/J-point measurement baseline, pericarditis claims, right-sided thresholds, Wellens/aVL statistics, LVH/LBBB caveats and waveform parameter semantics are pending qualified external clinical review. Do not alter these clinical rules or teaching claims without documented approval.
+**Clinical review gate:** High-severity findings remain release blockers until a qualified clinical/model owner approves the source-specific medication wording, multi-lead criteria, posterior MI framework, Q-wave criterion/model semantics, and PR/J-point reference policy. Numeric V3R/V4R claims, Wellens/aVL statistics, and De Winter source details remain omitted until primary-source provenance and reviewer approval are recorded. LVH/LBBB is displayed as an interpretation limitation only; no modified threshold is implemented.
 
 **Typography:** The application uses system font stacks and does not require Google Fonts at runtime.

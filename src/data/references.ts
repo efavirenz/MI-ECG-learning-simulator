@@ -17,7 +17,7 @@ export const CLINICAL_REFERENCES: ReferenceItem[] = [
     keyContributions: [
       'Current standard criteria for J-point ST-segment elevation across sex and age groups (V2–V3 thresholds: men <40 ≥2.5 mm, men ≥40 ≥2.0 mm, women ≥1.5 mm).',
       'Recommendation for routine acquisition of right-sided precordial leads (V3R, V4R) in suspected acute inferior STEMI.',
-      'Validation of posterior leads (V7–V9) with ≥0.5 mm ST elevation threshold in suspected posterior wall involvement.',
+      'Recommendation to acquire posterior leads when LCx occlusion is suspected, particularly with isolated anterior ST depression; use source-specific criteria rather than an unverified isolated-lead threshold.',
       'Integration of high-sensitivity cardiac troponin (hs-cTn) accelerated diagnostic pathways.'
     ]
   },
@@ -41,7 +41,7 @@ export const CLINICAL_REFERENCES: ReferenceItem[] = [
     url: 'https://www.escardio.org/guidelines/clinical-practice-guidelines/pocket-guidelines/universal-definition-of-myocardial-infarction/',
     keyContributions: [
       'Delineation of acute myocardial injury vs true acute myocardial infarction (Types 1 to 5).',
-      'Pathological Q-wave criteria (≥0.02s in V2–V3 or ≥0.03s and ≥1 mm deep in leads I, II, aVL, aVF, or V4–V6).',
+      'The pathological Q-wave rule requires clinical reviewer approval before it is presented as an active teaching criterion; see the pending model/criteria review gate.',
       'Standardized definition of J-point reference to PR segment.'
     ]
   },
