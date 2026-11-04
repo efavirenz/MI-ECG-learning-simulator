@@ -91,7 +91,7 @@ export default function SupplementalLeadsModule() {
                 ? 'bg-red-50 border-red-200 text-slate-800'
                 : 'bg-rose-950/40 border-rose-500/40 text-slate-200'
             }`}>
-              <span className={`font-bold uppercase tracking-wide block text-[11px] flex items-center gap-1 ${
+              <span className={`font-bold uppercase tracking-wide flex items-center gap-1 text-[11px] ${
                 isBright ? 'text-red-700' : 'text-rose-300'
               }`}>
                 <AlertTriangle className="w-3.5 h-3.5" /> Hemodynamic Danger:
