@@ -72,7 +72,7 @@ $$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrig
 
 ## Release Identifier Convention
 
-The visible simulator release (for example, v6.2) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
+The visible simulator release (for example, v6.3) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
 
 ## 🛠️ Technology Stack
 
@@ -139,6 +139,10 @@ npm run preview
 ---
 
 ## 📝 Update History & Changelog
+
+### [v6.3] [2026-11-04] — Electrode Placement Practice Mode Fix
+- **Practice-mode selection state**: previously selected electrode markers no longer retain their selection ring or enlarged selected appearance after Practice mode starts. This applies to the shared anterior torso simulator in both Electrode Placement and the right-sided Supplemental Leads workflow.
+- **Regression coverage**: added a V6-selected-before-entry test to ensure the prior selection highlight is cleared visually in Practice mode.
 
 ### [v6.2] [2026-11-04] — ECG Waveform Model & Magnified Analysis Corrections
 - **Waveform timing**: corrected the synthetic P-wave duration to 110 ms and aligned the PR-segment landmark with the modeled interval.

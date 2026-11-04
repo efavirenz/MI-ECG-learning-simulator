@@ -498,7 +498,7 @@ export default function AnteriorTorso({
               // Convert percentage to svg coordinates (400 x 500)
               const cx = (elec.coords.x / 100) * 400;
               const cy = (elec.coords.y / 100) * 500;
-              const isSelected = elec.id === selectedElectrodeId;
+              const isSelected = !practiceMode && elec.id === selectedElectrodeId;
 
               // In Practice Mode: labels are hidden, neutral appearance
               const dotFill = practiceMode ? '#475569' : elec.color;

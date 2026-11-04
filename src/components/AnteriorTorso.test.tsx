@@ -28,6 +28,19 @@ describe('anterior torso practice mode', () => {
     expect(screen.getByText(/Locate & Tap:/).textContent).toBe(restartedPrompt);
   });
 
+  it('hides a previously selected electrode when entering practice mode', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const { container } = render(
+      <AnteriorTorso selectedElectrodeId="v6" onSelectElectrode={vi.fn()} />
+    );
+
+    expect(container.querySelector('circle[stroke-width="3.5"]')).not.toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: /Practice Mode/ }));
+
+    expect(container.querySelector('circle[stroke-width="3.5"]')).toBeNull();
+  });
+
   it('supports keyboard activation of SVG electrode markers', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     render(<AnteriorTorso selectedElectrodeId={null} onSelectElectrode={vi.fn()} />);
