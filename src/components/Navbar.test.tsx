@@ -24,8 +24,8 @@ describe('navigation drawer accessibility', () => {
     const closeButton = screen.getByRole('button', { name: 'Close Menu' });
     expect(dialog).toBeInTheDocument();
     expect(closeButton).toHaveFocus();
-    expect(screen.getAllByText('v6.3')).toHaveLength(2);
-    expect(screen.getByText('Release v6.3')).toBeInTheDocument();
+    expect(screen.getAllByText('v6.4')).toHaveLength(2);
+    expect(screen.getByText('Release v6.4')).toBeInTheDocument();
 
     await user.keyboard('{Shift>}{Tab}{/Shift}');
     expect(dialog.contains(document.activeElement)).toBe(true);

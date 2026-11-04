@@ -7,6 +7,15 @@ interface ClinicalScenariosModuleProps {
   onSelectTerritoryForCase?: (territoryId: string) => void;
 }
 
+function createShuffledQuizOrder(): number[] {
+  const order = KNOWLEDGE_QUIZ.map((_, index) => index);
+  for (let index = order.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [order[index], order[randomIndex]] = [order[randomIndex], order[index]];
+  }
+  return order;
+}
+
 export default function ClinicalScenariosModule({
   onSelectTerritoryForCase
 }: ClinicalScenariosModuleProps) {
@@ -19,10 +28,12 @@ export default function ClinicalScenariosModule({
   
   // Quiz state
   const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
+  const [quizOrder, setQuizOrder] = useState<number[]>(() => KNOWLEDGE_QUIZ.map((_, index) => index));
   const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({});
   const [quizFinished, setQuizFinished] = useState(false);
 
   const currentCase = CLINICAL_CASES.find(c => c.id === selectedCaseId) || CLINICAL_CASES[0];
+  const currentQuizQuestion = KNOWLEDGE_QUIZ[quizOrder[currentQuizIndex]];
 
   const handleSelectCaseAnswer = (questionId: string, answerIndex: number) => {
     setCaseAnswers(prev => ({ ...prev, [questionId]: answerIndex }));
@@ -41,15 +52,26 @@ export default function ClinicalScenariosModule({
     }
   };
 
-  const handleRestartQuiz = () => {
+  const resetQuizAttempt = () => {
+    setQuizOrder(createShuffledQuizOrder());
     setQuizAnswers({});
     setCurrentQuizIndex(0);
     setQuizFinished(false);
   };
 
-  const quizScore = Object.entries(quizAnswers).reduce((acc, [idxStr, ansIdx]) => {
-    const qIdx = parseInt(idxStr);
-    return acc + (KNOWLEDGE_QUIZ[qIdx].correctIndex === ansIdx ? 1 : 0);
+  const handleOpenQuiz = () => {
+    if (activeTab !== 'quiz') resetQuizAttempt();
+    setActiveTab('quiz');
+  };
+
+  const handleRestartQuiz = () => {
+    resetQuizAttempt();
+  };
+
+  const quizScore = quizOrder.reduce((score, questionIndex, displayIndex) => {
+    const selectedAnswer = quizAnswers[displayIndex];
+    if (selectedAnswer === undefined) return score;
+    return score + (KNOWLEDGE_QUIZ[questionIndex].correctIndex === selectedAnswer ? 1 : 0);
   }, 0);
 
   return (
@@ -82,7 +104,7 @@ export default function ClinicalScenariosModule({
             Clinical Scenarios (5 Cases)
           </button>
           <button
-            onClick={() => setActiveTab('quiz')}
+            onClick={handleOpenQuiz}
             aria-pressed={activeTab === 'quiz'}
             className={`px-4 py-1.5 rounded-lg font-semibold transition ${
               activeTab === 'quiz'
@@ -338,16 +360,16 @@ export default function ClinicalScenariosModule({
                   <span className={`text-[10px] uppercase font-mono font-bold px-2 py-0.5 rounded border ${
                     isBright ? 'bg-slate-100 text-slate-700 border-slate-300' : 'bg-slate-800 text-slate-300 border-slate-700'
                   }`}>
-                    {KNOWLEDGE_QUIZ[currentQuizIndex].category}
+                    {currentQuizQuestion.category}
                   </span>
                   <p className={`text-sm sm:text-base font-bold leading-relaxed ${theme.headingColor}`}>
-                    {KNOWLEDGE_QUIZ[currentQuizIndex].question}
+                    {currentQuizQuestion.question}
                   </p>
                 </div>
 
                 {/* Options */}
                 <div className="space-y-2.5 pt-2">
-                  {KNOWLEDGE_QUIZ[currentQuizIndex].options.map((opt, optIdx) => {
+                  {currentQuizQuestion.options.map((opt, optIdx) => {
                     const selectedAns = quizAnswers[currentQuizIndex];
                     const hasAnswered = selectedAns !== undefined;
                     let btnClasses = isBright 
@@ -355,7 +377,7 @@ export default function ClinicalScenariosModule({
                       : 'border-slate-800 bg-slate-950/80 hover:bg-slate-800 text-slate-200';
 
                     if (hasAnswered) {
-                      if (optIdx === KNOWLEDGE_QUIZ[currentQuizIndex].correctIndex) {
+                      if (optIdx === currentQuizQuestion.correctIndex) {
                         btnClasses = 'border-emerald-500 bg-emerald-500/20 text-emerald-800 dark:text-emerald-200 font-bold';
                       } else if (optIdx === selectedAns) {
                         btnClasses = 'border-rose-500 bg-rose-500/20 text-rose-800 dark:text-rose-200 font-bold';
@@ -386,7 +408,7 @@ export default function ClinicalScenariosModule({
                     isBright ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-slate-950 border-slate-800 text-slate-300'
                   }`}>
                     <div className="font-bold text-xs flex items-center gap-1.5">
-                      {quizAnswers[currentQuizIndex] === KNOWLEDGE_QUIZ[currentQuizIndex].correctIndex ? (
+                      {quizAnswers[currentQuizIndex] === currentQuizQuestion.correctIndex ? (
                         <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                           <CheckCircle2 className="w-4 h-4" /> Correct Answer!
                         </span>
@@ -397,7 +419,7 @@ export default function ClinicalScenariosModule({
                       )}
                     </div>
                     <p className="leading-relaxed text-xs">
-                      {KNOWLEDGE_QUIZ[currentQuizIndex].explanation}
+                      {currentQuizQuestion.explanation}
                     </p>
                   </div>
                 )}
