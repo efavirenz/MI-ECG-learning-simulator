@@ -10,7 +10,7 @@ describe('heart territory orientation', () => {
     );
 
     const anteriorButton = screen.getByRole('button', { name: 'Anterior Heart View (Sternocostal)' });
-    const posteriorButton = screen.getByRole('button', { name: 'Posterior / Inferior View (Diaphragmatic)' });
+    const posteriorButton = screen.getByRole('button', { name: 'Posterior Heart View' });
     await waitFor(() => expect(posteriorButton).toHaveAttribute('aria-pressed', 'true'));
 
     rerender(
