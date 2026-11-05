@@ -72,7 +72,7 @@ $$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrig
 
 ## Release Identifier Convention
 
-The visible simulator release (for example, v6.5) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
+The visible simulator release (for example, v6.6) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
 
 ## 🛠️ Technology Stack
 
@@ -139,6 +139,11 @@ npm run preview
 ---
 
 ## 📝 Update History & Changelog
+
+### [v6.6] [2026-11-05] — Posterior RV Localization & Release Update
+- **Posterior RV territory**: corrected the posterior-view highlight mapping so Right Ventricular (RV) infarction highlights its own posterior RV region and the RCA, rather than the Inferior Wall and PDA.
+- **Inferior Wall labels**: moved the "Inferior Wall" and "(II, III, aVF)" labels down to avoid overlap with the region boundary.
+- **Version labels**: updated the application badge and footer references to v6.6 across the navigation bar, application footer, and project documentation.
 
 ### [v6.5] [2026-11-05] — Release Version Update
 - **Version labels**: updated the application version badge and footer references to v6.5 across the navigation bar, application footer, and project documentation.

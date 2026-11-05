@@ -451,16 +451,18 @@ export default function HeartTerritoryView({
                   strokeWidth={isHighlighted('region-inferior-post') ? 3.5 : 1.2}
                   className="transition-all duration-300"
                 />
-                <text x="220" y="350" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">Inferior Wall</text>
-                <text x="220" y="362" fill="#a7f3d0" fontSize="8" fontWeight="bold" textAnchor="middle">(II, III, aVF)</text>
+                <text x="220" y="358" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">Inferior Wall</text>
+                <text x="220" y="370" fill="#a7f3d0" fontSize="8" fontWeight="bold" textAnchor="middle">(II, III, aVF)</text>
 
                 {/* 8. Right Ventricle — thin sliver visible at patient's right base on posterior view */}
                 <path
+                  id="region-rv-post"
                   d="M 288 152 L 308 305 C 320 280, 322 240, 320 200 C 318 172, 308 155, 288 152 Z"
-                  fill="#641e2e"
-                  opacity="0.55"
-                  stroke="#9f1239"
-                  strokeWidth="1"
+                  fill={isHighlighted('region-rv-post') ? '#ef4444' : '#641e2e'}
+                  opacity={isHighlighted('region-rv-post') ? 0.95 : 0.55}
+                  stroke={isHighlighted('region-rv-post') ? '#fef08a' : '#9f1239'}
+                  strokeWidth={isHighlighted('region-rv-post') ? 3.5 : 1}
+                  className="transition-all duration-300"
                 />
                 <text x="310" y="210" fill="#fbcfe8" fontSize="7" fontWeight="bold" textAnchor="middle">RV</text>
 

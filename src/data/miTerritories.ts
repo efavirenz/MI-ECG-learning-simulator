@@ -346,7 +346,7 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
     ],
     heartRegionCoords: {
       anteriorHighlightSvgId: ['region-rv', 'artery-rca'],
-      posteriorHighlightSvgId: ['region-inferior-post', 'artery-rca-pda']
+      posteriorHighlightSvgId: ['region-rv-post', 'artery-rca']
     },
     waveformDeltas: {
       'II': { stElevationMm: 2.5, stSlope: 'convex' },
