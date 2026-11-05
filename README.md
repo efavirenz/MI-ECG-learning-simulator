@@ -72,7 +72,7 @@ $$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrig
 
 ## Release Identifier Convention
 
-The visible simulator release (for example, v6.4) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
+The visible simulator release (for example, v6.5) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
 
 ## 🛠️ Technology Stack
 
@@ -139,6 +139,9 @@ npm run preview
 ---
 
 ## 📝 Update History & Changelog
+
+### [v6.5] [2026-11-05] — Release Version Update
+- **Version labels**: updated the application version badge and footer references to v6.5 across the navigation bar, application footer, and project documentation.
 
 ### [v6.4] [2026-11-04] — Randomized Knowledge Quiz Order
 - **Quiz randomization**: the 10 Knowledge Check questions are shuffled at the start of each quiz attempt, including when reopening the quiz tab or selecting Restart Quiz. Each question is presented exactly once per attempt.

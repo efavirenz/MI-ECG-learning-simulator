@@ -75,7 +75,7 @@ export default function HeartTerritoryView({
                   : isBright ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              Posterior / Inferior View (Diaphragmatic)
+              Posterior Heart View
             </button>
           </div>
 
@@ -291,7 +291,7 @@ export default function HeartTerritoryView({
                 {/* 6. Inferior Margin visible anteriorly */}
                 <path
                   id="region-inferior"
-                  d="M 160 332 C 190 366, 235 375, 260 354 L 230 340 Z"
+                  d="M 155 330 C 180 350, 210 367, 235 374 C 252 370, 266 360, 278 344 C 250 356, 218 355, 190 341 Z"
                   fill={isHighlighted('region-inferior') ? '#10b981' : '#2b0716'}
                   opacity={isHighlighted('region-inferior') ? 0.95 : 0.55}
                   stroke={isHighlighted('region-inferior') ? '#ffffff' : 'none'}
@@ -376,8 +376,8 @@ export default function HeartTerritoryView({
                     (patient's right = viewer's right; patient's left = viewer's left).
                     Top:   base of heart (LA, atria, great veins).
                     Bottom: cardiac apex.
-                    Left (viewer's left = patient's right): RCA territory, RA.
-                    Right (viewer's left = patient's left): LCx territory, LA.
+                    Left side of image = patient's right (RA / RCA).
+                    Right side of image = patient's left.
                 ─────────────────────────────────────────────────────── */}
 
                 {/* 1. Left Atrium — posterior wall, occupying most of the base */}
@@ -390,7 +390,7 @@ export default function HeartTerritoryView({
                 />
                 <text x="200" y="110" fill="#e9d5ff" fontSize="8.5" fontWeight="bold" textAnchor="middle">Left Atrium (Posterior Wall)</text>
 
-                {/* 2. Right Atrium — visible on the right side of the base (patient's right = viewer's right) */}
+                {/* 2. Right Atrium — visible on the right side of the base (patient's right = viewer's left) */}
                 <path
                   d="M 270 95 C 285 80, 330 88, 338 120 C 340 138, 328 152, 310 155 L 270 152 C 280 135, 280 115, 270 95 Z"
                   fill="#4c1d95"
@@ -402,21 +402,21 @@ export default function HeartTerritoryView({
                 <text x="305" y="130" fill="#e9d5ff" fontSize="7" fontWeight="bold" textAnchor="middle">Atrium</text>
 
                 {/* 3. Pulmonary Veins (4 veins entering LA from lungs)
-                    In posterior view: Left PVs enter from the patient's left (viewer's left),
-                    Right PVs enter from the patient's right (viewer's right). */}
-                {/* Left Sup + Inf PVs (patient left = viewer left) */}
+                    In posterior view: Left PVs enter from the patient's left (viewer's right),
+                    Right PVs enter from the patient's right (viewer's left). */}
+                {/* Left Sup + Inf PVs (patient left = viewer right) */}
                 <ellipse cx="115" cy="95" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
                 <ellipse cx="110" cy="122" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
                 <text x="97" y="95" fill="#93c5fd" fontSize="6.5" textAnchor="end">L. Sup PV</text>
                 <text x="92" y="122" fill="#93c5fd" fontSize="6.5" textAnchor="end">L. Inf PV</text>
 
-                {/* Right Sup + Inf PVs (patient right = viewer right, approaching from right side) */}
+                {/* Right Sup + Inf PVs (patient right = viewer left, approaching from left side) */}
                 <ellipse cx="255" cy="78" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
                 <ellipse cx="260" cy="102" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
                 <text x="268" y="78" fill="#93c5fd" fontSize="6.5">R. Sup PV</text>
                 <text x="273" y="102" fill="#93c5fd" fontSize="6.5">R. Inf PV</text>
 
-                {/* 4. Inferior Vena Cava (IVC) entering RA inferiorly — on patient's right = viewer's right */}
+                {/* 4. Inferior Vena Cava (IVC) entering RA inferiorly — on patient's right = viewer's left */}
                 <ellipse cx="318" cy="157" rx="11" ry="6" fill="#1e3a8a" stroke="#3b82f6" strokeWidth="1.5" />
                 <text x="338" y="160" fill="#93c5fd" fontSize="7" fontWeight="bold">IVC</text>
 
@@ -428,7 +428,7 @@ export default function HeartTerritoryView({
                   strokeWidth="2.5"
                 />
 
-                {/* 6. Posterior LV wall — posterobasal territory (V7-V9; LCx territory on patient's left = viewer's left) */}
+                {/* 6. Posterior LV wall — posterobasal territory (V7-V9; predominantly patient's left side) */}
                 <path
                   id="region-posterior"
                   d="M 118 148 C 86 188, 86 258, 116 316 L 195 352 L 195 152 Z"
@@ -444,15 +444,15 @@ export default function HeartTerritoryView({
                 {/* 7. Inferior / Diaphragmatic wall (II, III, aVF; RCA/PDA territory — straddles the septum at the bottom) */}
                 <path
                   id="region-inferior-post"
-                  d="M 195 152 L 195 352 C 238 378, 278 360, 308 305 L 288 152 Z"
+                  d="M 116 316 C 135 350, 178 378, 220 382 C 264 380, 300 345, 322 300 C 296 321, 268 338, 236 344 C 190 350, 148 336, 116 316 Z"
                   fill={isHighlighted('region-inferior-post') ? '#10b981' : '#312e81'}
                   opacity={isHighlighted('region-inferior-post') ? 0.95 : 0.65}
                   stroke={isHighlighted('region-inferior-post') ? '#ffffff' : '#3730a3'}
                   strokeWidth={isHighlighted('region-inferior-post') ? 3.5 : 1.2}
                   className="transition-all duration-300"
                 />
-                <text x="248" y="230" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">Inferior Wall</text>
-                <text x="248" y="244" fill="#a7f3d0" fontSize="8" fontWeight="bold" textAnchor="middle">(II, III, aVF)</text>
+                <text x="220" y="350" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">Inferior Wall</text>
+                <text x="220" y="362" fill="#a7f3d0" fontSize="8" fontWeight="bold" textAnchor="middle">(II, III, aVF)</text>
 
                 {/* 8. Right Ventricle — thin sliver visible at patient's right base on posterior view */}
                 <path
