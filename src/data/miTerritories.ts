@@ -41,19 +41,19 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
   normal: {
     id: 'normal',
     name: 'Normal ECG (Sinus Baseline)',
-    shortDescription: 'Normal 12-lead baseline with upright T waves, normal R wave progression, and isoelectric ST segments.',
+    shortDescription: 'Reference 12-lead sinus-rhythm tracing without acute territorial ST–T changes. A normal-appearing ECG does not exclude ACS or obstructive coronary disease.',
     primaryLeads: [],
     reciprocalLeads: [],
-    culpritArtery: 'None (Patent coronary arteries)',
-    coronaryAnatomyNotes: 'Normal balanced coronary perfusion through Right Coronary Artery (RCA), Left Anterior Descending (LAD), and Left Circumflex (LCx).',
+    culpritArtery: 'No culprit vessel is inferred from a reference ECG',
+    coronaryAnatomyNotes: 'A normal ECG cannot establish coronary patency or the pattern of coronary dominance.',
     expectedECG: {
-      stSegment: 'Isoelectric (measured at J point relative to PR segment baseline; <0.5 mm deviation normal).',
+      stSegment: 'ST segments are usually near the isoelectric baseline relative to the preceding PR segment (or a source-defined TP fallback). Interpret J-point deviation using the applicable lead-, age-, and sex-specific criteria; no single cutoff applies to every lead.',
       tWave: 'Upright in leads I, II, V3–V6; inverted in aVR; variable in III, aVF, and V1.',
-      qWave: 'Septal q waves (<0.04s, <2 mm or <25% R wave) normal in I, aVL, V5, V6.',
+      qWave: 'Small septal q waves may be present in I, aVL, V5, and V6. Assess potentially pathological Q waves by their duration, depth, contiguous-lead distribution, and clinical context.',
       reciprocal: 'None.'
     },
     clinicalPearls: [
-      'Normal variant: benign early repolarization may show concave ST elevation in V2–V5 with prominent J-point notching.',
+      'Early-repolarization patterns may show J-point notching or slurring, with or without ST elevation; do not assume a pattern is benign when symptoms suggest ACS.',
       'Always compare with prior ECGs when available.'
     ],
     heartRegionCoords: {},
@@ -63,19 +63,19 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
   septal: {
     id: 'septal',
     name: 'Septal STEMI',
-    shortDescription: 'Infarction of the basal and mid interventricular septum.',
+    shortDescription: 'Injury involving the interventricular septum, commonly represented by changes in V1–V2. Isolated septal infarction is uncommon and often overlaps anterior involvement.',
     primaryLeads: ['V1', 'V2'],
     reciprocalLeads: [],
     culpritArtery: 'Left Anterior Descending (LAD) — Septal perforator branches',
-    coronaryAnatomyNotes: 'First septal perforator branch of the LAD supplies the anterior two-thirds of the interventricular septum and bundle branches.',
+    coronaryAnatomyNotes: 'LAD septal perforators supply much of the anterior two-thirds of the interventricular septum and may supply the conduction system. The posterior third is usually supplied by the PDA; branch anatomy varies.',
     expectedECG: {
-      stSegment: 'Convex or straight ST elevation in V1–V2 (often >= 2.0 mm in men >=40, >= 2.5 mm in men <40, >= 1.5 mm in women).',
-      tWave: 'Hyperacute peaked T waves early; evolves to symmetric T-wave inversion.',
-      qWave: 'Loss or reduction of the normal septal r wave in V1–V2 may produce QS morphology. This waveform pattern alone does not establish transmural necrosis or tissue viability.',
-      reciprocal: 'Usually no prominent reciprocal depression unless accompanied by inferior changes.'
+      stSegment: 'ST elevation in V1–V2 may indicate septal/anterior-septal injury in the appropriate context. Apply current STEMI criteria to at least two anatomically contiguous leads; ST-segment shape alone does not establish the diagnosis.',
+      tWave: 'Hyperacute T waves may appear early; T-wave inversion can develop during evolution. The sequence and degree of change vary with timing and reperfusion.',
+      qWave: 'Loss or reduction of the expected septal r wave in V1–V2 or a QS pattern may be seen, but neither is specific. Interpret morphology with lead placement, prior ECGs, serial changes, and clinical evidence.',
+      reciprocal: 'There is no single obligatory reciprocal pattern; reciprocal changes depend on the extent and direction of associated myocardial injury.'
     },
     clinicalPearls: [
-      'May be associated with new conduction blocks (RBBB or bifascicular block) due to septal perforator ischemia feeding the bundle of His.',
+      'New RBBB or fascicular conduction abnormalities may accompany extensive septal ischemia because septal branches supply parts of the conduction system; these findings require urgent clinical assessment.',
       'Isolated septal STEMI is rare; usually occurs with anterior involvement (Anteroseptal).'
     ],
     heartRegionCoords: {
@@ -90,20 +90,20 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
   anterior: {
     id: 'anterior',
     name: 'Anterior STEMI',
-    shortDescription: 'Infarction of the anterior left ventricular free wall.',
+    shortDescription: 'Injury involving the anterior LV wall, often extending toward the apex. The extent depends on the level of LAD occlusion, branch anatomy, and collateral supply.',
     primaryLeads: ['V3', 'V4'],
     reciprocalLeads: ['II', 'III', 'aVF'],
-    culpritArtery: 'Left Anterior Descending (LAD) — Diagonal branches / Mid-LAD',
-    coronaryAnatomyNotes: 'Diagonal branches of LAD supply the anterior wall of the left ventricle.',
+    culpritArtery: 'Left Anterior Descending (LAD) — main vessel or diagonal branches, depending on the involved territory',
+    coronaryAnatomyNotes: 'The LAD and its branches supply the anterior LV; septal perforators supply the anterior septum, while diagonal branches commonly supply anterolateral myocardium. The precise territory varies.',
     expectedECG: {
-      stSegment: 'Marked ST-segment elevation in V3 and V4 (coved/tombstone morphology).',
-      tWave: 'Hyperacute T waves initially, evolving into deep symmetric T-wave inversion.',
-      qWave: 'Development of pathological Q waves or poor R-wave progression (PRWP) across precordium.',
-      reciprocal: 'Reciprocal ST-segment depression in inferior leads (II, III, aVF) is common with proximal LAD occlusions.'
+      stSegment: 'ST elevation is commonly seen in V3–V4 and may extend into other anterior precordial leads according to the extent of injury. Apply current criteria to contiguous leads; a coved or tombstone shape is not required.',
+      tWave: 'Hyperacute T waves may occur early, with T-wave inversion developing later; these changes are time- and reperfusion-dependent and are not obligatory.',
+      qWave: 'Pathological Q waves or reduced R-wave progression may develop, but neither is required for acute MI. Poor R-wave progression is nonspecific and should not be used alone to localize infarction.',
+      reciprocal: 'Inferior ST depression may accompany some anterior, particularly proximal LAD, occlusions; it is variable and is not present in every case.'
     },
     clinicalPearls: [
-      'Anterior STEMI carries high risk of cardiogenic shock and heart failure due to large area of LV myocardium at risk.',
-      'Loss of anterior R-wave progression (R in V3 < 3 mm) indicates substantial anterior myocardial loss.'
+      'Large anterior territories can place substantial LV myocardium at risk and may lead to LV dysfunction or cardiogenic shock; risk depends on infarct extent and reperfusion time.',
+      'Reduced anterior R-wave progression can occur with anterior injury or prior infarction, but is nonspecific and must be interpreted with the full ECG and clinical context.'
     ],
     heartRegionCoords: {
       anteriorHighlightSvgId: ['region-anterior', 'artery-lad']
@@ -120,20 +120,20 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
   anteroseptal: {
     id: 'anteroseptal',
     name: 'Anteroseptal STEMI',
-    shortDescription: 'Combined infarction of both the interventricular septum and anterior wall.',
+    shortDescription: 'Injury involving the anterior interventricular septum and adjacent anterior LV wall; the ECG pattern may extend beyond these regions depending on LAD anatomy.',
     primaryLeads: ['V1', 'V2', 'V3', 'V4'],
     reciprocalLeads: ['II', 'III', 'aVF'],
-    culpritArtery: 'Left Anterior Descending (LAD) — Proximal to Mid',
-    coronaryAnatomyNotes: 'Occlusion of the proximal to mid-LAD before or between first septal and first diagonal branches.',
+    culpritArtery: 'Left Anterior Descending (LAD) — commonly proximal or mid-vessel, depending on the branch level',
+    coronaryAnatomyNotes: 'An LAD occlusion proximal to important septal and/or diagonal branches can involve both septal and anterior myocardium. The exact extent depends on branch origins, dominance, and collateral flow.',
     expectedECG: {
-      stSegment: 'Prominent ST elevation across contiguous precordial leads V1 through V4.',
-      tWave: 'Tall hyperacute T waves or inverted T waves in V1–V4.',
-      qWave: 'QS complexes in V1–V2, pathological Q waves in V3–V4, and abrupt loss of anterior R wave progression.',
-      reciprocal: 'Reciprocal ST depression in inferior leads II, III, aVF.'
+      stSegment: 'ST elevation commonly involves contiguous precordial leads V1–V4. The distribution varies with the level and extent of LAD involvement; use current diagnostic criteria rather than a fixed morphology.',
+      tWave: 'Hyperacute T waves may occur early; T-wave inversion may appear later. Findings depend on the stage of injury and reperfusion.',
+      qWave: 'QS complexes, pathological Q waves, or reduced R-wave progression may develop, but are not obligatory or specific enough to define the infarct territory alone.',
+      reciprocal: 'Reciprocal inferior ST depression may occur, but is variable and should not be treated as a required finding.'
     },
     clinicalPearls: [
-      'Look for new onset right bundle branch block (RBBB) + left anterior fascicular block (bifascicular block), warning of imminent complete heart block.',
-      'Carries substantially worse prognosis than isolated inferior STEMI.'
+      'New RBBB, fascicular block, or AV conduction abnormalities can accompany extensive septal ischemia. They are important high-risk findings but do not by themselves predict inevitable complete heart block.',
+      'A larger anterior-septal territory can place substantial LV myocardium at risk; prognosis depends on infarct size, reperfusion delay, ventricular function, and complications.'
     ],
     heartRegionCoords: {
       anteriorHighlightSvgId: ['region-septum', 'region-anterior', 'artery-lad']
@@ -152,20 +152,20 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
   extensive_anterior: {
     id: 'extensive_anterior',
     name: 'Extensive Anterior / Anterolateral STEMI',
-    shortDescription: 'Massive infarction of septum, anterior wall, lateral wall, and apex.',
+    shortDescription: 'A large anterior/anteroseptal injury pattern that may extend to the apex and anterolateral LV. The actual area at risk depends on LAD anatomy, branch involvement, and collateral supply.',
     primaryLeads: ['V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'I', 'aVL'],
     reciprocalLeads: ['II', 'III', 'aVF'],
-    culpritArtery: 'Proximal Left Anterior Descending (LAD) or Left Main (LMCA)',
-    coronaryAnatomyNotes: 'Occlusion proximal to both S1 (first septal perforator) and D1 (first diagonal branch), jeopardizing >50% of left ventricular muscle mass.',
+    culpritArtery: 'Usually a large proximal LAD territory; left-main or multivessel disease is a separate possibility requiring clinical and angiographic correlation',
+    coronaryAnatomyNotes: 'Occlusion proximal to major septal and diagonal branches can jeopardize a large LV territory. The amount of myocardium at risk cannot be assigned a fixed percentage from the ECG alone.',
     expectedECG: {
-      stSegment: 'Dramatic "tombstone" ST elevation across precordial leads V1–V6 and limb leads I and aVL.',
-      tWave: 'Massive monophasic ST-T wave amalgamation.',
-      qWave: 'Extensive Q wave development with total loss of R waves across the precordium.',
-      reciprocal: 'Deep reciprocal ST depression in inferior leads II, III, and aVF.'
+      stSegment: 'Broad ST elevation may involve multiple anterior precordial leads (often V1–V6) and lateral leads I/aVL. The exact distribution varies; tombstone morphology is neither required nor specific.',
+      tWave: 'Hyperacute T waves and evolving ST–T changes may occur across the involved leads; morphology changes with timing and reperfusion.',
+      qWave: 'Pathological Q waves and reduced R-wave amplitudes may develop in affected leads, but complete loss of precordial R waves is not inevitable.',
+      reciprocal: 'Inferior reciprocal ST depression may accompany extensive anterior injury, but its presence and magnitude are variable.'
     },
     clinicalPearls: [
-      'High mortality; frequent progression to cardiogenic shock, malignant ventricular arrhythmias (VT/VF), and acute pulmonary edema.',
-      'Emergency cardiac catheterization activation is immediate priority.'
+      'Large proximal LAD infarctions can cause severe LV dysfunction, heart failure, cardiogenic shock, or ventricular arrhythmias; risk depends on the amount of myocardium involved and time to reperfusion.',
+      'For suspected acute coronary occlusion, activate the local emergent reperfusion pathway promptly in accordance with the applicable ACS guideline.'
     ],
     heartRegionCoords: {
       anteriorHighlightSvgId: ['region-septum', 'region-anterior', 'region-lateral', 'artery-lad', 'artery-lmca']
@@ -188,20 +188,20 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
   lateral: {
     id: 'lateral',
     name: 'Lateral STEMI',
-    shortDescription: 'Infarction of the lateral free wall of the left ventricle.',
+    shortDescription: 'Injury involving the lateral LV free wall; high-lateral and low-lateral lead patterns may overlap and can accompany anterior or inferior injury.',
     primaryLeads: ['I', 'aVL', 'V5', 'V6'],
     reciprocalLeads: ['II', 'III', 'aVF'],
     culpritArtery: 'Left Circumflex (LCx) or Diagonal branch of LAD',
     coronaryAnatomyNotes: 'LCx courses in the left atrioventricular groove and supplies the lateral LV via obtuse marginal (OM) branches; a sizable LAD diagonal branch can also supply the anterolateral/lateral territory.',
     expectedECG: {
-      stSegment: 'ST-segment elevation >= 1.0 mm in lateral leads I, aVL, V5, V6.',
-      tWave: 'T-wave elevation/hyperacute changes early, followed by symmetric inversion.',
-      qWave: 'Pathological Q waves in I, aVL, V5, V6 (>0.04s or >25% of following R wave).',
-      reciprocal: 'Reciprocal ST depression in inferior leads (III > II).'
+      stSegment: 'ST elevation may appear in I, aVL, V5, and/or V6 depending on the level and extent of lateral injury. Apply the current criteria for the relevant leads and contiguous distribution.',
+      tWave: 'Hyperacute T waves may occur early, with T-wave inversion developing later; evolution is variable and depends on timing and reperfusion.',
+      qWave: 'Pathological Q waves may develop in involved leads, but are not required for acute lateral MI. Assess Q waves using accepted duration, depth, and contiguous-lead criteria.',
+      reciprocal: 'ST depression in inferior leads, particularly III and aVF, may be reciprocal but is not obligatory.'
     },
     clinicalPearls: [
-      'Often accompanies anterior or inferior infarctions, forming anterolateral or inferolateral patterns.',
-      'Check for posterior involvement (LCx often supplies posterobasal myocardium).'
+      'Lateral involvement may coexist with anterior or inferior injury, producing anterolateral or inferolateral patterns.',
+      'Assess for inferobasal/posterior extension when LCx or a dominant RCA territory is involved; coronary dominance and branch anatomy affect the distribution.'
     ],
     heartRegionCoords: {
       anteriorHighlightSvgId: ['region-lateral', 'artery-lcx', 'artery-lad-diagonal'],
@@ -221,20 +221,20 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
   high_lateral: {
     id: 'high_lateral',
     name: 'High Lateral STEMI',
-    shortDescription: 'Subtle infarction localized to the superior/basal lateral LV free wall.',
+    shortDescription: 'Injury involving the high/basal lateral LV, commonly reflected in leads I and aVL; the territory may overlap with anterolateral myocardium.',
     primaryLeads: ['I', 'aVL'],
     reciprocalLeads: ['II', 'III', 'aVF'],
     culpritArtery: 'First Diagonal of LAD (D1) or First Obtuse Marginal of LCx (OM1)',
-    coronaryAnatomyNotes: 'Isolated high lateral wall infarction is caused by occlusion of high-takeoff diagonal or obtuse marginal branches.',
+    coronaryAnatomyNotes: 'High-lateral injury is often associated with a first diagonal (D1) or obtuse marginal (OM) branch occlusion, but ECG patterns do not identify the culprit artery with certainty.',
     expectedECG: {
-      stSegment: 'ST elevation in I and aVL (may be subtle: 1–2 mm).',
-      tWave: 'Hyperacute or inverted T waves in I and aVL.',
-      qWave: 'Pathological Q wave in aVL (depth > 2 mm or width > 0.04s in presence of reciprocal inferior changes).',
-      reciprocal: 'Mirror reciprocal ST depression in leads III and aVF (very prominent and often more noticeable than the subtle ST elevation in I/aVL!).'
+      stSegment: 'ST elevation is commonly seen in I and aVL; it may be subtle. Some D1-related patterns also show elevation in V2 (e.g., the South African flag pattern).',
+      tWave: 'Hyperacute T waves may occur early and T-wave inversion may develop later; findings vary with the stage of injury.',
+      qWave: 'A Q wave may develop in I or aVL, but is not required. Interpret Q-wave duration, depth, and distribution using accepted criteria and the clinical context.',
+      reciprocal: 'Reciprocal ST depression may appear in III and aVF. It can be more conspicuous than the ST elevation, but is not required and should not be labelled primary inferior infarction without supporting evidence.'
     },
     clinicalPearls: [
-      'CLASSIC PITFALL: Inferior reciprocal depression in lead III and aVF is frequently misinterpreted as "inferior ischemia" while overlooking the true culprit STEMI in aVL.',
-      '"South African Flag sign": high lateral STEMI characterized by elevation in I, aVL, V2 with depression in III and aVF.'
+      'Inferior ST depression can be reciprocal to high-lateral injury; interpret the full lead pattern rather than localizing infarction from ST depression alone.',
+      '"South African flag" pattern: ST elevation in I, aVL, and V2 with reciprocal depression in III, classically associated with D1 occlusion. This is a separate ECG variant; the simplified high-lateral waveform in this simulator does not model the additional V2 elevation.'
     ],
     heartRegionCoords: {
       anteriorHighlightSvgId: ['region-high-lateral', 'artery-lad-diagonal', 'artery-lcx-om']
@@ -251,25 +251,25 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
   inferior: {
     id: 'inferior',
     name: 'Inferior STEMI',
-    shortDescription: 'Infarction of the diaphragmatic (inferior) wall of the left ventricle.',
+    shortDescription: 'Injury involving the diaphragmatic (inferior) LV wall. RV involvement may coexist, particularly with proximal RCA occlusion, but is a separate territory.',
     primaryLeads: ['II', 'III', 'aVF'],
     reciprocalLeads: ['I', 'aVL'],
     culpritArtery: 'Right Coronary Artery (RCA) or Left Circumflex (LCx), depending on coronary dominance',
-    coronaryAnatomyNotes: 'Supplied by the Posterior Descending Artery (PDA). When RCA dominant: ST elevation III > II and ST depression in lead I. When LCx dominant: ST elevation II >= III and ST elevation or isoelectric in I.',
+    coronaryAnatomyNotes: 'The inferior LV is commonly supplied by the PDA, which usually arises from the RCA in right-dominant circulation or the LCx in left-dominant circulation. ST elevation in III greater than II and reciprocal depression in I/aVL may favor RCA involvement, but ECG patterns do not prove the culprit artery.',
     expectedECG: {
-      stSegment: 'Convex ST elevation >= 1.0 mm in at least two contiguous leads: II, III, aVF.',
-      tWave: 'Tall peaked T waves early, followed by deep T-wave inversion in II, III, aVF.',
-      qWave: 'Pathological Q waves in III and aVF (width >= 0.04s).',
-      reciprocal: 'Reciprocal ST depression and T-wave changes may be seen in lead aVL and lead I. Performance statistics are omitted pending primary-study verification.'
+      stSegment: 'ST elevation in at least two anatomically contiguous inferior leads (II, III, aVF) supports an inferior injury pattern when current diagnostic criteria and clinical context are met. Convex morphology is not required.',
+      tWave: 'Hyperacute T waves may occur early; T-wave inversion may develop later. The sequence is variable and depends on timing and reperfusion.',
+      qWave: 'Pathological Q waves may develop in inferior leads, but are not required for acute MI. Interpret them using accepted duration, depth, and contiguous-lead criteria.',
+      reciprocal: 'Reciprocal ST depression may appear in I and aVL, particularly aVL, but can be absent. Do not use an isolated reciprocal change as proof of an inferior culprit.'
     },
     supplementalLeadsRecommended: {
       leads: ['V3R', 'V4R'],
-      reason: 'Mandatory evaluation for co-existing Right Ventricular (RV) Infarction, present in up to 30-50% of inferior STEMIs.',
-      clinicalPearl: 'Acquire right-sided leads promptly when RV involvement is suspected. Avoid nitroglycerin in suspected RV infarction; assess morphine and diuretics individually under the applicable local protocol.'
+      reason: 'Record right-sided leads in suspected inferior MI to assess for associated RV involvement; V3R and V4R are particularly useful.',
+      clinicalPearl: 'Record V3R/V4R promptly when RV involvement is suspected. Avoid nitrates in suspected RV infarction because preload reduction may precipitate hypotension; individualize other drugs and fluid therapy to the haemodynamic state and local protocol.'
     },
     clinicalPearls: [
-      'Sinus bradycardia and 1st, 2nd (Mobitz I / Wenckebach), or 3rd degree AV block are common due to RCA supply to SA node (~60%) and AV node (~90%). Usually transient/nodal with junctional escape.',
-      'Always look for reciprocal ST depression in aVL. Even 0.5 mm ST depression in aVL with subtle inferior ST elevation is highly specific for acute inferior MI.'
+      'Sinus bradycardia and AV-nodal block may occur, particularly with RCA-related inferior MI because the nodal arteries often arise from the RCA; the pattern and frequency vary with coronary dominance.',
+      'Check I and aVL for reciprocal ST depression, especially when inferior ST elevation is subtle. Its presence can support the pattern, but its absence does not exclude inferior MI.'
     ],
     heartRegionCoords: {
       anteriorHighlightSvgId: ['region-inferior', 'artery-rca'],
@@ -293,19 +293,19 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
     culpritArtery: 'Left Circumflex (LCx) or Right Coronary Artery (RCA — Posterolateral branches)',
     coronaryAnatomyNotes: 'Usually supplied by distal LCx or posterolateral branches of a dominant RCA; the exact territory varies with coronary dominance. The PDA more typically supplies the inferior LV and inferior interventricular septum. Because standard 12-lead electrodes face anteriorly, V1–V3 may show reciprocal changes; V7–V9 provide a direct posterior/inferobasal view.',
     expectedECG: {
-      stSegment: 'Standard leads V1–V3 may show horizontal ST-segment depression (mirror-image clue). Obtain posterior leads when LCx occlusion is suspected, particularly with isolated anterior ST depression; use a source-specific lead combination and threshold rather than a single-lead rule.',
-      tWave: 'Standard leads V1–V3 show tall, upright, prominent T waves (mirror image of T inversion).',
-      qWave: 'Standard leads V1–V3 show abnormally tall, broad R waves (R/S ratio > 1 in V2; mirror image of pathological Q waves!).',
-      reciprocal: 'Standard V1–V3 are the reciprocal view of the posterior wall!'
+      stSegment: 'ST depression in V1–V3, especially with a positive terminal T wave, may be the reciprocal presentation of posterior injury. Obtain V7–V9 when posterior occlusion is suspected, particularly with ongoing symptoms and isolated ST depression in V1–V3; interpret the posterior lead group using the selected source-specific criteria.',
+      tWave: 'Tall, upright T waves in V1–V3 may accompany the reciprocal anterior pattern, but are not required and should be interpreted with ST-segment and clinical findings.',
+      qWave: 'A relatively tall or broad R wave in V1–V3 may develop as a mirror-image finding in established posterior infarction; it is not required and is not diagnostic on its own.',
+      reciprocal: 'V1–V3 may show reciprocal changes from posterior injury; this pattern is suggestive, not independently diagnostic.'
     },
     supplementalLeadsRecommended: {
       leads: ['V7', 'V8', 'V9'],
-      reason: 'Standard 12-lead ECG is often nondiagnostic or misinterpreted as "anterior subendocardial ischemia", delaying primary reperfusion.',
+      reason: 'A standard 12-lead ECG may show only reciprocal anterior ST depression. Record V7–V9 when posterior occlusion is suspected, particularly with ongoing symptoms or isolated ST depression in V1–V3.',
       clinicalPearl: 'Place V7 (left posterior axillary line), V8 (midscapular line), V9 (paraspinal line) horizontally level with V6. Interpret the lead group using the selected source framework; a single lead is not independently confirmatory.'
     },
     clinicalPearls: [
-      'The "flip-test": Turning the ECG upside down and holding it to the light turns V1–V3 ST depression into classic ST elevation and tall R waves into deep Q waves.',
-      'Isolated posterior STEMI represents 3-11% of all infarcts and is frequently missed.'
+      'Do not rely on the "flip test" for diagnosis. Recognize reciprocal ST depression in V1–V3 and obtain posterior leads V7–V9 when clinically indicated.',
+      'Posterior/inferobasal infarction may be missed on a standard 12-lead ECG because the posterior wall is not directly viewed by the standard precordial leads.'
     ],
     heartRegionCoords: {
       posteriorHighlightSvgId: ['region-posterior', 'region-lv-post', 'artery-lcx-post', 'artery-rca-plb']
@@ -323,26 +323,26 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
   right_ventricular: {
     id: 'right_ventricular',
     name: 'Right Ventricular (RV) Infarction',
-    shortDescription: 'Infarction of the thin-walled right ventricle, almost always accompanying inferior STEMI.',
+    shortDescription: 'Infarction involving the RV free wall, often accompanying inferior MI and commonly associated with proximal RCA occlusion; isolated RV infarction is uncommon.',
     primaryLeads: ['V3R', 'V4R', 'II', 'III', 'aVF'],
     reciprocalLeads: ['I', 'aVL'],
     culpritArtery: 'Proximal Right Coronary Artery (RCA) — Proximal to acute marginal branches',
-    coronaryAnatomyNotes: 'RCA supplies the right ventricular free wall via acute marginal branches before continuing to the posterior interventricular groove.',
+    coronaryAnatomyNotes: 'The proximal RCA gives off acute marginal branches that supply the RV free wall before the vessel continues toward the inferior/posterior interventricular territory. Branch anatomy and dominance vary.',
     expectedECG: {
-      stSegment: 'Right-sided ST-segment changes can support assessment for RV involvement in the context of inferior injury; numeric thresholds remain omitted pending primary-source review.',
-      tWave: 'Upright, hyperacute T wave in right precordial leads V3R and V4R.',
-      qWave: 'Q waves in III and aVF; QS patterns can emerge in V3R/V4R.',
-      reciprocal: 'ST depression in I and aVL; standard V1 may show subtle ST elevation while V2 is isoelectric or depressed.'
+      stSegment: 'ST elevation in right-sided leads, especially V3R–V4R, supports RV involvement in the appropriate clinical context. Record right-sided leads when inferior MI is suspected; interpret changes with symptoms and haemodynamics.',
+      tWave: 'T-wave morphology in V3R/V4R varies with timing and is not required to identify RV involvement; interpret it with the right-sided ST segments and clinical findings.',
+      qWave: 'Q waves in III/aVF usually indicate associated inferior LV injury, not RV injury alone. QS patterns may occur in right-sided leads but are not required or diagnostic by themselves.',
+      reciprocal: 'I/aVL may show reciprocal changes when inferior injury coexists. Standard V1 may show ST elevation, but the absence of these findings does not exclude RV infarction.'
     },
     supplementalLeadsRecommended: {
       leads: ['V3R', 'V4R'],
-      reason: 'Standard 12-lead ECG is blind to right ventricular free wall electrical activity.',
-      clinicalPearl: 'Acquire right-sided leads promptly when RV involvement is suspected. Numeric sensitivity and fading-time claims require primary-source verification.'
+      reason: 'Standard precordial leads provide limited direct assessment of the RV free wall; obtain right-sided leads, particularly V3R and V4R, when RV infarction is suspected.',
+      clinicalPearl: 'Record V3R/V4R promptly when RV involvement is suspected; interpret findings with the standard ECG, symptoms, and haemodynamic assessment.'
     },
     clinicalPearls: [
-      'HEMODYNAMIC DISASTER WARNING: The infarcted RV behaves as a stiff, passive conduit. LV filling depends strictly on high right-sided preload (elevated JVP).',
-      'Medication teaching must distinguish drug classes. Avoid nitroglycerin in suspected RV infarction; morphine is not universally contraindicated and diuretic use depends on haemodynamic and volume status. Final wording requires qualified local-protocol review.',
-      'TREATMENT: Aggressive IV fluid resuscitation (normal saline bolus), inotropes if needed, emergent PCI.'
+      'RV systolic dysfunction can reduce pulmonary blood flow and LV preload, causing hypotension and elevated JVP. Assess haemodynamics and volume status rather than assuming that every patient needs a large fluid bolus.',
+      'Avoid nitrates in suspected RV infarction because preload reduction may worsen hypotension. Other medications and fluid therapy must be individualized to blood pressure, congestion, and the applicable local protocol.',
+      'Prioritize urgent reperfusion and haemodynamic support. Give fluids only when indicated by the patient’s filling status and response; use vasoactive or mechanical support when clinically required.'
     ],
     heartRegionCoords: {
       anteriorHighlightSvgId: ['region-rv', 'artery-rca'],
@@ -364,20 +364,20 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
   pericarditis: {
     id: 'pericarditis',
     name: 'STEMI Mimic: Acute Pericarditis',
-    shortDescription: 'Inflammation of pericardial sac producing widespread concave ST elevation and PR depression.',
+    shortDescription: 'Inflammation of the pericardial sac that may produce diffuse ST elevation and PR depression; ECG findings are variable and must be interpreted with the clinical presentation.',
     primaryLeads: ['I', 'II', 'III', 'aVL', 'aVF', 'V2', 'V3', 'V4', 'V5', 'V6'],
     reciprocalLeads: ['aVR'],
-    culpritArtery: 'Non-ischemic (Pericardial inflammation — viral, post-infarct, uremic)',
-    coronaryAnatomyNotes: 'No epicardial coronary artery occlusion. Epicardial sub-surface irritation causes widespread current of injury.',
+    culpritArtery: 'Pericardial inflammation (infectious/idiopathic, autoimmune, uremic, post-injury, or other causes)',
+    coronaryAnatomyNotes: 'Pericarditis does not define a coronary territory. The pericardium is electrically silent; ST/PR changes imply concomitant epicardial myocardial involvement. Troponin may be elevated with myopericarditis, and a pericarditis-like ECG does not exclude coexisting ACS.',
     expectedECG: {
-      stSegment: 'Widespread, diffuse CONCAVE ("saddleback") ST elevation across limb and precordial leads without anatomical territory confinement.',
-      tWave: 'Upright T waves during acute stage; T inversion develops ONLY AFTER ST segments have returned to baseline (unlike STEMI where T inverts while ST still elevated).',
-      qWave: 'NO pathological Q waves develop.',
-      reciprocal: 'Reciprocal PR elevation and ST depression in lead aVR (and occasionally lead V1). PR depression in inferolateral leads (II, V5, V6).'
+      stSegment: 'Typically widespread, often concave ST elevation (commonly sparing aVR and often V1) with PR depression. ECG changes may be absent, incomplete, or atypical; morphology alone is not diagnostic.',
+      tWave: 'In the classical sequence, T-wave inversion follows return of the ST segment toward baseline. The stages are not always present or sequential, so this timing is a clue rather than an absolute rule.',
+      qWave: 'Pathological Q waves are not typical of uncomplicated pericarditis; consider myocardial involvement, infarction, or another diagnosis if they are present.',
+      reciprocal: 'PR depression may occur in multiple leads, with reciprocal PR elevation and ST depression in aVR and sometimes V1. ST depression beyond these leads should prompt assessment for alternative or coexisting causes.'
     },
     clinicalPearls: [
-      'Hallmark: PR segment depression in multiple leads with PR segment elevation in aVR (subepicardial atrial injury).',
-      'Chest pain is sharp, pleuritic, worse lying flat (supine), and relieved by sitting up and leaning forward.'
+      'Under the 2025 ESC framework, definite pericarditis requires a compatible clinical presentation plus more than one additional criterion (e.g. pericardial rub, PR depression/widespread ST elevation, raised CRP, new/worsening effusion, or CMR evidence). ECG alone is insufficient.',
+      'Typical pain is sharp or pleuritic, worsens with inspiration or lying flat, and may improve when sitting up and leaning forward; presentations vary.'
     ],
     heartRegionCoords: {},
     waveformDeltas: {
@@ -397,21 +397,21 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
 
   early_repolarization: {
     id: 'early_repolarization',
-    name: 'STEMI Mimic: Benign Early Repolarization (BER)',
-    shortDescription: 'Normal physiological variant in healthy young individuals, especially athletes.',
+    name: 'STEMI Mimic: Early Repolarization Pattern (ERP)',
+    shortDescription: 'An ECG pattern defined by an end-QRS notch or slur with Jp ≥0.1 mV in at least two contiguous leads other than V1–V3 and QRS duration <120 ms. ST elevation is not required; clinical context remains essential.',
     primaryLeads: ['V2', 'V3', 'V4', 'V5', 'V6', 'II'],
     reciprocalLeads: [],
-    culpritArtery: 'None (Physiological normal variant)',
-    coronaryAnatomyNotes: 'Commonly observed in healthy individuals < 50 years old.',
+    culpritArtery: 'No culprit vessel is implied by this ECG pattern; its presence does not exclude coronary disease or ACS.',
+    coronaryAnatomyNotes: 'The pattern can occur in healthy people, but it is not synonymous with a universally benign prognosis. Inferior/lateral patterns and horizontal or descending ST segments have been associated with higher arrhythmic risk; this is distinct from diagnosing acute coronary occlusion.',
     expectedECG: {
-      stSegment: 'Concave upward ST-segment elevation (typically < 2 mm in limb leads, < 3 mm in precordial leads). Distinct J-point notch or fishhook slur.',
-      tWave: 'Large, prominent, concordant upright asymmetrical T waves.',
-      qWave: 'No pathological Q waves.',
-      reciprocal: 'ABSENCE of reciprocal ST depression (except sometimes in aVR).'
+      stSegment: 'The consensus definition requires an end-QRS notch and/or slur with Jp ≥0.1 mV in at least two contiguous leads (excluding V1–V3) and QRS duration <120 ms. ST-segment elevation is not required; elevation alone is nonspecific.',
+      tWave: 'T waves are often prominent and concordant with the QRS, but their amplitude and shape vary by lead and individual.',
+      qWave: 'Early repolarization does not itself produce infarction-related Q waves; pathological Q waves should prompt assessment for prior/current myocardial injury or another cause.',
+      reciprocal: 'Reciprocal ST depression is usually absent, but its absence cannot rule out acute coronary occlusion or ACS.'
     },
     clinicalPearls: [
-      'ST-to-T wave amplitude ratio in V6 < 0.25 strongly supports BER over anterior STEMI.',
-      'ST elevation is static on serial ECGs (does not dynamically evolve like acute ischemia).'
+      'Compare with prior ECGs and assess serial changes when symptoms are ongoing. A single ST/T ratio or concave ST shape must not be used alone to label an ECG benign or exclude ACS.',
+      'A stable pattern on prior ECGs can support an early-repolarization interpretation, but stability alone does not exclude ACS; interpret symptoms, serial ECGs, biomarkers, and the complete tracing.'
     ],
     heartRegionCoords: {},
     waveformDeltas: {

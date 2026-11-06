@@ -225,7 +225,7 @@ export default function Navbar({
                 </optgroup>
                 <optgroup label="STEMI Mimics">
                   <option value="pericarditis">Acute Pericarditis (Diffuse Concave ST & PR Depression)</option>
-                  <option value="early_repolarization">Benign Early Repolarization (Concave ST & J-Point Notch)</option>
+                  <option value="early_repolarization">Early Repolarization Pattern (J-Point Notch / Slur)</option>
                 </optgroup>
               </select>
             </div>

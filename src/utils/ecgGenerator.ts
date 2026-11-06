@@ -162,10 +162,10 @@ export function getEcgVoltage(
       baseVoltage = rAmp + (stMv - rAmp) * Math.sin(0.5 * Math.PI * u) * Math.sin(0.5 * Math.PI * u);
     }
 
-    // Benign early repolarization: J-point notch / fishhook slurring on terminal QRS
+    // Early-repolarization pattern: J-point notch / slurring at the terminal QRS
     if (territoryId === 'early_repolarization' && tau > tS && tau <= tJ) {
       const notchProg = (tau - tS) / (tJ - tS);
-      const notch = 0.08 * Math.sin(Math.PI * notchProg);
+      const notch = 0.12 * Math.sin(Math.PI * notchProg);
       return baseVoltage + notch;
     }
 
@@ -207,7 +207,7 @@ export function getEcgVoltage(
       const arch = 0.30 * Math.max(Math.abs(stMv), 0.15) * Math.sin(Math.PI * u);
       return (stMv + (vSTEnd - stMv) * u) + (stMv >= 0 ? arch : -arch);
     } else if (slopeType === 'concave') {
-      // Pericarditis / Benign Early Repol: concave "saddleback" ST elevation
+      // Synthetic pericarditis / early-repolarization ST shape; ERP itself is defined by terminal QRS notching/slurring, not ST elevation
       const scoop = -0.20 * Math.max(Math.abs(stMv), 0.10) * Math.sin(Math.PI * u);
       return (stMv + (vSTEnd - stMv) * u) + scoop;
     } else if (slopeType === 'horizontal') {
@@ -366,7 +366,7 @@ export function getCycleLandmarks(lead: string, territoryId: string = 'normal', 
       : territoryId === 'posterior' && delta?.tallRWave
       ? 'Prominent upright T-wave morphology in an anterior reciprocal lead; interpret with the accompanying ST and QRS pattern.'
       : territoryId === 'early_repolarization' && delta?.tWaveAmplitudeMm !== undefined
-      ? 'Prominent upright T wave can accompany benign early repolarization; it is not an acute coronary occlusion marker by itself.'
+      ? 'Prominent upright T waves can accompany an early-repolarization pattern; this finding alone neither diagnoses the pattern nor excludes acute coronary occlusion.'
       : delta?.tWaveAmplitudeMm !== undefined && delta.tWaveAmplitudeMm >= 6
       ? 'Prominent T-wave amplitude in this synthetic acute-infarct scenario; assess for hyperacute morphology in the complete ECG and clinical context.'
       : 'Rapid ventricular repolarization (phase 3). Normal upright morphology concordant with main QRS vector.'

@@ -29,8 +29,9 @@ export const CLINICAL_REFERENCES: ReferenceItem[] = [
     url: 'https://academic.oup.com/eurheartj/article/44/38/3720/7243210',
     keyContributions: [
       'Comprehensive definitions of STEMI equivalents including Wellens syndrome, de Winter T-wave pattern, and modified Sgarbossa criteria.',
-      'Definition of reciprocal ST-segment depression in distinguishing STEMI from acute pericarditis and early repolarization.',
-      'Standardized guidance on repeat serial 12-lead ECG recording every 15–30 minutes in patients with ongoing ischemic symptoms and inconclusive initial ECG.'
+      'Recommendations for V3R–V4R in suspected inferior STEMI and V7–V9 when posterior MI is suspected.',
+      'Recognition that ST depression in V1–V3 and/or ST elevation in V7–V9 can indicate posterior coronary occlusion.',
+      'Guidance on ECG criteria, serial assessment, and limitations of surface ECG localization.'
     ]
   },
   {
@@ -38,11 +39,47 @@ export const CLINICAL_REFERENCES: ReferenceItem[] = [
     title: 'Fifth Universal Definition of Myocardial Infarction',
     organization: 'European Society of Cardiology (ESC), ACC, AHA, and World Heart Federation Task Force',
     year: '2026',
-    url: 'https://www.escardio.org/guidelines/clinical-practice-guidelines/pocket-guidelines/universal-definition-of-myocardial-infarction/',
+    url: 'https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/universal-definition-myocardial-infarction/',
     keyContributions: [
-      'Delineation of acute myocardial injury vs true acute myocardial infarction (Types 1 to 5).',
-      'The pathological Q-wave rule requires clinical reviewer approval before it is presented as an active teaching criterion; see the pending model/criteria review gate.',
-      'Standardized definition of J-point reference to PR segment.'
+      'Replaces the previous numerical Type 1–5 classification with primary, secondary, and procedure-related clinical MI categories.',
+      'Refines the definition of acute and chronic myocardial injury and emphasizes sex-specific cardiac troponin reference limits.',
+      'Emphasizes that MI diagnosis integrates clinical evidence, biomarkers, ECG findings, and coronary/cardiac imaging; no single ECG feature is sufficient on its own.',
+      'Summarizes ECG findings of myocardial ischemia or infarction, including posterior MI and RV MI patterns and the South African flag sign.'
+    ]
+  },
+  {
+    id: 'acc-rv-mi-2024',
+    title: 'Right Ventricular Myocardial Infarction — A Tale of Two Ventricles: JACC Focus Seminar',
+    organization: 'American College of Cardiology / Journal of the American College of Cardiology',
+    year: '2024',
+    url: 'https://www.jacc.org/doi/10.1016/j.jacc.2023.09.839',
+    keyContributions: [
+      'RV infarction commonly accompanies inferior STEMI and is usually related to proximal RCA occlusion affecting RV branches.',
+      'Right-sided ECG, particularly V3R and V4R, is useful when assessing suspected RV infarction in inferior MI.',
+      'RV dysfunction can reduce pulmonary blood flow and LV preload; haemodynamic and volume assessment should guide support.'
+    ]
+  },
+  {
+    id: 'esc-pericarditis-2025',
+    title: '2025 ESC Guidelines for the Management of Myocarditis and Pericarditis',
+    organization: 'European Society of Cardiology (ESC)',
+    year: '2025',
+    url: 'https://academic.oup.com/eurheartj/article/46/40/3952/8234483',
+    keyContributions: [
+      'The 2025 ESC framework defines definite pericarditis as a compatible clinical presentation with more than one additional criterion; ECG changes include PR depression and widespread ST elevation.',
+      'Pathological Q waves are not typical of uncomplicated pericarditis; myopericardial involvement and coexisting ACS require clinical assessment.',
+      'ECG changes occur in up to 60% of cases, imply concomitant myocardial involvement because the pericardium is electrically silent, and their temporal evolution is variable.'
+    ]
+  },
+  {
+    id: 'jacc-early-repolarization-2015',
+    title: 'The Early Repolarization Pattern: A Consensus Paper',
+    organization: 'Journal of the American College of Cardiology',
+    year: '2015',
+    url: 'https://www.jacc.org/doi/10.1016/j.jacc.2015.05.033',
+    keyContributions: [
+      'Defines early repolarization by an end-QRS notch/slur with Jp ≥0.1 mV in at least two contiguous leads excluding V1–V3, and QRS duration <120 ms; ST elevation is not required.',
+      'Clarifies that early repolarization should be described as an ECG pattern and interpreted in clinical context rather than automatically assumed benign.'
     ]
   },
   {

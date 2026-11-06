@@ -70,49 +70,49 @@ export interface StemMimicComparison {
 export const STEMI_MIMICS: StemMimicComparison[] = [
   {
     feature: 'ST Segment Morphology',
-    acuteSTEMI: 'Convex upward ("coved", tombstone) or straight oblique',
-    pericarditis: 'Concave upward ("saddleback"), widespread across multiple territories',
-    earlyRepol: 'Concave upward, notched/slurred J point',
+    acuteSTEMI: 'May be convex, straight, or concave; morphology varies by lead and clinical setting',
+    pericarditis: 'Often concave and widespread, but morphology and distribution vary; shape alone is not diagnostic',
+    earlyRepol: 'J-point notch or slur; ST elevation may accompany the pattern but is not required',
     lvhWithStrain: 'Asymmetrical downsloping ST depression in lateral leads; concave ST elevation in V1–V3',
     lbbb: 'Discordant to major QRS deflection (ST elevation in right leads with QS; ST depression in lateral leads)'
   },
   {
     feature: 'Anatomical Distribution',
-    acuteSTEMI: 'Confined to specific coronary artery territory (e.g. II/III/aVF or V1–V4)',
-    pericarditis: 'Diffuse, non-territorial (leads I, II, III, aVF, V2–V6)',
-    earlyRepol: 'Most pronounced in V3–V5 and inferolateral leads',
+    acuteSTEMI: 'Often regional and compatible with a coronary territory, but the ECG distribution can overlap or be atypical',
+    pericarditis: 'Often diffuse and non-territorial; may be incomplete or atypical',
+    earlyRepol: 'Often seen in precordial or inferolateral leads; distribution varies',
     lvhWithStrain: 'V1–V3 (elevation) and I, aVL, V5–V6 (depression)',
     lbbb: 'V1–V3 (elevation) and I, aVL, V5–V6 (depression)'
   },
   {
     feature: 'Reciprocal ST Depression',
-    acuteSTEMI: 'Present and highly specific (e.g. aVL depression in inferior STEMI)',
-    pericarditis: 'Usually absent outside aVR, which may show reciprocal PR elevation and ST depression',
-    earlyRepol: 'Absent',
+    acuteSTEMI: 'May occur in electrically opposite leads and can support localization; it is variable and is not independently diagnostic',
+    pericarditis: 'ST depression is often limited to aVR and sometimes V1; assess broader depression for alternative or coexisting causes',
+    earlyRepol: 'Usually absent, but absence does not exclude ACS',
     lvhWithStrain: 'Strain pattern is secondary repolarization abnormality, not true ischemic reciprocity',
     lbbb: 'Secondary discordance, not true acute ischemic reciprocity (evaluate modified Sgarbossa)'
   },
   {
     feature: 'PR Segment Changes',
     acuteSTEMI: 'Isoelectric (PR depression rare, seen in atrial infarction)',
-    pericarditis: 'PR segment depression in inferolateral leads; PR elevation in aVR (very specific)',
+    pericarditis: 'PR depression may occur in multiple leads, with reciprocal PR elevation in aVR and sometimes V1; this is supportive, not diagnostic alone',
     earlyRepol: 'Isoelectric PR segment',
     lvhWithStrain: 'Isoelectric',
     lbbb: 'Isoelectric'
   },
   {
     feature: 'T Wave Morphology',
-    acuteSTEMI: 'Hyperacute tall symmetrical early; evolves to deep symmetric inversion while ST elevated',
-    pericarditis: 'T waves are often upright initially; inversion may occur after ST segments return toward baseline',
-    earlyRepol: 'Prominent, asymmetrical upright T waves',
+    acuteSTEMI: 'Hyperacute T waves may occur early; T-wave inversion can develop later. Evolution varies with timing and reperfusion',
+    pericarditis: 'In the classical sequence, T inversion follows return of ST segments toward baseline; stages are not always present or sequential',
+    earlyRepol: 'T waves are often prominent and concordant, but shape and amplitude vary',
     lvhWithStrain: 'Asymmetrical T wave inversion with rapid return to baseline in lateral leads',
     lbbb: 'Discordant T waves (inverted in leads with positive QRS)'
   },
   {
     feature: 'Serial Evolution',
-    acuteSTEMI: 'Dynamic and rapid evolution over hours (hyperacute T -> ST elevation -> Q waves -> T inversion)',
-    pericarditis: 'Slow evolution over days to weeks (4 distinct stages)',
-    earlyRepol: 'Static over weeks/months/years',
+    acuteSTEMI: 'May evolve over time; the sequence and presence of hyperacute T waves, Q waves, and T inversion are variable',
+    pericarditis: 'May evolve over days to weeks, but the classical stages are not consistently observed',
+    earlyRepol: 'Often stable on prior or serial ECGs; stability alone does not exclude ACS',
     lvhWithStrain: 'Static (unless hypertension controlled over months)',
     lbbb: 'Static baseline (unless acute new coronary occlusion occurs)'
   }

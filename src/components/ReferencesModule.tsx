@@ -155,7 +155,7 @@ export default function ReferencesModule() {
               Differential Diagnosis: STEMI vs Common ST-Elevation Mimics
             </h3>
             <span className={`text-[11px] ${theme.subtextColor}`}>
-              Distinguishing features according to 2023 ESC & 2025 ACC/AHA
+              Typical comparison features; see cited ACS, pericarditis, and early-repolarization sources. No single feature confirms or excludes ACS.
             </span>
           </div>
 
@@ -168,7 +168,7 @@ export default function ReferencesModule() {
                   <th className="p-3 w-32">Diagnostic Feature</th>
                   <th className="p-3 text-rose-600 dark:text-rose-400 font-bold">Acute STEMI</th>
                   <th className="p-3 text-amber-700 dark:text-amber-300">Acute Pericarditis</th>
-                  <th className="p-3 text-emerald-700 dark:text-emerald-300">Benign Early Repol (BER)</th>
+                  <th className="p-3 text-emerald-700 dark:text-emerald-300">Early Repolarization Pattern (ERP)</th>
                   <th className="p-3 text-indigo-700 dark:text-indigo-300">LVH with Strain</th>
                   <th className="p-3 text-purple-700 dark:text-purple-300">Left Bundle Branch Block (LBBB)</th>
                 </tr>

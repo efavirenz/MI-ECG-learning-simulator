@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CLINICAL_CASES, KNOWLEDGE_QUIZ } from './clinicalCases';
-import { STEMI_CRITERIA_TABLE } from './clinicalCriteria';
+import { STEMI_CRITERIA_TABLE, STEMI_MIMICS } from './clinicalCriteria';
 import { CLINICAL_REFERENCES } from './references';
 import { MI_TERRITORIES } from './miTerritories';
 import { BASE_LEADS, getCycleLandmarks, getEcgVoltage } from '../utils/ecgGenerator';
@@ -39,6 +39,38 @@ describe('educational data structure integrity', () => {
       expect(row.thresholdMm.trim()).not.toBe('');
       expect(row.thresholdMv.trim()).not.toBe('');
       expect(row.guidelineSource.trim()).not.toBe('');
+    }
+  });
+
+  it('keeps MI localization profiles complete and guards key clinical wording', () => {
+    for (const [territoryId, territory] of Object.entries(MI_TERRITORIES)) {
+      expect(territory.shortDescription.trim(), territoryId).not.toBe('');
+      expect(territory.culpritArtery.trim(), territoryId).not.toBe('');
+      expect(territory.coronaryAnatomyNotes.trim(), territoryId).not.toBe('');
+      expect(territory.expectedECG.stSegment.trim(), territoryId).not.toBe('');
+      expect(territory.expectedECG.tWave.trim(), territoryId).not.toBe('');
+      expect(territory.expectedECG.qWave.trim(), territoryId).not.toBe('');
+      expect(territory.expectedECG.reciprocal.trim(), territoryId).not.toBe('');
+      expect(territory.clinicalPearls.length, territoryId).toBeGreaterThan(0);
+      territory.clinicalPearls.forEach(pearl => expect(pearl.trim(), territoryId).not.toBe(''));
+    }
+
+    expect(MI_TERRITORIES.normal.culpritArtery).toContain('No culprit vessel');
+    expect(MI_TERRITORIES.right_ventricular.shortDescription).not.toMatch(/almost always/i);
+    expect(MI_TERRITORIES.posterior.coronaryAnatomyNotes).toContain('PDA more typically supplies the inferior LV');
+    expect(MI_TERRITORIES.early_repolarization.name).not.toMatch(/benign/i);
+    expect(MI_TERRITORIES.early_repolarization.shortDescription).toContain('Jp ≥0.1 mV');
+    expect(MI_TERRITORIES.pericarditis.expectedECG.tWave).toContain('not always present or sequential');
+    expect(MI_TERRITORIES.pericarditis.clinicalPearls[0]).toContain('more than one additional criterion');
+
+    const reciprocalRow = STEMI_MIMICS.find(row => row.feature === 'Reciprocal ST Depression');
+    expect(reciprocalRow?.acuteSTEMI).not.toMatch(/highly specific/i);
+    expect(reciprocalRow?.pericarditis).not.toMatch(/very specific/i);
+    const evolutionRow = STEMI_MIMICS.find(row => row.feature === 'Serial Evolution');
+    expect(evolutionRow?.earlyRepol).toContain('stability alone does not exclude ACS');
+
+    for (const referenceId of ['acc-rv-mi-2024', 'esc-pericarditis-2025', 'jacc-early-repolarization-2015']) {
+      expect(CLINICAL_REFERENCES.some(reference => reference.id === referenceId), referenceId).toBe(true);
     }
   });
 
@@ -149,10 +181,13 @@ describe('educational data structure integrity', () => {
   });
 
   it('labels prominent T waves according to the selected disease scenario', () => {
-    const berTWave = getCycleLandmarks('V3', 'early_repolarization', 75).find(landmark => landmark.code === 'T');
+    const erpTWave = getCycleLandmarks('V3', 'early_repolarization', 75).find(landmark => landmark.code === 'T');
     const posteriorTWave = getCycleLandmarks('V2', 'posterior', 75).find(landmark => landmark.code === 'T');
     const acuteTWave = getCycleLandmarks('V3', 'anterior', 75).find(landmark => landmark.code === 'T');
-    expect(berTWave?.description).toContain('not an acute coronary occlusion marker');
+    expect(erpTWave?.description).toContain('neither diagnoses the pattern nor excludes acute coronary occlusion');
+    const erpJNotch = getEcgVoltage('V4', 0.3725, 'early_repolarization', 75);
+    const normalJNotch = getEcgVoltage('V4', 0.3725, 'normal', 75);
+    expect(erpJNotch - normalJNotch).toBeGreaterThan(0.2);
     expect(posteriorTWave?.description).toContain('anterior reciprocal lead');
     expect(acuteTWave?.description).toContain('complete ECG and clinical context');
   });

@@ -837,7 +837,11 @@ export default function LeadDetailModal({
               <p className={isBright ? 'text-slate-700' : 'text-slate-300'}>
                 {territory.primaryLeads.includes(lead) ? (
                   <span className="text-rose-600 dark:text-rose-400 font-bold flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> {territoryId === 'pericarditis' || territoryId === 'early_repolarization' ? 'PRIMARY ST-elevation mimic lead.' : 'PRIMARY territory lead (programmed ST elevation).'}
+                    <CheckCircle2 className="w-3.5 h-3.5" /> {territoryId === 'pericarditis'
+                      ? 'PRIMARY pericarditis-pattern lead.'
+                      : territoryId === 'early_repolarization'
+                      ? 'PRIMARY early-repolarization-pattern lead.'
+                      : 'PRIMARY territory lead (programmed ST elevation).'}
                   </span>
                 ) : territory.reciprocalLeads.includes(lead) ? (
                   <span className="text-cyan-600 dark:text-cyan-400 font-bold flex items-center gap-1">

@@ -56,7 +56,7 @@ $$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrig
 
 ### 5. Clinical Criteria, STEMI Mimics & Equivalents
 - **Guideline Diagnostic Thresholds**: 2025 ACC/AHA and 2023 ESC criteria by age and sex (including V2–V3 specific cutoffs).
-- **STEMI Mimics Comparison Table**: Distinguishes acute STEMI from Acute Pericarditis, Benign Early Repolarization (BER), LVH with strain, and Left Bundle Branch Block (LBBB).
+- **STEMI Mimics Comparison Table**: Distinguishes acute STEMI from Acute Pericarditis, Early Repolarization Pattern (ERP), LVH with strain, and Left Bundle Branch Block (LBBB).
 - **High-Risk Equivalents**: Wellens Syndrome (Type A and B), de Winter pattern, and Modified Sgarbossa criteria.
 
 ### 6. Clinical Scenarios & Knowledge Check Quiz
@@ -132,19 +132,28 @@ npm run preview
 2. **2023 ESC Guidelines for the Management of Acute Coronary Syndromes**  
    [European Heart Journal](https://academic.oup.com/eurheartj/article/44/38/3720/7243210)
 3. **Fifth Universal Definition of Myocardial Infarction (2026)**  
-   [European Society of Cardiology Pocket Guidelines](https://www.escardio.org/guidelines/clinical-practice-guidelines/pocket-guidelines/universal-definition-of-myocardial-infarction/)
-4. **Queensland Ambulance Service Clinical Practice Procedures: 12-Lead ECG Acquisition and Interpretation (June 2026)**
+   [European Society of Cardiology Pocket Guidelines](https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/universal-definition-myocardial-infarction/)
+4. **Right Ventricular Myocardial Infarction — A Tale of Two Ventricles: JACC Focus Seminar (2024)**
+   - [Journal of the American College of Cardiology](https://www.jacc.org/doi/10.1016/j.jacc.2023.09.839)
+5. **2025 ESC Guidelines for the Management of Myocarditis and Pericarditis**
+   - [European Heart Journal](https://academic.oup.com/eurheartj/article/46/40/3952/8234483)
+6. **The Early Repolarization Pattern: A Consensus Paper (2015)**
+   - [Journal of the American College of Cardiology](https://www.jacc.org/doi/10.1016/j.jacc.2015.05.033)
+7. **Queensland Ambulance Service Clinical Practice Procedures: 12-Lead ECG Acquisition and Interpretation (June 2026)**
    - [Queensland Ambulance Service CPP](https://www.ambulance.qld.gov.au/__data/assets/pdf_file/0033/475791/CPP_12-Lead-ECG-acquisition-and-interpretation.pdf)
 
 ---
 
 ## 📝 Update History & Changelog
 
-### [v7] [2026-11-06] — MI Localization Anatomy & Territory Mapping Review
+### [v7] [2026-11-06] — MI Localization Anatomy, Territory Mapping & Profile Review
 - **Wall orientation**: corrected posterior view right/left orientation labels and clarified the schematic projection limitations.
 - **Inferior MI view**: selected the posterior/diaphragmatic aspect automatically for Inferior STEMI.
 - **Coronary territory mapping**: refined lateral/high-lateral branch highlighting for LAD diagonal and LCx obtuse marginal branches, and separated PDA from RCA posterolateral branch highlighting in inferobasal/posterior MI.
-- **Regression coverage**: added checks for MI-to-SVG region mappings, orientation behavior, and culprit branch highlighting.
+- **Clinical profile copy**: revised descriptions, coronary anatomy notes, ECG features, reciprocal-lead wording, and clinical pearls across MI territories and STEMI mimics to distinguish common patterns from required findings.
+- **Mimic comparison**: updated the References table to describe reciprocal changes, pericarditis features, and early repolarization as supportive patterns rather than definitive rules.
+- **Reference coverage**: added clinical sources for RV infarction, acute pericarditis, and the early-repolarization pattern.
+- **Regression coverage**: added checks for MI-to-SVG region mappings, profile completeness, orientation behavior, and culprit branch highlighting.
 - **Version labels**: updated application badges, tooltips, footers, tests, and project documentation to v7.
 
 ### [v6.9] [2026-11-06] — Posterior Heart View Clarification & Release Update
@@ -181,7 +190,7 @@ npm run preview
 
 ### [v6.2] [2026-11-04] — ECG Waveform Model & Magnified Analysis Corrections
 - **Waveform timing**: corrected the synthetic P-wave duration to 110 ms and aligned the PR-segment landmark with the modeled interval.
-- **Mimic visualization**: distinguished pericarditis and benign early repolarization from ischemic ST elevation with a separate trace state in both live and magnified views.
+- **Mimic visualization**: distinguished pericarditis and early-repolarization waveform patterns from ischemic ST elevation in the live and magnified views.
 - **Scenario coverage**: regression checks exercise all 17 leads across all 12 configured baseline, infarct-territory and STEMI-mimic scenarios.
 - **Sweep phase continuity**: standard, rhythm and supplemental traces now wrap only after a whole number of 0.8 s reference cycles; any residual canvas width remains isoelectric. The Lead II strip starts after its 20 mm calibration lead-in and uses the available canvas width for complete cycles.
 - **Canvas clipping**: centered the shared isoelectric baseline and constrained the common gain to preserve vertical headroom for tall positive and deep negative complexes across the lead set.
@@ -252,8 +261,8 @@ npm run preview
   - Dynamic Anti-Clipping Headroom: enhanced canvas height to `h-44 sm:h-48` ($176\text{ px}$ mobile, $192\text{ px}$ desktop) and dynamically computed baseline rows to guarantee $\ge 1.6\text{ mV}$ downward headroom (preventing clipping on deep $-1.45\text{ mV}$ S waves in V1–V2) and $\ge 1.8\text{ mV}$ upward headroom (preventing clipping on tall R waves + STEMI ST elevation).
 - **Magnified Waveform Analysis Precision & STEMI Mimics Clinical Evaluator**:
   - In `src/components/LeadDetailModal.tsx`, upgraded `getClinicalThresholdEvaluation` to accurately evaluate STEMI Mimics:
-    - Acute Pericarditis: Correctly identifies widespread concave "saddleback" ST elevation with PR segment depression, and recognizes reciprocal ST depression with PR segment elevation in lead aVR as diagnostic confirmation.
-    - Benign Early Repolarization (BER): Accurately identifies concave ST elevation with characteristic terminal QRS J-point notch ("fishhook" slur) and absence of reciprocal ST depression as a normal physiological variant rather than acute STEMI.
+    - Acute Pericarditis: Correctly identifies widespread concave "saddleback" ST elevation with PR segment depression, and shows PR-segment changes as supportive clues that require clinical correlation, not as diagnostic confirmation by themselves.
+    - Early Repolarization Pattern (ERP): The model displays terminal QRS J-point notching/slurring; ST elevation and reciprocal-lead patterns vary. Do not use this morphology alone to label an ECG benign or exclude ACS.
     - Normal Baseline: Confirms normal isoelectric baseline ($< 0.5\text{ mm}$ physiological variation relative to PR segment).
   - Normal Comparison Hygiene: Hidden redundant "Compare Normal" button and disabled duplicate baseline overlay when the active selected pattern is already Normal Baseline.
   - Added `onPointerDown` alongside `onClick` on SVG coordinate system for immediate touch caliper response on mobile and iPad viewports.
@@ -422,7 +431,7 @@ npm run preview
 - **Accurate & Clinically Calibrated ECG Tracings**:
   - Overhauled the mathematical electrophysiological cardiac cycle synthesizer in `src/utils/ecgGenerator.ts`.
   - **Normal Baseline**: Strict $0\text{ mV}$ isoelectric PR and TP segments, crisp QRS deflections, and physiological asymmetric T-wave transitions.
-  - **Acute ST Elevation (STEMI & Mimics)**: S-wave terminates directly at the elevated J-point with a smooth coved "tombstone" dome merging into the T wave; concave "saddleback" ST elevation with PR depression for acute pericarditis; J-point slurring for benign early repolarization.
+  - **Acute ST Elevation (STEMI & Mimics)**: S-wave terminates directly at the elevated J-point with a smooth coved "tombstone" dome merging into the T wave; concave "saddleback" ST elevation with PR depression for acute pericarditis; J-point notching/slurring for an early-repolarization pattern; interpret in clinical context.
   - **ST Depression & Reciprocal Changes**: Clean horizontal ischemic shelf and downsloping ST depression starting strictly at the depressed J-point; tall R waves ($R/S > 1$) and upright prominent T waves for reciprocal posterior STEMI patterns.
 - **Synchronized Real-Time Sweeping Beam**:
   - Fixed the static waveform issue during playback in `src/components/ECGWaveformMonitor.tsx`.

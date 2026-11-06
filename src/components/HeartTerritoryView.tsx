@@ -630,7 +630,7 @@ export default function HeartTerritoryView({
           {currentTerritory.primaryLeads.length > 0 && (
             <div className={`border rounded-lg p-2.5 ${isBright ? 'bg-white border-slate-200' : 'bg-slate-900/90 border-slate-800'}`}>
               <span className={`font-semibold uppercase tracking-wide text-[11px] block mb-1 ${theme.accentText}`}>
-                Primary Contiguous ECG Leads:
+                Typical ECG Leads:
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {currentTerritory.primaryLeads.map(lead => (
@@ -653,7 +653,7 @@ export default function HeartTerritoryView({
           {currentTerritory.reciprocalLeads.length > 0 && (
             <div className={`border rounded-lg p-2.5 ${isBright ? 'bg-white border-slate-200' : 'bg-slate-900/90 border-slate-800'}`}>
               <span className="font-semibold text-cyan-600 dark:text-cyan-400 uppercase tracking-wide text-[11px] block mb-1">
-                Reciprocal Mirror ECG Leads:
+                Possible Reciprocal Leads:
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {currentTerritory.reciprocalLeads.map(lead => (
@@ -675,7 +675,7 @@ export default function HeartTerritoryView({
           {/* Culprit Artery & Dominance Notes */}
           <div>
             <span className="font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide text-[11px] block mb-0.5">
-              Culprit Vessel & Anatomy:
+              Likely Vessel / Underlying Mechanism:
             </span>
             <p className={`font-semibold ${isBright ? 'text-slate-900' : 'text-slate-200'}`}>
               {currentTerritory.culpritArtery}
@@ -690,7 +690,7 @@ export default function HeartTerritoryView({
             isBright ? 'bg-white border-slate-200 text-slate-800' : 'bg-slate-900/60 border-slate-800 text-slate-200'
           }`}>
             <span className="font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide text-[11px] block mb-1">
-              Hallmark ECG Abnormalities:
+              Common ECG Features:
             </span>
             <p className={`text-xs ${theme.subtextColor}`}>
               <strong className={isBright ? 'text-slate-900' : 'text-slate-200'}>ST Segment:</strong> {currentTerritory.expectedECG.stSegment}
@@ -739,7 +739,7 @@ export default function HeartTerritoryView({
         }`}>
           <ShieldAlert className="w-3.5 h-3.5 text-slate-400 flex-shrink-0 mt-0.5" />
           <span>
-            Clinical Note: ECG lead territories represent typical electrical projections. Biological variation in coronary dominance and collateral channels means findings are supportive, not an absolute one-to-one anatomical map.
+            Clinical Note: Lead territories are approximate electrical projections, not fixed anatomical borders. Coronary dominance, branch anatomy, and collateral flow vary; ECG patterns support localization but do not identify the culprit vessel or infarct size on their own.
           </span>
         </div>
       </div>

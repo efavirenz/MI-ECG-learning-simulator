@@ -60,6 +60,20 @@ describe('lead detail dialog accessibility', () => {
     vi.unstubAllGlobals();
   });
 
+  it('labels pericarditis leads as a pericarditis pattern rather than an infarct ST-elevation lead', () => {
+    render(
+      <LeadDetailModal lead="II" territoryId="pericarditis" paperMode="dark" onClose={() => undefined} />
+    );
+    expect(screen.getByText('PRIMARY pericarditis-pattern lead.')).toBeInTheDocument();
+  });
+
+  it('labels early-repolarization leads without implying ST elevation is required', () => {
+    render(
+      <LeadDetailModal lead="V4" territoryId="early_repolarization" paperMode="dark" onClose={() => undefined} />
+    );
+    expect(screen.getByText('PRIMARY early-repolarization-pattern lead.')).toBeInTheDocument();
+  });
+
   it('disables caliper feedback for pericarditis until a validated reference method is approved', () => {
     render(
       <LeadDetailModal lead="II" territoryId="pericarditis" paperMode="dark" onClose={() => undefined} />
