@@ -42,8 +42,8 @@ describe('navigation drawer accessibility', () => {
     expect(dialog).toBeInTheDocument();
 
     expect(closeButton).toHaveFocus();
-    expect(screen.getAllByText('v6.9')).toHaveLength(2);
-    expect(screen.getByText('Release v6.9')).toBeInTheDocument();
+    expect(screen.getAllByText('v7')).toHaveLength(2);
+    expect(screen.getByText('Release v7')).toBeInTheDocument();
 
     await user.keyboard('{Shift>}{Tab}{/Shift}');
     expect(dialog.contains(document.activeElement)).toBe(true);

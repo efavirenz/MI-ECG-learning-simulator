@@ -14,12 +14,12 @@ export default function HeartTerritoryView({
 }: HeartTerritoryViewProps) {
   const { theme, isBright } = useTheme();
   const [viewOrientation, setViewOrientation] = useState<'anterior' | 'posterior'>(
-    selectedTerritoryId === 'posterior' ? 'posterior' : 'anterior'
+    selectedTerritoryId === 'posterior' || selectedTerritoryId === 'inferior' ? 'posterior' : 'anterior'
   );
 
-  // Automatically switch to posterior orientation when Posterior STEMI is selected
+  // Automatically show the posterior/diaphragmatic aspect for posterior and inferior MI
   useEffect(() => {
-    setViewOrientation(selectedTerritoryId === 'posterior' ? 'posterior' : 'anterior');
+    setViewOrientation(selectedTerritoryId === 'posterior' || selectedTerritoryId === 'inferior' ? 'posterior' : 'anterior');
   }, [selectedTerritoryId]);
 
   const currentTerritory: MITerritory = MI_TERRITORIES[selectedTerritoryId] || MI_TERRITORIES['normal'];
@@ -75,7 +75,7 @@ export default function HeartTerritoryView({
                   : isBright ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              Posterior Heart View
+              Posterior / Inferior Heart View
             </button>
           </div>
 
@@ -341,7 +341,7 @@ export default function HeartTerritoryView({
                   filter={isHighlighted('artery-lad') ? 'url(#heartGlow)' : undefined}
                 />
                 {/* LAD Diagonal Branches (D1, D2) */}
-                <path d="M 220 175 L 256 210" fill="none" stroke={isHighlighted('artery-lad') ? '#fef08a' : '#ef4444'} strokeWidth="2.4" strokeLinecap="round" />
+                <path id="artery-lad-diagonal" d="M 220 175 L 256 210" fill="none" stroke={isHighlighted('artery-lad-diagonal') || isHighlighted('artery-lad') ? '#fef08a' : '#ef4444'} strokeWidth="2.4" strokeLinecap="round" />
                 <text x="262" y="200" fill="#fca5a5" fontSize="7" fontWeight="bold">D1 Branch</text>
                 <path d="M 210 240 L 246 270" fill="none" stroke={isHighlighted('artery-lad') ? '#fef08a' : '#ef4444'} strokeWidth="2.2" strokeLinecap="round" />
                 <text x="252" y="266" fill="#fca5a5" fontSize="7" fontWeight="bold">D2 Branch</text>
@@ -361,7 +361,7 @@ export default function HeartTerritoryView({
                   filter={isHighlighted('artery-lcx') ? 'url(#heartGlow)' : undefined}
                 />
                 {/* Obtuse Marginal Branches (OM1, OM2) */}
-                <path d="M 270 155 L 292 200" fill="none" stroke={isHighlighted('artery-lcx') ? '#fef08a' : '#ef4444'} strokeWidth="2.4" strokeLinecap="round" />
+                <path id="artery-lcx-om" d="M 270 155 L 292 200" fill="none" stroke={isHighlighted('artery-lcx-om') || isHighlighted('artery-lcx') ? '#fef08a' : '#ef4444'} strokeWidth="2.4" strokeLinecap="round" />
                 <text x="312" y="165" fill="#fbbf24" fontSize="8" fontWeight="bold">LCx (OM)</text>
 
                 {/* Cardiac Apex Landmark */}
@@ -372,12 +372,11 @@ export default function HeartTerritoryView({
               /* POSTERIOR / INFERIOR VIEW (DIAPHRAGMATIC & BASE) */
               <g>
                 {/* ─── Posterior View Anatomical Key ─────────────────────
-                    Orientation: as if looking at the back of the heart
-                    (patient's right = viewer's right; patient's left = viewer's left).
-                    Top:   base of heart (LA, atria, great veins).
-                    Bottom: cardiac apex.
-                    Left side of image = patient's right (RA / RCA).
-                    Right side of image = patient's left.
+                    Orientation: posterior aspect in attitudinally correct position.
+                    Patient's right is on the viewer's right; patient's left is on the viewer's left.
+                    Left side of image: left pulmonary veins and LCx.
+                    Right side of image: right atrium, IVC, right pulmonary veins, and RCA.
+                    Top: atrial base; bottom: ventricular apex.
                 ─────────────────────────────────────────────────────── */}
 
                 {/* 1. Left Atrium — posterior wall, occupying most of the base */}
@@ -390,7 +389,7 @@ export default function HeartTerritoryView({
                 />
                 <text x="200" y="110" fill="#e9d5ff" fontSize="8.5" fontWeight="bold" textAnchor="middle">Left Atrium (Posterior Wall)</text>
 
-                {/* 2. Right Atrium — visible on the right side of the base (patient's right = viewer's left) */}
+                {/* 2. Right Atrium — visible on the right side of the base (patient's right = viewer's right) */}
                 <path
                   d="M 270 95 C 285 80, 330 88, 338 120 C 340 138, 328 152, 310 155 L 270 152 C 280 135, 280 115, 270 95 Z"
                   fill="#4c1d95"
@@ -402,21 +401,20 @@ export default function HeartTerritoryView({
                 <text x="305" y="130" fill="#e9d5ff" fontSize="7" fontWeight="bold" textAnchor="middle">Atrium</text>
 
                 {/* 3. Pulmonary Veins (4 veins entering LA from lungs)
-                    In posterior view: Left PVs enter from the patient's left (viewer's right),
-                    Right PVs enter from the patient's right (viewer's left). */}
-                {/* Left Sup + Inf PVs (patient left = viewer right) */}
+                    In this diagram: left pulmonary veins enter from the viewer's left; right pulmonary veins enter from the viewer's right. */}
+                {/* Left Sup + Inf PVs (patient left = viewer left) */}
                 <ellipse cx="115" cy="95" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
                 <ellipse cx="110" cy="122" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
                 <text x="97" y="95" fill="#93c5fd" fontSize="6.5" textAnchor="end">L. Sup PV</text>
                 <text x="92" y="122" fill="#93c5fd" fontSize="6.5" textAnchor="end">L. Inf PV</text>
 
-                {/* Right Sup + Inf PVs (patient right = viewer left, approaching from left side) */}
+                {/* Right Sup + Inf PVs (patient right = viewer right, approaching from right side) */}
                 <ellipse cx="255" cy="78" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
                 <ellipse cx="260" cy="102" rx="9" ry="6" fill="#1e40af" stroke="#60a5fa" strokeWidth="1.5" />
                 <text x="268" y="78" fill="#93c5fd" fontSize="6.5">R. Sup PV</text>
                 <text x="273" y="102" fill="#93c5fd" fontSize="6.5">R. Inf PV</text>
 
-                {/* 4. Inferior Vena Cava (IVC) entering RA inferiorly — on patient's right = viewer's left */}
+                {/* 4. Inferior Vena Cava (IVC) entering RA inferiorly — on patient's right = viewer's right */}
                 <ellipse cx="318" cy="157" rx="11" ry="6" fill="#1e3a8a" stroke="#3b82f6" strokeWidth="1.5" />
                 <text x="338" y="160" fill="#93c5fd" fontSize="7" fontWeight="bold">IVC</text>
 
@@ -438,7 +436,7 @@ export default function HeartTerritoryView({
                   strokeWidth="1.2"
                   className="transition-all duration-300"
                 />
-                <text x="145" y="230" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">Posterior LV</text>
+                <text x="145" y="230" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">Inferobasal LV</text>
 
                 {/* 6b. Posterolateral LV free wall between posterobasal LV, diaphragmatic LV, and the RV border */}
                 <path
@@ -450,7 +448,7 @@ export default function HeartTerritoryView({
                   strokeWidth="1.2"
                   className="transition-all duration-300"
                 />
-                <text x="252" y="250" fill="#ffffff" fontSize="8" fontWeight="bold" textAnchor="middle">Posterior LV</text>
+                <text x="252" y="250" fill="#ffffff" fontSize="8" fontWeight="bold" textAnchor="middle">Posterolateral LV</text>
                 <text x="145" y="244" fill="#fed7aa" fontSize="8" fontWeight="bold" textAnchor="middle">(V7, V8, V9)</text>
 
                 {/* 7. Inferior / Diaphragmatic wall (II, III, aVF; PDA territory includes inferior LV and posterior third of septum) */}
@@ -514,6 +512,16 @@ export default function HeartTerritoryView({
                   strokeLinecap="round"
                   filter={isHighlighted('artery-rca') ? 'url(#heartGlow)' : undefined}
                 />
+                <path
+                  id="artery-rca-plb"
+                  d="M 308 264 C 298 278, 280 292, 260 306"
+                  fill="none"
+                  stroke={isHighlighted('artery-rca-plb') ? '#fbbf24' : '#ef4444'}
+                  strokeWidth={isHighlighted('artery-rca-plb') ? 4.5 : 2.8}
+                  strokeLinecap="round"
+                  filter={isHighlighted('artery-rca-plb') ? 'url(#heartGlow)' : undefined}
+                />
+                <text x="258" y="303" fill={isHighlighted('artery-rca-plb') ? '#fbbf24' : '#fca5a5'} fontSize="6.5" fontWeight="bold">RCA PLB</text>
                 <text x="340" y="200" fill="#fbbf24" fontSize="7.5" fontWeight="bold" textAnchor="start">RCA</text>
 
                 {/* 13. Posterolateral Branches (PLB) from LCx — patient's left = viewer's left */}
@@ -534,13 +542,14 @@ export default function HeartTerritoryView({
 
                 {/* 15. Orientation compass */}
                 <text x="14" y="165" fill={isBright ? "#475569" : "#94a3b8"} fontSize="6.5" fontWeight="bold">Patient</text>
-                <text x="14" y="174" fill={isBright ? "#475569" : "#94a3b8"} fontSize="6.5" fontWeight="bold">Right →</text>
-                <text x="355" y="165" fill={isBright ? "#475569" : "#94a3b8"} fontSize="6.5" fontWeight="bold" textAnchor="end">← Patient</text>
-                <text x="355" y="174" fill={isBright ? "#475569" : "#94a3b8"} fontSize="6.5" fontWeight="bold" textAnchor="end">Left</text>
+                <text x="14" y="174" fill={isBright ? "#475569" : "#94a3b8"} fontSize="6.5" fontWeight="bold">← Left</text>
+                <text x="355" y="165" fill={isBright ? "#475569" : "#94a3b8"} fontSize="6.5" fontWeight="bold" textAnchor="end">Patient</text>
+                <text x="355" y="174" fill={isBright ? "#475569" : "#94a3b8"} fontSize="6.5" fontWeight="bold" textAnchor="end">Right →</text>
               </g>
             )}
           </svg>
         </div>
+        <p className="mt-2 w-full text-center text-[10px] leading-relaxed text-slate-400">Schematic territory projection — wall boundaries overlap and vary; the septum is internal and shown by projection, not as an exposed surface.</p>
 
         {/* Territory Selector Buttons */}
         <div className="w-full mt-3 flex flex-wrap gap-1.5 justify-center">
@@ -553,8 +562,8 @@ export default function HeartTerritoryView({
                 aria-pressed={isSelected}
                 onClick={() => {
                   onSelectTerritory(key);
-                  // Auto-orient: Posterior STEMI → posterior view; all others → anterior
-                  if (key === 'posterior') {
+                  // Auto-orient posterior and inferior MI to the posterior/diaphragmatic aspect.
+                  if (key === 'posterior' || key === 'inferior') {
                     setViewOrientation('posterior');
                   } else {
                     setViewOrientation('anterior');

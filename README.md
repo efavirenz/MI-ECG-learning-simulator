@@ -72,7 +72,7 @@ $$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrig
 
 ## Release Identifier Convention
 
-The visible simulator release (for example, v6.9) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
+The visible simulator release (for example, v7) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
 
 ## 🛠️ Technology Stack
 
@@ -139,6 +139,13 @@ npm run preview
 ---
 
 ## 📝 Update History & Changelog
+
+### [v7] [2026-11-06] — MI Localization Anatomy & Territory Mapping Review
+- **Wall orientation**: corrected posterior view right/left orientation labels and clarified the schematic projection limitations.
+- **Inferior MI view**: selected the posterior/diaphragmatic aspect automatically for Inferior STEMI.
+- **Coronary territory mapping**: refined lateral/high-lateral branch highlighting for LAD diagonal and LCx obtuse marginal branches, and separated PDA from RCA posterolateral branch highlighting in inferobasal/posterior MI.
+- **Regression coverage**: added checks for MI-to-SVG region mappings, orientation behavior, and culprit branch highlighting.
+- **Version labels**: updated application badges, tooltips, footers, tests, and project documentation to v7.
 
 ### [v6.9] [2026-11-06] — Posterior Heart View Clarification & Release Update
 - **Posterior LV boundaries**: removed the thick white highlight strokes that visually split the Posterior LV into separate anatomical structures.

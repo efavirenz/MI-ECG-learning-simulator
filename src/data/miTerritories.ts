@@ -192,7 +192,7 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
     primaryLeads: ['I', 'aVL', 'V5', 'V6'],
     reciprocalLeads: ['II', 'III', 'aVF'],
     culpritArtery: 'Left Circumflex (LCx) or Diagonal branch of LAD',
-    coronaryAnatomyNotes: 'LCx courses in the left atrioventricular groove to supply lateral LV wall via obtuse marginal (OM) branches.',
+    coronaryAnatomyNotes: 'LCx courses in the left atrioventricular groove and supplies the lateral LV via obtuse marginal (OM) branches; a sizable LAD diagonal branch can also supply the anterolateral/lateral territory.',
     expectedECG: {
       stSegment: 'ST-segment elevation >= 1.0 mm in lateral leads I, aVL, V5, V6.',
       tWave: 'T-wave elevation/hyperacute changes early, followed by symmetric inversion.',
@@ -204,8 +204,8 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
       'Check for posterior involvement (LCx often supplies posterobasal myocardium).'
     ],
     heartRegionCoords: {
-      anteriorHighlightSvgId: ['region-lateral', 'artery-lcx'],
-      posteriorHighlightSvgId: ['artery-lcx-post']
+      anteriorHighlightSvgId: ['region-lateral', 'artery-lcx', 'artery-lad-diagonal'],
+      posteriorHighlightSvgId: ['region-lv-post', 'artery-lcx-post', 'artery-rca-plb']
     },
     waveformDeltas: {
       'I': { stElevationMm: 2.2, stSlope: 'convex' },
@@ -237,7 +237,7 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
       '"South African Flag sign": high lateral STEMI characterized by elevation in I, aVL, V2 with depression in III and aVF.'
     ],
     heartRegionCoords: {
-      anteriorHighlightSvgId: ['region-high-lateral', 'artery-lcx']
+      anteriorHighlightSvgId: ['region-high-lateral', 'artery-lad-diagonal', 'artery-lcx-om']
     },
     waveformDeltas: {
       'I': { stElevationMm: 1.8, stSlope: 'convex' },
@@ -287,11 +287,11 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
   posterior: {
     id: 'posterior',
     name: 'Posterior STEMI',
-    shortDescription: 'Infarction of the posterior / posterobasal wall of the left ventricle.',
+    shortDescription: 'Infarction of the inferobasal (traditionally termed posterior) left ventricular territory, sometimes extending into the posterolateral wall.',
     primaryLeads: ['V7', 'V8', 'V9'], // Supplemental
     reciprocalLeads: ['V1', 'V2', 'V3'], // Standard anterior leads show mirror image
     culpritArtery: 'Left Circumflex (LCx) or Right Coronary Artery (RCA — Posterolateral branches)',
-    coronaryAnatomyNotes: 'Supplied by distal branches of LCx or dominant RCA. Because standard 12-lead electrodes face anteriorly, standard leads record the electrical event from the opposite side ("through the heart").',
+    coronaryAnatomyNotes: 'Usually supplied by distal LCx or posterolateral branches of a dominant RCA; the exact territory varies with coronary dominance. The PDA more typically supplies the inferior LV and inferior interventricular septum. Because standard 12-lead electrodes face anteriorly, V1–V3 may show reciprocal changes; V7–V9 provide a direct posterior/inferobasal view.',
     expectedECG: {
       stSegment: 'Standard leads V1–V3 may show horizontal ST-segment depression (mirror-image clue). Obtain posterior leads when LCx occlusion is suspected, particularly with isolated anterior ST depression; use a source-specific lead combination and threshold rather than a single-lead rule.',
       tWave: 'Standard leads V1–V3 show tall, upright, prominent T waves (mirror image of T inversion).',
@@ -308,7 +308,7 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
       'Isolated posterior STEMI represents 3-11% of all infarcts and is frequently missed.'
     ],
     heartRegionCoords: {
-      posteriorHighlightSvgId: ['region-posterior', 'region-lv-post', 'artery-lcx-post', 'artery-rca-pda']
+      posteriorHighlightSvgId: ['region-posterior', 'region-lv-post', 'artery-lcx-post', 'artery-rca-plb']
     },
     waveformDeltas: {
       'V1': { stElevationMm: -2.2, stSlope: 'horizontal', tallRWave: true, rAmplitudeMultiplier: 4.5, tWaveAmplitudeMm: 5 },

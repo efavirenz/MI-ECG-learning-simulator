@@ -1,6 +1,6 @@
-# AGENTS.md — Development & Clinical Guidelines for AI Agents (Release v6.9)
+# AGENTS.md — Development & Clinical Guidelines for AI Agents (Release v7)
 
-This document defines the architecture, project conventions, and clinical accuracy standards for AI agents contributing to the **Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator (v6.9)**.
+This document defines the architecture, project conventions, and clinical accuracy standards for AI agents contributing to the **Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator (v7)**.
 
 ---
 
@@ -11,7 +11,7 @@ This document defines the architecture, project conventions, and clinical accura
 - **Audience**: Registered Nurses, Paramedics/EMTs, Emergency and Critical Care staff, and Medical Trainees.
 - **Language**: English throughout all user-facing strings, labels, ECG annotations, and references.
 - **Patient Population**: Adult cardiology only.
-- **Release identifiers**: the visible simulator release label (v6.9 and future v6.x releases) is maintained separately from the private npm package metadata version (`1.0.0`); do not automatically synchronize them.
+- **Release identifiers**: the visible simulator release label (v7 and future v7.x releases) is maintained separately from the private npm package metadata version (`1.0.0`); do not automatically synchronize them.
 
 ---
 
@@ -141,7 +141,7 @@ git status
 Ensure build exits with code 0 and no console warnings.
 
 ---
-*Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator • Release v6.9*
+*Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator • Release v7*
 
 **Clinical review gate:** High-severity findings remain release blockers until a qualified clinical/model owner approves the source-specific medication wording, multi-lead criteria, posterior MI framework, Q-wave criterion/model semantics, and PR/J-point reference policy. Numeric V3R/V4R claims, Wellens/aVL statistics, and De Winter source details remain omitted until primary-source provenance and reviewer approval are recorded. LVH/LBBB is displayed as an interpretation limitation only; no modified threshold is implemented.
 
