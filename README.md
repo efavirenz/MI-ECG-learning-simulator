@@ -72,7 +72,7 @@ $$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrig
 
 ## Release Identifier Convention
 
-The visible simulator release (for example, v6.8) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
+The visible simulator release (for example, v6.9) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
 
 ## 🛠️ Technology Stack
 
@@ -139,6 +139,12 @@ npm run preview
 ---
 
 ## 📝 Update History & Changelog
+
+### [v6.9] [2026-11-06] — Posterior Heart View Clarification & Release Update
+- **Posterior LV boundaries**: removed the thick white highlight strokes that visually split the Posterior LV into separate anatomical structures.
+- **PDA annotation**: clarified the PDA label to identify its inferior wall and septal supply, avoiding the implication that it is the primary supply to the posterolateral LV free wall.
+- **Clinical comments**: clarified the relationship between the PDA, inferior LV wall, and posterior third of the interventricular septum.
+- **Version labels**: updated application badges, tooltips, footer references, tests, and project documentation to v6.9.
 
 ### [v6.8] [2026-11-06] — Posterior LV Territory Coverage & Release Update
 - **Posterior anatomy coverage**: added a separately highlighted posterolateral LV free-wall region (region-lv-post) to close the previously unassigned posterior myocardial area and included it in Posterior STEMI highlighting.

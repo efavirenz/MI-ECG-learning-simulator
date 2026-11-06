@@ -434,8 +434,8 @@ export default function HeartTerritoryView({
                   d="M 118 148 C 86 188, 86 258, 116 316 L 195 352 L 195 152 Z"
                   fill={isHighlighted('region-posterior') ? '#f97316' : '#4a044e'}
                   opacity={isHighlighted('region-posterior') ? 0.95 : 0.65}
-                  stroke={isHighlighted('region-posterior') ? '#ffffff' : '#701a75'}
-                  strokeWidth={isHighlighted('region-posterior') ? 3.5 : 1.2}
+                  stroke="#701a75"
+                  strokeWidth="1.2"
                   className="transition-all duration-300"
                 />
                 <text x="145" y="230" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">Posterior LV</text>
@@ -446,14 +446,14 @@ export default function HeartTerritoryView({
                   d="M 195 152 L 288 152 C 296 190, 300 245, 308 305 C 286 326, 260 344, 236 344 L 195 352 Z"
                   fill={isHighlighted('region-lv-post') ? '#f97316' : '#500724'}
                   opacity={isHighlighted('region-lv-post') ? 0.95 : 0.65}
-                  stroke={isHighlighted('region-lv-post') ? '#ffffff' : '#701a75'}
-                  strokeWidth={isHighlighted('region-lv-post') ? 3.5 : 1.2}
+                  stroke="#701a75"
+                  strokeWidth="1.2"
                   className="transition-all duration-300"
                 />
                 <text x="252" y="250" fill="#ffffff" fontSize="8" fontWeight="bold" textAnchor="middle">Posterior LV</text>
                 <text x="145" y="244" fill="#fed7aa" fontSize="8" fontWeight="bold" textAnchor="middle">(V7, V8, V9)</text>
 
-                {/* 7. Inferior / Diaphragmatic wall (II, III, aVF; RCA/PDA territory — straddles the septum at the bottom) */}
+                {/* 7. Inferior / Diaphragmatic wall (II, III, aVF; PDA territory includes inferior LV and posterior third of septum) */}
                 <path
                   id="region-inferior-post"
                   d="M 116 316 C 135 350, 178 378, 220 382 C 264 380, 300 345, 322 300 C 296 321, 268 338, 236 344 C 190 350, 148 336, 116 316 Z"
@@ -492,7 +492,7 @@ export default function HeartTerritoryView({
                 {/* 10. Posterior interventricular sulcus fat pad */}
                 <path d="M 195 152 L 195 360" fill="none" stroke="url(#fatPadGrad)" strokeWidth="6" opacity="0.35" />
 
-                {/* 11. Posterior Descending Artery (PDA) in posterior IV sulcus */}
+                {/* 11. Posterior Descending Artery (PDA) in posterior IV sulcus; supplies inferior wall and posterior third of IV septum */}
                 <path
                   id="artery-rca-pda"
                   d="M 195 148 L 195 360"
@@ -502,7 +502,7 @@ export default function HeartTerritoryView({
                   strokeLinecap="round"
                   filter={isHighlighted('artery-rca-pda') ? 'url(#heartGlow)' : undefined}
                 />
-                <text x="202" y="280" fill="#fbbf24" fontSize="7.5" fontWeight="bold">PDA (RCA ~85% / LCx ~15%)</text>
+                <text x="205" y="294" fill="#fbbf24" fontSize="7" fontWeight="bold" textAnchor="middle">PDA: inferior wall / septum</text>
 
                 {/* 12. RCA running in right AV groove (patient right = viewer right, superior to inferior along right border) */}
                 <path
