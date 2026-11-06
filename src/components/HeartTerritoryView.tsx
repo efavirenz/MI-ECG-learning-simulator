@@ -439,6 +439,18 @@ export default function HeartTerritoryView({
                   className="transition-all duration-300"
                 />
                 <text x="145" y="230" fill="#ffffff" fontSize="9" fontWeight="bold" textAnchor="middle">Posterior LV</text>
+
+                {/* 6b. Posterolateral LV free wall between posterobasal LV, diaphragmatic LV, and the RV border */}
+                <path
+                  id="region-lv-post"
+                  d="M 195 152 L 288 152 C 296 190, 300 245, 308 305 C 286 326, 260 344, 236 344 L 195 352 Z"
+                  fill={isHighlighted('region-lv-post') ? '#f97316' : '#500724'}
+                  opacity={isHighlighted('region-lv-post') ? 0.95 : 0.65}
+                  stroke={isHighlighted('region-lv-post') ? '#ffffff' : '#701a75'}
+                  strokeWidth={isHighlighted('region-lv-post') ? 3.5 : 1.2}
+                  className="transition-all duration-300"
+                />
+                <text x="252" y="250" fill="#ffffff" fontSize="8" fontWeight="bold" textAnchor="middle">Posterior LV</text>
                 <text x="145" y="244" fill="#fed7aa" fontSize="8" fontWeight="bold" textAnchor="middle">(V7, V8, V9)</text>
 
                 {/* 7. Inferior / Diaphragmatic wall (II, III, aVF; RCA/PDA territory — straddles the septum at the bottom) */}

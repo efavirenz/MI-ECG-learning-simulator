@@ -146,10 +146,10 @@ export default function Navbar({
             </div>
           </div>
 
-          {/* Top Right: Version Number (v6.7 in rounded rectangle) */}
+          {/* Top Right: Version Number (v6.8 in rounded rectangle) */}
           <div className="flex items-center gap-2">
             <span
-              title="Simulator Version 6.7"
+              title="Simulator Version 6.8"
               className={`px-2.5 py-1 rounded-lg border font-mono font-bold text-xs tracking-wider shadow-sm flex items-center gap-1.5 transition-colors ${
                 isBright
                   ? `${currentTheme.badgeBg} ${currentTheme.badgeBorder} ${currentTheme.badgeText}`
@@ -157,7 +157,7 @@ export default function Navbar({
               }`}
             >
               <span className={`w-1.5 h-1.5 rounded-full ${isBright ? 'bg-current' : 'bg-current'} animate-ping`} />
-              v6.7
+              v6.8
             </span>
           </div>
         </div>
@@ -281,7 +281,7 @@ export default function Navbar({
                       ? `${currentTheme.badgeBg} ${currentTheme.badgeBorder} ${currentTheme.badgeText} border`
                       : `bg-slate-800 ${currentTheme.accentText} border border-slate-700`
                   }`}>
-                    v6.7
+                    v6.8
                   </span>
                   <button
                     ref={closeButtonRef}
@@ -418,7 +418,7 @@ export default function Navbar({
             {/* Drawer Footer */}
             <div className="pt-3 border-t border-slate-700/50 text-[11px] text-slate-400 flex items-center justify-between">
               <span>ACC/AHA 2025 • ESC 2023</span>
-              <span className={`font-mono font-bold ${currentTheme.accentText}`}>Release v6.7</span>
+              <span className={`font-mono font-bold ${currentTheme.accentText}`}>Release v6.8</span>
             </div>
           </div>
         </div>

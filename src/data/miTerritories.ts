@@ -308,7 +308,7 @@ export const MI_TERRITORIES: Record<string, MITerritory> = {
       'Isolated posterior STEMI represents 3-11% of all infarcts and is frequently missed.'
     ],
     heartRegionCoords: {
-      posteriorHighlightSvgId: ['region-posterior', 'artery-lcx-post', 'artery-rca-pda']
+      posteriorHighlightSvgId: ['region-posterior', 'region-lv-post', 'artery-lcx-post', 'artery-rca-pda']
     },
     waveformDeltas: {
       'V1': { stElevationMm: -2.2, stSlope: 'horizontal', tallRWave: true, rAmplitudeMultiplier: 4.5, tWaveAmplitudeMm: 5 },

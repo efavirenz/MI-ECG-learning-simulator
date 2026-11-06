@@ -158,7 +158,7 @@ export default function App() {
         }`}>
           <div className="max-w-7xl mx-auto px-4 space-y-2">
             <p className={`font-semibold ${currentTheme.accentText}`}>
-              Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator • Release v6.7
+              Interactive 12-Lead ECG & Myocardial Infarction Learning Simulator • Release v6.8
             </p>
             <p className={`text-[11px] max-w-xl mx-auto ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
               Developed in accordance with the 2025 ACC/AHA ACS Guidelines, 2023 ESC ACS Guidelines, and Queensland Ambulance Service June 2026 Clinical Practice Procedures. Educational model only.

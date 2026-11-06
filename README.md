@@ -72,7 +72,7 @@ $$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrig
 
 ## Release Identifier Convention
 
-The visible simulator release (for example, v6.7) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
+The visible simulator release (for example, v6.8) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
 
 ## 🛠️ Technology Stack
 
@@ -139,6 +139,11 @@ npm run preview
 ---
 
 ## 📝 Update History & Changelog
+
+### [v6.8] [2026-11-06] — Posterior LV Territory Coverage & Release Update
+- **Posterior anatomy coverage**: added a separately highlighted posterolateral LV free-wall region (region-lv-post) to close the previously unassigned posterior myocardial area and included it in Posterior STEMI highlighting.
+- **Regression coverage**: added a test confirming the newly mapped LV region highlights with Posterior STEMI without highlighting the Inferior Wall or RV regions.
+- **Version labels**: updated the application version badge, tooltip, and footer references to v6.8 across the navigation bar, application footer, and project documentation.
 
 ### [v6.7] [2026-11-06] — Normal ECG Default State
 - **Default territory**: changed the shared MI Localization and Waveform Simulator selection from Inferior STEMI to Normal ECG (Sinus Baseline). Users can still select any infarct territory manually.

@@ -20,6 +20,15 @@ describe('heart territory orientation', () => {
     expect(posteriorButton).toHaveAttribute('aria-pressed', 'false');
   });
 
+  it('highlights the posterior LV free-wall region as part of Posterior STEMI', () => {
+    render(<HeartTerritoryView selectedTerritoryId="posterior" onSelectTerritory={vi.fn()} />);
+
+    expect(document.querySelector('#region-posterior')).toHaveAttribute('fill', '#f97316');
+    expect(document.querySelector('#region-lv-post')).toHaveAttribute('fill', '#f97316');
+    expect(document.querySelector('#region-inferior-post')).toHaveAttribute('fill', '#312e81');
+    expect(document.querySelector('#region-rv-post')).toHaveAttribute('fill', '#641e2e');
+  });
+
   it('highlights the right ventricular territory, not the inferior wall, in posterior view', () => {
     render(<HeartTerritoryView selectedTerritoryId="right_ventricular" onSelectTerritory={vi.fn()} />);
 
