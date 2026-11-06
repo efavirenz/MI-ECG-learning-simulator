@@ -72,7 +72,7 @@ $$\text{Anatomical Location} \longrightarrow \text{Electrode Placement} \longrig
 
 ## Release Identifier Convention
 
-The visible simulator release (for example, v6.6) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
+The visible simulator release (for example, v6.7) is maintained separately from `package.json` version `1.0.0`. The npm package is private; its metadata version is not injected into the application UI. Keep these identifiers separate unless a package publication and semantic-versioning policy is adopted.
 
 ## 🛠️ Technology Stack
 
@@ -139,6 +139,10 @@ npm run preview
 ---
 
 ## 📝 Update History & Changelog
+
+### [v6.7] [2026-11-06] — Normal ECG Default State
+- **Default territory**: changed the shared MI Localization and Waveform Simulator selection from Inferior STEMI to Normal ECG (Sinus Baseline). Users can still select any infarct territory manually.
+- **Version labels**: updated application badges, tooltips, and footer references to v6.7 across the navigation bar, application footer, and project documentation.
 
 ### [v6.6] [2026-11-05] — Posterior RV Localization & Release Update
 - **Posterior RV territory**: corrected the posterior-view highlight mapping so Right Ventricular (RV) infarction highlights its own posterior RV region and the RCA, rather than the Inferior Wall and PDA.
